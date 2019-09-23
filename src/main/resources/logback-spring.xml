@@ -33,12 +33,12 @@
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
         </encoder>
     </appender>
-    
-	<logger name="org.springframework.web" level="INFO" />
+
+    <logger name="org.springframework.web" level="INFO" />
 	
 	<!-- 开发环境 -->
 	<springProfile name="dev">
-		<logger name="com.win" level="INFO">
+		<logger name="com.win" level="DEBUG">
 			<appender-ref ref="LOGCONSOLE" />
 		</logger>
 		<root level="INFO">
