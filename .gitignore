@@ -1,5 +1,5 @@
 
-data/
+*.db
 # Compiled class file
 *.class
 

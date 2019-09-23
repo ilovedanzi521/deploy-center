@@ -1,7 +1,7 @@
 package com.win.dfas.deploy.modules.sys.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.win.dfas.deploy.modules.sys.entity.User;
+import com.win.dfas.deploy.modules.sys.entity.SysUser;
 
 /**
  * @包名 com.win.dfas.deploy.modules.sys.service
@@ -10,6 +10,6 @@ import com.win.dfas.deploy.modules.sys.entity.User;
  * @创建人 heshansen
  * @创建时间 2019/09/23 10:25
  */
-public interface UserService extends IService<User> {
+public interface UserService extends IService<SysUser> {
 
 }

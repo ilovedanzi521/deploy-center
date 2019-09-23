@@ -1,6 +1,8 @@
 package com.win.dfas.deploy.config;
 
+import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -13,5 +15,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @MapperScan("com.win.dfas.deploy.modules.*.dao")
 public class MybatisPlusConfig {
+    /**
+     * 1.分页插件
+     * 2.多租户
+     */
+    @Bean
+    public PaginationInterceptor paginationInterceptor() {
+        return new PaginationInterceptor();
+    }
 
 }

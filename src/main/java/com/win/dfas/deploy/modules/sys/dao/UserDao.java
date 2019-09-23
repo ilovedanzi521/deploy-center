@@ -1,7 +1,7 @@
 package com.win.dfas.deploy.modules.sys.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.win.dfas.deploy.modules.sys.entity.User;
+import com.win.dfas.deploy.modules.sys.entity.SysUser;
 
 /**
  * @包名 com.win.dfas.deploy.modules.sys.dao
@@ -10,5 +10,5 @@ import com.win.dfas.deploy.modules.sys.entity.User;
  * @创建人 heshansen
  * @创建时间 2019/09/23 10:28
  */
-public interface UserDao extends BaseMapper<User> {
+public interface UserDao extends BaseMapper<SysUser> {
 }
