@@ -1,0 +1,61 @@
+server:
+  port: 20001 #本地开发环境时用，生产部署时，应该设置为0，系统随机创建端口
+  servlet:
+    context-path: /deploy
+spring:
+  profiles:
+    active: dev
+  application:
+    name: dfas-deploy-center #服务名
+## h2数据库配置
+  datasource:
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:file:./data/db/dfas-deploy-center
+    username: root
+    password: 1234
+    type: com.alibaba.druid.pool.DruidDataSource
+    #进行该配置后，每次启动程序，程序都会运行resources/db/schema-h2文件，对数据库的结构进行操作，相当于新建一个表。
+    schema: classpath:db/schema-h2.sql
+    #进行该配置后，每次启动程序，程序都会运行resources/data.sql文件，对数据库的数据操作，相当于往表中插入数据。
+    #    data: classpath:db/data.sql
+    druid:
+      initial-size: 10
+      max-active: 100
+      min-idle: 10
+      max-wait: 60000
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 1 FROM DUAL
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        #login-username: admin
+        #login-password: admin
+      filter:
+        stat:
+          log-slow-sql: true
+          slow-sql-millis: 1000
+          merge-sql: false
+        wall:
+          config:
+            multi-statement-allow: true
+  ##开启web访问
+  #是否允许从其他地址访问，还是只能本地访问，默认false
+  h2:
+    console:
+      settings:
+        web-allow-others: true
+      #访问路径，默认/db-console
+      path: /db
+      #网页访问开关，默认false
+      enabled: true
+mybatis-plus:
+  # 扫描 mapper.xml
+  mapper-locations: classpath:/mapper/**/*Mapper.xml
+  configuration:
+    jdbc-type-for-null: 'null'
