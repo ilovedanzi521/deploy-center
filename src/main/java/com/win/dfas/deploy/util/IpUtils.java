@@ -2,20 +2,14 @@ package com.win.dfas.deploy.util;
 
 import com.alibaba.druid.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * IP地址
- * 
- * @author chenshun
- * @email sunlightcs@gmail.com
- * @date 2017年3月8日 下午12:57:02
+ *
  */
 @Slf4j
-public class IPUtils {
+public class IpUtils {
 
 	/**
 	 * 获取IP地址
@@ -43,7 +37,7 @@ public class IPUtils {
                 ip = request.getRemoteAddr();
             }
         } catch (Exception e) {
-        	log.error("IPUtils ERROR ", e);
+        	log.error("IpUtils ERROR ", e);
         }
         
 //        //使用代理，则获取第一个IP地址

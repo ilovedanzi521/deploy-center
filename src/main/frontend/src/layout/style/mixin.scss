@@ -1,0 +1,617 @@
+/***********************layot*************************************************/
+/**Layout头部**/
+@mixin headerContainer($bgColor, $fontColr, $otherColor) {
+    .header-container {
+        background: $bgColor; //主色
+
+        .win-more {
+            &:hover {
+                &::before {
+                    color: $fontColr; //主色
+                }
+            }
+
+            &::before {
+                color: $fontColr; //
+            }
+        }
+
+        .user {
+            color: $fontColr; //
+
+            &+.more-userinfo {
+                border: 6px solid transparent; //换色
+                border-top-color: $fontColr; //换色
+            }
+        }
+
+
+    }
+
+    //user弹出层
+    .contanier-user {
+        color: $fontColr; //换色
+        background: $bgColor; //主色
+
+        div {
+            &:hover {
+                color: $fontColr; //换色
+            }
+        }
+
+        &::after {
+            border: 12px solid transparent !important;
+            border-bottom-color: $bgColor !important; //换色
+
+        }
+    }
+
+    /*快速菜单*/
+
+    .fast-contanier {
+        .icon {
+
+            &::before {
+                color: $fontColr; //换色
+            }
+
+            &:hover {
+                &::before {
+                    color: $fontColr; //换色
+                }
+            }
+
+            .right-hr {
+                background: $fontColr; //换色
+            }
+        }
+    }
+
+
+
+    /*更多快速菜单*/
+    .moreFast-contanier ul {
+        background: $bgColor !important;
+        border-radius: 2px !important;
+        border-color: transparent !important;
+
+        li {
+            color: $fontColr !important; //主色
+        }
+
+        .close {
+            color: $otherColor
+        }
+    }
+
+}
+
+
+
+
+
+@mixin secondMenu($bcolor, $font1Color, $fontddColor, $fontddBgActive, $fontddFontActive, $closeColor) {
+
+    /*二级侧边栏**/
+    .secondMeun {
+        background: $bcolor; //换色
+    }
+
+    .menu-panel {
+        background: $bcolor; //换色
+    }
+
+    //二级菜单标签
+    .menu-second {
+        .second-menu-floor {
+            dt {
+                color: $font1Color !important; //换肤字体
+            }
+
+            dd {
+                color: $fontddColor !important; //换肤字体
+
+                &.active {
+                    background: $fontddBgActive !important; //换色
+
+                    span {
+                        color: $fontddFontActive !important;
+
+                        &::before {
+                            color: #409EFF !important;
+                        }
+                    }
+
+                    .startImg {
+                        display: inline-block;
+                    }
+                }
+
+                & span.noAddress {
+                    color: #999 !important; //换色
+
+                    &:hover {
+                        color: #999 !important;
+
+                    }
+                }
+
+                span,
+                i {
+                    &::before {
+                        color: #999 !important;
+                    }
+
+                    &.win-star {
+                        &::before {
+                            opacity: 0;
+                        }
+                    }
+
+                    &.win-star.active {
+                        +span {
+                            color: $color-orange;
+                        }
+
+                        &::before {
+
+                            color: $color-orange;
+                        }
+                    }
+                }
+
+                &:hover {
+                    // background: $color-main2; //换色
+
+                    // span {
+                    //     color: $color-orange;
+                    // }
+
+                    // .win-star {
+                    //     &::before {
+                    //         opacity: 1;
+                    //     }
+                    // }
+                }
+            }
+        }
+
+        .close {
+            color: $closeColor; //换色
+
+            &:hover {
+                color: $color-orange; //换色
+            }
+        }
+    }
+}
+
+
+
+/*菜单tab*/
+
+@mixin tabContaner($bColor, $fColor, $hBcolor, $hFcolor, $mBColor, $mFColor) {
+    .tabContaner {
+        .el-tabs--card>.el-tabs__header {
+            border-bottom: 1px solid $hBcolor !important;
+            background: #fff !important;
+        }
+
+        .el-tabs__item {
+            height: 32px !important;
+            line-height: 32px !important;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            display: inline-block;
+            list-style: none;
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+            color: $fColor !important;
+            text-align: center;
+            background: $bColor !important;
+
+            &:hover {
+                height: 32px !important;
+                line-height: 32px !important;
+                background: $hBcolor !important;
+                color: $hFcolor !important
+            }
+        }
+
+        .el-tabs--card>.el-tabs__header .el-tabs__item {
+            border-left: 1px solid $hBcolor;
+        }
+
+        .el-tabs--card>.el-tabs__header .el-tabs__item.is-active {
+            height: 32px !important;
+            line-height: 32px !important;
+            background: $hBcolor !important;
+            color: $hFcolor !important;
+            border-bottom-color: $hBcolor !important;
+        }
+
+        .more {
+            color: $mFColor !important;
+            background: $mBColor !important;
+
+            border: 1px solid $mBColor !important;
+
+            .other p {
+                background: $mBColor !important
+            }
+        }
+    }
+}
+
+
+
+/*侧边栏**/
+@mixin asideContainer ($bColor, $fontColor, $hBcolor, $hFcolor) {
+
+    /*侧边栏**/
+    .aside-container {
+        background: $bColor; //主色
+
+        .icon {
+            &::before {
+                color: $fontColor !important; //换色
+            }
+
+            &.active {
+                background: $hBcolor !important; //换色
+
+                &::before {
+                    color: $hFcolor !important;
+                }
+            }
+        }
+    }
+
+    /*一级侧边栏**/
+
+    .menu-first {
+        background: $bColor !important; //主色
+
+        li {
+            color: $fontColor !important; //换色
+
+            &.active {
+                background: $hBcolor !important; //换色
+                color: $hFcolor !important;
+
+                .icon-14::before {
+                    color: $hFcolor !important;
+                }
+            }
+        }
+    }
+}
+
+/*contanier底色**/
+@mixin mainContainer ($bgColor) {
+    .main-container {
+        background: $bgColor; //换色
+    }
+}
+
+
+/*底部内容**/
+@mixin footerContainer($bgColor) {
+    .footer-container {
+        background: $bgColor; //换色
+    }
+}
+
+
+
+
+/***********************组件**************************************************/
+
+/*弹框组件**/
+@mixin dialog($bgColor, $titleColor, $fontColor, $closeColor, $bdcolor, $bdColor2) {
+
+
+    .el-dialog__wrapper .el-dialog {
+        background: $bgColor !important;
+        border-color: $bdColor2 !important;
+        border-radius: 2px !important;
+
+        .el-dialog__header {
+            color: $titleColor !important;
+            border-bottom-color: $bdColor2 !important;
+        }
+
+
+        .el-dialog__title {
+            color: $titleColor;
+        }
+
+
+        .el-dialog__headerbtn .el-dialog__close {
+            &:before {
+                color: $closeColor !important;
+            }
+        }
+
+        .el-dialog__footer {
+            border-top-color: $bdColor2 !important;
+        }
+
+        .el-form-item__label {
+            color: $fontColor !important;
+        }
+    }
+
+}
+
+
+
+/*input组件**/
+@mixin input($color, $bgcolor) {
+
+    .el-input__inner {
+        color: $color !important;
+    }
+
+    .el-input.is-disabled .el-input__inner {
+        background-color: $bgcolor !important; //rgba(0, 0, 0, .4)
+
+    }
+
+}
+
+
+
+/*grounpButton组件**/
+@mixin grounpButton($bg, $fcolor, $icon) {
+
+    .el-button.is-round {
+        background: $bg !important;
+        color: $fcolor !important;
+
+    }
+
+    *:before {
+        color: $icon !important;
+    }
+
+}
+
+@mixin table($hColor, $hfcolor, $bodybgColor, $bodyFontColor, $hoverBd) {
+
+    //table组件
+    .vxe-table {
+        background: transparent !important;
+    }
+
+    .vxe-table .vxe-table--header-wrapper {
+        background: $hColor !important;
+
+        .vxe-cell {
+            color: $hfcolor !important;
+        }
+    }
+
+    .vxe-table .vxe-body--row {
+        background: $bodybgColor !important;
+    }
+
+
+    .vxe-table .vxe-cell {
+        color: $bodyFontColor !important;
+    }
+
+    // .vxe-cell {
+    //     color: $bodyFontColor !important;
+    // }
+
+
+
+    .vxe-table.row--highlight .vxe-body--row:hover {
+        outline: 1px solid $hoverBd !important;
+        outline-offset: -1px !important;
+    }
+
+
+    .vxe-table .vxe-table--empty-block {
+        background: $bodybgColor !important;
+    }
+}
+
+/*tree组件**/
+@mixin tree($bgcolor2, $fontColor) {
+
+
+    .el-tree {
+        background: $bgcolor2;
+        color: $fontColor !important;
+    }
+
+    .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
+        background: transparent !important;
+    }
+
+
+
+}
+
+
+
+
+/*tree组件**/
+@mixin roundButton($bgcolor, $fonrColor) {
+    .el-button.el-button--info.is-round {
+        background-color: $bgcolor !important;
+        color: $fonrColor
+    }
+
+}
+
+
+/*分页组件**/
+@mixin paging($fcolor, $moreColor, $moreFColor) {
+
+    .el-pagination__total {
+        color: $fcolor !important;
+    }
+
+    .el-pager li {
+        color: $fcolor !important;
+    }
+
+    .input-unit {
+        color: $fcolor !important;
+    }
+
+    .el-pagination__jump {
+        color: $fcolor !important;
+    }
+
+    .el-autocomplete-suggestion {
+        background-color: red !important;
+        color: $moreFColor !important;
+    }
+
+
+}
+
+/*二级tab**/
+@mixin tabSecond ($color, $bcolor, $activeColor, $hoverColor) {
+
+    .el-tabs__item {
+        color: $color !important;
+        border-right: 1px solid $bcolor !important;
+        background: $bcolor;
+    }
+
+    .second-tabs .el-tabs__item:hover {
+        background: $hoverColor;
+    }
+
+    .second-tabs .el-tabs__item.is-active {
+        background: $activeColor
+    }
+}
+
+
+
+/***********************内容**************************************************/
+
+@mixin home($bgColor, $bg2) {
+    .addPanel {
+        background: $bgColor !important;
+        border-color: $bg2 !important;
+
+        &::before {
+            background: $bg2 !important;
+        }
+
+        &::after {
+            background: $bg2 !important;
+        }
+    }
+}
+
+/**数字字典与stwich页面*/
+@mixin switch($bgColor) {
+
+    //seitch
+    .contanier-title {
+        background: $bgColor !important;
+    }
+
+    .contanier-radius {
+        background: $bgColor !important;
+    }
+
+
+    //数字字典
+    .container .content-fr .content-fr-warp {
+        background: $bgColor !important
+    }
+
+    .container .content-fl .content-fl-warp {
+        background: $bgColor !important
+    }
+}
+
+/*市场*/
+@mixin mark($frameBg, $frameFColor) {
+    .transactionForm_contanier {
+        background: $frameBg !important;
+    }
+
+    // .transactionForm_contanier span {
+    //     color: $frameFColor !important;
+    // }
+
+
+}
+
+
+@mixin currency($bg, $bg2, $fcolor) {
+
+    //货币
+    .left {
+        background: $bg !important;
+    }
+
+    .el-menu {
+        background: $bg2 !important;
+        color: $fcolor
+    }
+
+    .el-menu-item {
+        color: $fcolor !important;
+    }
+
+    .select {
+        background: $bg2 !important;
+    }
+
+}
+
+
+@mixin user($treeBg, $bg, $fontTitleCl, $fontColor) {
+
+    //use
+    .tree-content {
+        background: $treeBg !important;
+    }
+
+    .rl .searchList dt {
+        color: $fontTitleCl !important;
+    }
+
+    .rl .searchList dd {
+        background: $bg !important
+    }
+
+    .rl .searchList dd .but {
+        color: $fontColor !important
+    }
+
+    .rl .type-title {
+        color: $fontColor !important;
+    }
+}
+
+
+@mixin subButton($bg, $fontColor) {
+    .el-button {
+        background: #999;
+        color: #333;
+    }
+
+    .el-button--primary {
+        background: $bg !important;
+        border-color: $bg !important;
+
+        span {
+            color: $fontColor !important;
+        }
+    }
+
+
+}

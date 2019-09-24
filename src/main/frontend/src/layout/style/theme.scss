@@ -1,0 +1,321 @@
+@import "./mixin.scss";
+@import "../../assets/style/element.scss";
+
+
+/**需要换色css**/
+/**dark css**/
+
+
+.dark {
+    .header-container {
+        background: $color-assist; //换色
+
+        .win-more {
+            &:hover {
+                &::before {
+                    color: $color-orange; //换色
+                }
+            }
+
+            &::before {
+                color: $colorAdb5bb; //换色
+            }
+        }
+
+        .user {
+            color: $color-font6; //换色
+
+            &+.more-userinfo {
+                border: 6px solid transparent; //换色
+                border-top-color: $color-footer-bg; //换色
+            }
+        }
+    }
+
+    //user弹出层
+    .contanier-user {
+        color: #fff; //换色
+        background: $color-footer-bg; //换色
+
+        div {
+            &:hover {
+                color: $color-orange; //换色
+            }
+        }
+
+        &::after {
+            border: 12px solid transparent;
+            border-bottom-color: $color-footer-bg; //换色
+        }
+    }
+
+    /*快速菜单*/
+    .fast-contanier {
+        .icon {
+
+            &::before {
+                color: $colorAdb5bb; //换色
+            }
+
+            &:hover {
+                &::before {
+                    color: $color-orange; //换色
+                }
+            }
+
+            .right-hr {
+                background: $colorAdb5bb; //换色
+            }
+        }
+    }
+
+    .tabContaner {
+        background: $color-main2 //换色
+    }
+
+    /*侧边栏**/
+    .aside-container {
+        background: $color-assist; //换色
+
+        .icon {
+            &::before {
+                color: $colorAdb5bb; //换色
+            }
+
+            &.active {
+                background: $color-main; //换色
+
+                &::before {
+                    color: $color-orange;
+                }
+            }
+        }
+    }
+
+    /*一级侧边栏**/
+    .menu-first {
+        background: $color-assist; //换色
+
+        li {
+            color: $colorAdb5bb; //换色
+            font-size: 14px;
+
+            &.active {
+                background: $color-main; //换色
+                color: $color-orange;
+
+                .icon-14::before {
+                    color: $color-orange;
+                }
+            }
+        }
+    }
+
+    /*二级侧边栏**/
+    .secondMeun {
+        background: $color-main; //换色
+    }
+
+    .menu-panel {
+        background: $color-main; //换色
+    }
+
+    //二级菜单标签
+    .menu-second {
+        .second-menu-floor {
+            dt {
+                color: #fff; //换肤字体
+            }
+
+            dd {
+                color: $colorADB5BBFF; //换肤字体
+
+                &.active {
+                    background: #0b1431; //换色
+
+                    span {
+                        color: $color-orange;
+                    }
+
+                    .startImg {
+                        display: inline-block;
+                    }
+                }
+
+                & span.noAddress {
+                    color: #999; //换色
+
+                    &:hover {
+                        color: #999;
+
+                    }
+                }
+
+                span,
+                i {
+                    &.win-star {
+                        &::before {
+                            opacity: 0;
+                        }
+                    }
+
+                    &.win-star.active {
+                        +span {
+                            color: $color-orange;
+                        }
+
+                        &::before {
+
+                            color: $color-orange;
+                        }
+                    }
+                }
+
+                &:hover {
+                    // background: $color-main2; //换色
+
+                    // span {
+                    //     color: $color-orange;
+                    // }
+
+                    // .win-star {
+                    //     &::before {
+                    //         opacity: 1;
+                    //     }
+                    // }
+                }
+            }
+        }
+
+        .close {
+            color: #666; //换色
+
+            &:hover {
+                color: $color-orange; //换色
+            }
+        }
+    }
+
+    /*右侧container内容**/
+    .main-container {
+        background: $color-main2
+    }
+
+    /*底部内容**/
+    .footer-container {
+        background: $color-footer-bg; //换色
+    }
+
+    &.container .el-tabs__item {
+        &:hover {
+            background: #F58A0D !important;
+            color: #fff !important
+        }
+    }
+
+}
+
+
+
+.light {
+    /**layout**/
+    @include headerContainer($bgColor:#409EFF, $fontColr:#fff, $otherColor:#666);
+    @include tabContaner($bColor:#fff, $fColor:#333, $hBcolor:#3385ff, $hFcolor:#fff, $mBColor:#3385ff, $mFColor:#fff);
+    @include asideContainer($bColor:#409EFF, $fontColor:#fff, $hBcolor:#fff, $hFcolor:#409EFF);
+    @include secondMenu($bcolor:#fff, $font1Color:#666, $fontddColor:#999, $fontddBgActive:rgba(0, 0, 0, .1), $fontddFontActive:#409EFF, $closeColor:#333);
+    @include mainContainer($bgColor:#fff);
+    @include footerContainer($bgColor:#409EFF);
+    /*组件*/
+    @include table($hColor:#409EFF, $hfcolor:#fff, $bodybgColor:#fff, $bodyFontColor:#333, $hoverBd:#409EFF);
+    @include paging($fcolor:#333, $moreColor:#409EFF, $moreFColor:#fff);
+    @include input($color:#666, $bgcolor:rgba(0, 0, 0, .4));
+    @include dialog($bgColor:#fff, $titleColor:#333, $fontColor:#333, $closeColor:#969696, $bdcolor:transparent, $bdColor2:#E8E8E8);
+    @include tabSecond ($color:#fff, $bcolor:#409EFF, $activeColor:#3385ff, $hoverColor:#409EFF);
+    @include tree($bgcolor2:#409EFF, $fontColor:#fff);
+    @include grounpButton($bg:#409EFF, $fcolor:#fff, $icon:#fff);
+    @include subButton($bg:#409EFF, $fontColor:#fff);
+    /*内容*/
+    //home
+    @include home($bgColor:#fff, $bg2:#3385ff);
+    //swtich
+    @include switch($bgColor:#3385ff);
+
+    //mark
+    @include mark($frameBg:rgba(0, 0, 0, .2), $frameFColor: #333);
+
+    //currency
+    @include currency($bg: #3385ff, $bg2: #409EFF, $fcolor:#fff);
+    //use
+    @include user($treeBg :#3385ff, $bg:#409EFF, $fontTitleCl: #333, $fontColor: #fff);
+}
+
+
+
+/**公共*/
+//下拉框字体超出出省略号
+.el-select-dropdown__item * {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+
+/**公共*/
+//switch样式OFF
+
+.el-switch.is-checked .el-switch__core {
+    width: 56px !important;
+    height: 22px !important;
+    background: #13CE66 !important;
+    border: #13CE66 !important;
+    box-sizing: border-box;
+
+    &::after {
+        content: "ON" !important;
+        height: 16px;
+        line-height: 16px;
+        position: absolute;
+        width: 16px;
+        left: 96% !important;
+        background-color: #fff !important;
+        text-indent: -176%;
+        font-size: 14px;
+        top: 3px !important;
+        color: #fff !important;
+    }
+}
+
+/**公共*/
+//switch样式ON
+.el-switch__core {
+    width: 56px;
+    height: 22px;
+    margin: 0;
+    display: inline-block;
+    position: relative;
+    border: 1px solid #FF4949 !important;
+    outline: none;
+    border-radius: 10px;
+    box-sizing: border-box;
+    background: #FF4949 !important;
+    cursor: pointer;
+    transition: border-color .3s, background-color .3s;
+    vertical-align: middle;
+
+
+
+    &::after {
+        content: "OFF" !important;
+        position: absolute;
+        width: 16px !important;
+        height: 16px !important;
+        line-height: 16px !important;
+        background-color: #fff !important;
+        font-size: 14px;
+        top: 1px !important;
+        left: 3% !important;
+        color: #fff !important;
+        text-indent: 19px;
+    }
+}

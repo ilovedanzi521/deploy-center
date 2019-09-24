@@ -3,8 +3,6 @@ package com.win.dfas.deploy.modules.sys.po;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import java.util.Date;
-
 /**
  * @包名 com.win.dfas.deploy.modules.sys.po
  * @类名 SysLogPO

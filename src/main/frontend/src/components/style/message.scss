@@ -1,0 +1,79 @@
+.el-message-box {
+    border-color: $--color-primary;
+}
+
+.el-message-box__title {
+    font-size: 15px;
+}
+
+.el-message-box__message {
+    color: $--color-primary;
+}
+
+
+
+
+.el-message {
+    min-width: 446px !important;
+    box-sizing: border-box;
+    border-radius: 4px !important;
+    padding: 15px 15px 15px 16px !important;
+    height: 36px !important;
+
+    .win {
+        color: transparent !important;
+        font-size: 16px;
+        margin: 2px 8px 0 0
+    }
+}
+
+// .el-message__icon {
+//     margin-right: 8px !important;
+//     font-size: 16px !important;
+//     font-weight: 200 !important;
+//     margin-top: 2px !important;
+//     color: #fff !important;
+//     font-weight: 100 !important;
+// }
+
+
+.el-icon-close:before {
+    content: "\E6DB" !important;
+    font-weight: bolder !important;
+}
+
+.el-message__closeBtn {
+    color: #fff !important;
+}
+
+
+
+
+.win-error {
+    border-color: #FC5660 !important;
+    background: url("./img/eicon.png") no-repeat 19px 10px #FC5660 !important;
+
+    .el-message__content {
+        color: #FFFFFF !important;
+        font-size: 13px !important;
+        font-weight: bolder !important;
+    }
+
+}
+
+
+
+
+
+.win-success {
+    border-color: #00BAF3 !important;
+    background: url("./img/sicon.png") no-repeat 19px 10px #00BAF3 !important;
+
+    .el-message__content {
+        color: #FFFFFF !important;
+        font-size: 13px !important;
+        font-weight: bolder !important;
+    }
+
+
+}

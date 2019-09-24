@@ -1,0 +1,272 @@
+//弹框的布局样式
+
+.el-dialog__wrapper {
+    .el-dialog {
+        background: #090F26FF !important;
+        border-radius: 12px !important;
+    }
+
+    .el-dialog__header {
+        padding: 10px 34px !important;
+        border-bottom: 1px solid #6b7286;
+        width: 100% !important;
+        margin: 0 auto !important;
+    }
+
+    .el-dialog__title {
+        font-size: 14px !important;
+        color: #fff;
+        font-weight: bolder !important;
+    }
+
+    .el-dialog__headerbtn {
+        position: absolute !important;
+        top: 17px !important;
+        right: 20px !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+
+    .el-dialog__body {
+        padding: 0 36px !important;
+        max-height: 546px !important;
+        box-sizing: border-box !important;
+        overflow-y: auto !important;
+
+        &::-webkit-scrollbar {
+            /*滚动条整体样式*/
+            width: 16px;
+            height: 1px;
+            /*高宽分别对应横竖滚动条的尺寸*/
+            box-sizing: border-box;
+        }
+
+        &::-webkit-scrollbar-track {
+            /*滚动条里面轨道*/
+            width: 6px !important;
+            background: #323952FF
+        }
+
+        &::-webkit-scrollbar-thumb {
+            /*滚动条里面小方块*/
+            border-radius: 36%;
+            background: linear-gradient(to right, transparent 0, transparent 10%, transparent 20%, #090F26FF 30%, #090F26FF 40%, #090F26FF 50%, #090F26FF 60%, #090F26FF 70%, transparent 80%, transparent 90%, transparent 100%)
+        }
+    }
+
+    .el-icon-close:before {
+        position: relative;
+        color: #fff;
+        top: -5px;
+    }
+
+    //el-form--inline儿子
+    .el-form--inline>div {
+        padding:20px 0 0 0 !important;
+        border-bottom: 1px solid #6B7286FF;
+        overflow: hidden;
+        .el-form-item:last-of-type{
+           margin-bottom: 20px !important;
+        }
+        &:last-of-type {
+            border-bottom: 1px solid transparent;
+        }
+    }
+
+    .input-unit {
+        position: absolute;
+        left: 96%;
+        font-size:12px !important;
+        margin-left: 6px !important;
+    }
+
+    .from-panel {
+        overflow: hidden;
+        margin-top: 16px;
+        border-bottom: 1px solid#6B7286FF;
+
+        &:last-of-type {
+            border-bottom: 1px solid transparent;
+        }
+    }
+
+    .el-form-item {
+        position: relative;
+        margin-bottom: 10px !important;
+      
+    }
+
+    .el-form-item__content {
+        line-height: 28px !important;
+    }
+
+    .el-form-item__label {
+        line-height: 1;
+        color: #ADB5BBFF !important;
+        vertical-align: middle;
+        font-size:12px;
+        padding:0 9px 0 0;
+        &::before {
+            margin-right: 1px !important;
+        }
+    }
+
+
+    .el-form-item__content {
+        line-height: 28px !important;
+        vertical-align: middle !important;
+    }
+
+    .el-input {
+        width: 200px !important;
+
+    }
+
+  
+    .input_last {
+        position: absolute;
+        right: -45%;
+        left: 102%;
+        top: 0
+    }
+
+    // .el-input .el-input__inner:hover {
+    //     border-color: #fff
+    // }
+//    .el-input__inner, .el-input__inner:focus{
+//         border-color:#ff900d
+//     }
+    .el-dialog__footer {
+        padding: 16px 0 !important;
+        width: 100% !important;
+        text-align:center;
+    }
+
+    .el-button {
+        padding: 0 32px;
+        height: 28px;
+        // line-height: 28px;
+    }
+
+}
+
+
+//tree布局
+.tree-content {
+    position: absolute;
+    width: 212px;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    padding: 16px 0;
+    background: #273049;
+
+    &>.text-content {
+        width: 100%;
+        padding: 16px 0 16px;
+        background: #3E4760;
+        text-align: center;
+
+        .el-input {
+            display: inline-block;
+            width: 191px;
+            height: 32px;
+            margin: 0 auto;
+        }
+
+        .el-input__inner {
+            border: 1px solid #3D455C;
+            background: #273049;
+        }
+    }
+
+    .tree-wrapp {
+        overflow-y: auto;
+        overflow-x: hidden;
+        color: #adb5bb;
+        max-height: 920px;
+        background: #3E4760;
+        z-index: 2;
+
+        .el-tree-node {
+            margin: 0px 0 !important;
+        }
+
+        .el-tree>.el-tree-node {
+            margin: 0 0 10px 0 !important;
+
+            &:nth-last-of-type(2) {
+                margin: 0 0 0 0 !important;
+            }
+
+            &:last-of-type {
+                padding-bottom: 0px !important;
+            }
+        }
+
+        .el-tree>.el-tree-node {
+            margin: 0 0 10px 0 !important;
+
+            &:nth-last-of-type(2) {
+                margin: 0 0 0 0 !important;
+            }
+
+            &:last-of-type {
+                padding-bottom: 0px !important;
+            }
+        }
+
+        .el-tree>.el-tree-node.is-expanded.is-focusable {
+            margin: 0 0 0 0 !important;
+        }
+
+        .el-tree>.el-tree-node.is-expanded.is-focusable>.el-tree-node__children {
+            background: #0b1431;
+            padding: 6px;
+        }
+
+        .el-tree {
+            background: #3E4760;
+        }
+
+        .el-tree-node__content {
+            padding-right: 14px
+        }
+
+
+        .el-tree-node__label:nth-of-type(2) {
+            font-size: 14px !important;
+        }
+
+        .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
+            background: transparent;
+            border-right: none;
+
+            .el-tree-node__label {
+                color: #F58A0D
+            }
+        }
+
+    }
+
+}
+
+
+// .win {
+//     position: relative;
+//     display: inline-block;
+//     vertical-align: middle;
+//     font-size: 14px;
+//     color: #C7CDD6;
+
+//     &::before {
+//         position: absolute;
+//         left: -22px
+//     }
+
+// }

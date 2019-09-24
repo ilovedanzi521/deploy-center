@@ -2,10 +2,9 @@ package com.win.dfas.deploy.common.aspect;
 
 import com.win.dfas.deploy.common.annotation.SysLog;
 import com.win.dfas.deploy.modules.sys.po.SysLogPO;
-import com.win.dfas.deploy.modules.sys.po.SysUserPO;
 import com.win.dfas.deploy.modules.sys.service.SysLogService;
 import com.win.dfas.deploy.util.HttpContextUtils;
-import com.win.dfas.deploy.util.IPUtils;
+import com.win.dfas.deploy.util.IpUtils;
 import com.win.dfas.deploy.util.JSONUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
-import java.util.Date;
 
 /**
  * @包名 com.win.dfas.deploy.common.aspect
@@ -79,7 +77,7 @@ public class SysLogAspect {
         //获取request
         HttpServletRequest request = HttpContextUtils.getHttpServletRequest();
         //设置IP地址
-        sysLogPO.setIp(IPUtils.getIpAddr(request));
+        sysLogPO.setIp(IpUtils.getIpAddr(request));
 
         //用户名
 //        String username = ((SysUserPO) SecurityUtils.getSubject().getPrincipal()).getUsername();

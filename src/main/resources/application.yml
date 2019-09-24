@@ -1,5 +1,5 @@
 server:
-  port: 20001 #本地开发环境时用，生产部署时，应该设置为0，系统随机创建端口
+  port: 8080 #本地开发环境时用，生产部署时，应该设置为0，系统随机创建端口
   servlet:
     context-path: /deploy
 spring:
