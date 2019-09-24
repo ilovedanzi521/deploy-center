@@ -38,7 +38,7 @@
 	
 	<!-- 开发环境 -->
 	<springProfile name="dev">
-		<logger name="com.win" level="DEBUG">
+		<logger name="com.win" level="INFO">
 			<appender-ref ref="LOGCONSOLE" />
 		</logger>
 		<root level="INFO">
