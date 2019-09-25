@@ -1,11 +1,15 @@
 package com.win.dfas.deploy.modules.sys.controller;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.win.dfas.common.vo.WinResponseData;
 import com.win.dfas.deploy.common.annotation.SysLog;
 import com.win.dfas.deploy.modules.sys.po.SysUserPO;
 import com.win.dfas.deploy.modules.sys.service.SysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @包名 com.win.dfas.deploy.modules.app.controller
@@ -31,5 +35,12 @@ public class SysUserController {
     public WinResponseData infoById(Integer id){
         SysUserPO sysUserPO = sysUserService.getById(id);
         return WinResponseData.handleSuccess("Success get sysUserPO info", sysUserPO);
+    }
+
+    @GetMapping("/list")
+    public WinResponseData list(){
+        QueryWrapper queryWrapper = new QueryWrapper();
+        List<SysUserPO> list = sysUserService.list(queryWrapper);
+        return WinResponseData.handleSuccess(list);
     }
 }
