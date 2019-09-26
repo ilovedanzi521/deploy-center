@@ -1,5 +1,5 @@
 server:
-  port: 8080 #本地开发环境时用，生产部署时，应该设置为0，系统随机创建端口
+  port: 8888 #本地开发环境时用，生产部署时，应该设置为0，系统随机创建端口
   servlet:
     context-path: /deploy
 spring:
@@ -59,3 +59,18 @@ mybatis-plus:
   mapper-locations: classpath:/mapper/**/*Mapper.xml
   configuration:
     jdbc-type-for-null: 'null'
+
+deploy-center:
+  home_dir: /root/repo
+  deploy_dir: /root/deploy
+  modules_dir: ${deploy-center.home_dir}/modules
+  scripts_dir: ${deploy-center.home_dir}/scripts
+  packages_dir: ${deploy-center.home_dir}/packages
+  ftp-server:
+    host: 192.168.0.70
+    port: 21
+    user: ftp
+    pswd: ftp
+    repo-dir: /pub/repo
+  relased-description: release_version.txt
+

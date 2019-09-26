@@ -2,19 +2,12 @@ package com.win.dfas.deploy.schedule.bean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.task.TaskExecutor;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.stereotype.Component;
-
-import java.util.concurrent.ThreadPoolExecutor;
 
 public class TaskExecutorConfig {
     private final static Logger logger = LoggerFactory.getLogger(TaskExecutorConfig.class);
 
-    public ThreadPoolTaskExecutor taskExecutor() {
+    public static ThreadPoolTaskExecutor taskExecutor() {
         logger.info("Start taskExecutor ...");
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         // 设置核心线程数
