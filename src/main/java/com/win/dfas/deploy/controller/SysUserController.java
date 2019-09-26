@@ -1,14 +1,11 @@
 package com.win.dfas.deploy.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.win.dfas.common.vo.WinResponseData;
-import com.win.dfas.deploy.common.annotation.SysLog;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.win.dfas.deploy.po.SysUserPO;
 import com.win.dfas.deploy.service.SysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @包名 com.win.dfas.deploy.modules.app.controller
@@ -19,27 +16,12 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/sys/user")
-public class SysUserController {
+public class SysUserController extends BaseController<SysUserPO> {
     @Autowired
     private SysUserService sysUserService;
 
-
-    @SysLog("新增用户")
-    @PostMapping("/add")
-    public WinResponseData add(@RequestBody SysUserPO sysUserPO){
-        sysUserService.save(sysUserPO);
-        return WinResponseData.handleSuccess("Success add new sysUserPO", sysUserPO);
-    }
-    @GetMapping("/infoById")
-    public WinResponseData infoById(Integer id){
-        SysUserPO sysUserPO = sysUserService.getById(id);
-        return WinResponseData.handleSuccess("Success get sysUserPO info", sysUserPO);
-    }
-
-    @GetMapping("/list")
-    public WinResponseData list(){
-        QueryWrapper queryWrapper = new QueryWrapper();
-        List<SysUserPO> list = sysUserService.list(queryWrapper);
-        return WinResponseData.handleSuccess(list);
+    @Override
+    public IService<SysUserPO> getBaseService() {
+        return this.sysUserService;
     }
 }
