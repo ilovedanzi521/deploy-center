@@ -1,10 +1,10 @@
-package com.win.dfas.deploy.modules.sys.po;
+package com.win.dfas.deploy.po;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 /**
- * @包名 com.win.dfas.deploy.modules.sys.po
+ * @包名 com.win.dfas.deploy.po
  * @类名 SysLogPO
  * @类描述 TODO:
  * @创建人 heshansen
@@ -13,6 +13,7 @@ import lombok.Data;
 @Data
 @TableName("sys_log")
 public class SysLogPO extends BasePO {
+    private static final long serialVersionUID = 5134537697706060764L;
     //用户名
     private String username;
     //用户操作

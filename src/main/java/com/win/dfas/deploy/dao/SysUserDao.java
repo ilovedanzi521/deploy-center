@@ -1,10 +1,10 @@
-package com.win.dfas.deploy.modules.sys.dao;
+package com.win.dfas.deploy.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.win.dfas.deploy.modules.sys.po.SysUserPO;
+import com.win.dfas.deploy.po.SysUserPO;
 
 /**
- * @包名 com.win.dfas.deploy.modules.sys.dao
+ * @包名 com.win.dfas.deploy.dao
  * @类名 SysUserDao
  * @类描述 用户数据层
  * @创建人 heshansen

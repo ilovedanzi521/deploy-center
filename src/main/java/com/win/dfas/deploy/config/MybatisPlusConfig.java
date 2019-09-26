@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
  * @创建时间 2019/09/22 17:59
  */
 @Configuration
-@MapperScan("com.win.dfas.deploy.modules.*.dao")
+@MapperScan("com.win.dfas.deploy.dao")
 public class MybatisPlusConfig {
     /**
      * 1.分页插件

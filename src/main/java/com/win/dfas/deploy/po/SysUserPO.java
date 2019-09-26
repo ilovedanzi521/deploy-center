@@ -1,12 +1,10 @@
-package com.win.dfas.deploy.modules.sys.po;
+package com.win.dfas.deploy.po;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import java.util.Date;
-
 /**
- * @包名 com.win.dfas.deploy.modules.sys.po
+ * @包名 com.win.dfas.deploy.po
  * @类名 SysUserPO
  * @类描述 用户信息
  * @创建人 heshansen

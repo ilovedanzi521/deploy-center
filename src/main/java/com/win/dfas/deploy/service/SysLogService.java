@@ -1,10 +1,10 @@
-package com.win.dfas.deploy.modules.sys.service;
+package com.win.dfas.deploy.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.win.dfas.deploy.modules.sys.po.SysLogPO;
+import com.win.dfas.deploy.po.SysLogPO;
 
 /**
- * @包名 com.win.dfas.deploy.modules.sys.service
+ * @包名 com.win.dfas.deploy.service
  * @类名 SysLogService
  * @类描述 TODO:
  * @创建人 heshansen

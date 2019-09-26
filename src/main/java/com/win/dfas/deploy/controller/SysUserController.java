@@ -1,11 +1,10 @@
-package com.win.dfas.deploy.modules.sys.controller;
+package com.win.dfas.deploy.controller;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.win.dfas.common.vo.WinResponseData;
 import com.win.dfas.deploy.common.annotation.SysLog;
-import com.win.dfas.deploy.modules.sys.po.SysUserPO;
-import com.win.dfas.deploy.modules.sys.service.SysUserService;
+import com.win.dfas.deploy.po.SysUserPO;
+import com.win.dfas.deploy.service.SysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,7 +13,7 @@ import java.util.List;
 /**
  * @包名 com.win.dfas.deploy.modules.app.controller
  * @类名 TestController
- * @类描述 接口测试类
+ * @类描述 用户接口测试类
  * @创建人 heshansen
  * @创建时间 2019/09/22 15:17
  */

@@ -34,18 +34,18 @@ const routerChildren = [
         component: Home
     },
     {
-        path: "/deploy-index",
-        name: "deploy-index",
+        path: "/deployIndex",
+        name: "deployIndex",
         component: DeployIndex,
     },
     {
-        path: "/deploy-device",
-        name: "deploy-device",
+        path: "/deployDevice",
+        name: "deployDevice",
         component: DeployDevice,
     },
     {
-        path: "/deploy-user",
-        name: "deploy-user",
+        path: "/deployUser",
+        name: "deployUser",
         component: DeployUser,
     },
 ];

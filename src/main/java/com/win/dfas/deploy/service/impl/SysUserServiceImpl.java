@@ -1,14 +1,14 @@
-package com.win.dfas.deploy.modules.sys.service.impl;
+package com.win.dfas.deploy.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.win.dfas.deploy.modules.sys.dao.SysUserDao;
-import com.win.dfas.deploy.modules.sys.po.SysUserPO;
-import com.win.dfas.deploy.modules.sys.service.SysUserService;
+import com.win.dfas.deploy.dao.SysUserDao;
+import com.win.dfas.deploy.po.SysUserPO;
+import com.win.dfas.deploy.service.SysUserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * @包名 com.win.dfas.deploy.modules.sys.service.impl
+ * @包名 com.win.dfas.deploy.service.impl
  * @类名 UserServiceImpl
  * @类描述 用户服务实现类
  * @创建人 heshansen

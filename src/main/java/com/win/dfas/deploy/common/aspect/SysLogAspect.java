@@ -1,8 +1,8 @@
 package com.win.dfas.deploy.common.aspect;
 
 import com.win.dfas.deploy.common.annotation.SysLog;
-import com.win.dfas.deploy.modules.sys.po.SysLogPO;
-import com.win.dfas.deploy.modules.sys.service.SysLogService;
+import com.win.dfas.deploy.po.SysLogPO;
+import com.win.dfas.deploy.service.SysLogService;
 import com.win.dfas.deploy.util.HttpContextUtils;
 import com.win.dfas.deploy.util.IpUtils;
 import com.win.dfas.deploy.util.JSONUtil;
