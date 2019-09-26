@@ -1,0 +1,8 @@
+[modules]
+#script_name				module_name		package_direcotry		package_version		package_file				allow_delete	  
+java_sdk.sh 				Java-SDK		packages				jdk1.8.0_221		jdk-8u221-linux-x64.tar.gz		0
+java_ms_registe_center.sh	注册中心		packages/java_ms		1.0					dfas-register-5.1.3.33.jar		1 
+
+[scripts]
+#script_name				strategy_name		
+java_ms_registe_center.sh	注册中心部署策略
