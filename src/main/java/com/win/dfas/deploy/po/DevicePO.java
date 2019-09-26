@@ -2,6 +2,7 @@ package com.win.dfas.deploy.po;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import org.springframework.context.annotation.Description;
 
 /**
  * @包名 com.win.dfas.deploy.po
@@ -12,6 +13,7 @@ import lombok.Data;
  */
 @Data
 @TableName("dc_devcie")
+@Description("设备信息")
 public class DevicePO extends BasePO{
 
     /**

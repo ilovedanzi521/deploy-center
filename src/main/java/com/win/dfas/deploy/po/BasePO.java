@@ -2,6 +2,7 @@ package com.win.dfas.deploy.po;
 
 import lombok.Data;
 
+import javax.annotation.PropertyKey;
 import java.io.Serializable;
 import java.util.Date;
 
