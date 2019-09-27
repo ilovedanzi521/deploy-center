@@ -1,5 +1,9 @@
 package com.win.dfas.deploy.controller;
 
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.win.dfas.deploy.po.AppModulePO;
+import com.win.dfas.deploy.service.AppModuleService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,5 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/app/module")
-public class AppModuleController {
+public class AppModuleController extends BaseController<AppModulePO> {
+    @Autowired
+    private AppModuleService appModuleService;
+
+    @Override
+    public IService<AppModulePO> getBaseService() {
+        return this.appModuleService;
+    }
 }

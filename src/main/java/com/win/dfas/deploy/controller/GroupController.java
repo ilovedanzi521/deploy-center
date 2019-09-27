@@ -1,27 +1,27 @@
 package com.win.dfas.deploy.controller;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.win.dfas.deploy.po.TaskPO;
-import com.win.dfas.deploy.service.TaskService;
+import com.win.dfas.deploy.po.GroupPO;
+import com.win.dfas.deploy.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @包名 com.win.dfas.deploy.controller
- * @类名 TaskController
- * @类描述 TODO:
+ * @类名 GroupController
+ * @类描述  组控制器
  * @创建人 heshansen
- * @创建时间 2019/09/27 11:41
+ * @创建时间 2019/09/27 11:40
  */
 @RestController
-@RequestMapping("/task")
-public class TaskController extends BaseController<TaskPO> {
+@RequestMapping("/group")
+public class GroupController extends BaseController<GroupPO> {
     @Autowired
-    private TaskService taskService;
+    private GroupService groupService;
 
     @Override
-    public IService<TaskPO> getBaseService() {
-        return this.taskService;
+    public IService<GroupPO> getBaseService() {
+        return this.groupService;
     }
 }

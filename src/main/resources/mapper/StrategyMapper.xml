@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.win.dfas.deploy.dao.StrategyDao">
+<!--说明：单表的所有操作不用写代码（如果只有简单的单表操作，mapper.xml文件也不需要），mybatis-plus已经自动处理-->
+
+</mapper>

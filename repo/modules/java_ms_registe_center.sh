@@ -99,11 +99,13 @@ Status(){
   #echo "Status pid=$pid"
   if [ -z $pid ];then
     _PID=0
-    echo "not running $_PID"
+    echo $_PID
+    echo "not running"
     return 0
   else 
     _PID=$pid
-    echo "running $_PID"
+    echo $_PID
+    echo "running"
     return 1
   fi
 }
