@@ -16,6 +16,15 @@ import java.util.List;
  * @创建时间 2019/09/26 15:24
  */
 public abstract class BaseController<T extends BasePO> {
+    public String BaseAppName ="";
+
+    public String getBaseAppName() {
+        return BaseAppName;
+    }
+
+    public void setBaseAppName(String baseAppName) {
+        BaseAppName = baseAppName;
+    }
 
     /**
      * 抽象业务服务，必须在控制层注入
@@ -23,7 +32,7 @@ public abstract class BaseController<T extends BasePO> {
      */
     public abstract IService<T> getBaseService();
 
-    @SysLog("新增")
+    @SysLog
     @PostMapping("/save")
     public WinResponseData save(@RequestBody T t){
         Boolean flag = this.getBaseService().save(t);
@@ -33,7 +42,7 @@ public abstract class BaseController<T extends BasePO> {
         return WinResponseData.handleSuccess(t);
     }
 
-    @SysLog("修改")
+    @SysLog
     @PostMapping("/update")
     public WinResponseData updateById(@RequestBody T t){
         Boolean flag = this.getBaseService().updateById(t);
@@ -43,7 +52,7 @@ public abstract class BaseController<T extends BasePO> {
         return WinResponseData.handleSuccess(t);
     }
 
-    @SysLog("新增或修改")
+    @SysLog
     @PostMapping("/saveOrUpdate")
     public WinResponseData saveOrUpdate(@RequestBody T t){
         Boolean flag = this.getBaseService().saveOrUpdate(t);
@@ -53,7 +62,7 @@ public abstract class BaseController<T extends BasePO> {
         return WinResponseData.handleSuccess(t);
     }
 
-    @SysLog("删除")
+    @SysLog
     @DeleteMapping("/remove/{id}")
     public WinResponseData removeById(@PathVariable Long id){
         Boolean flag = this.getBaseService().removeById(id);
@@ -63,6 +72,7 @@ public abstract class BaseController<T extends BasePO> {
         return WinResponseData.handleSuccess("删除成功");
     }
 
+    @SysLog
     @DeleteMapping("/remove")
     public WinResponseData removeByIds(@RequestBody List<Long> ids){
         Boolean flag = this.getBaseService().removeByIds(ids);

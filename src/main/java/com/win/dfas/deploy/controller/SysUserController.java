@@ -22,6 +22,7 @@ public class SysUserController extends BaseController<SysUserPO> {
 
     @Override
     public IService<SysUserPO> getBaseService() {
+        this.setBaseAppName("用户信息");
         return this.sysUserService;
     }
 }

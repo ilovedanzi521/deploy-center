@@ -1,6 +1,7 @@
 package com.win.dfas.deploy.common.aspect;
 
 import com.win.dfas.deploy.common.annotation.SysLog;
+import com.win.dfas.deploy.common.enumerate.LogEnum;
 import com.win.dfas.deploy.po.SysLogPO;
 import com.win.dfas.deploy.service.SysLogService;
 import com.win.dfas.deploy.util.HttpContextUtils;
@@ -13,6 +14,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -54,17 +56,19 @@ public class SysLogAspect {
         Method method = signature.getMethod();
 
         SysLogPO sysLogPO = new SysLogPO();
-        SysLog syslog = method.getAnnotation(SysLog.class);
-        if(syslog != null){
-            //注解上的描述
-            sysLogPO.setOperation(syslog.value());
-        }
-
         //请求的方法名
         String className = joinPoint.getTarget().getClass().getName();
         String methodName = signature.getName();
+        //注解上的描述
+        SysLog syslog = method.getAnnotation(SysLog.class);
+        if(syslog != null){
+            String operate = syslog.value();
+            if (StringUtils.isEmpty(operate)){
+                operate = LogEnum.getOperationDesc(methodName,className.substring(className.lastIndexOf(".")+1));
+            }
+            sysLogPO.setOperation(operate);
+        }
         sysLogPO.setMethod(className + "." + methodName + "()");
-
         //请求的参数
         Object[] args = joinPoint.getArgs();
         try{
