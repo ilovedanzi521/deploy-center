@@ -16,16 +16,6 @@ import java.util.List;
  * @创建时间 2019/09/26 15:24
  */
 public abstract class BaseController<T extends BasePO> {
-    public String BaseAppName ="";
-
-    public String getBaseAppName() {
-        return BaseAppName;
-    }
-
-    public void setBaseAppName(String baseAppName) {
-        BaseAppName = baseAppName;
-    }
-
     /**
      * 抽象业务服务，必须在控制层注入
      * @return
