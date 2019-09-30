@@ -1,15 +1,25 @@
 package com.win.dfas.deploy.schedule;
 
+import cn.hutool.core.util.StrUtil;
+import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.schedule.bean.DeployEnvConfig;
 import com.win.dfas.deploy.schedule.bean.TaskExecutorConfig;
+import com.win.dfas.deploy.service.DeviceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -21,7 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @创建时间 2019/09/25
  */
 @Component
-@RestController
+@Configuration
 public class Scheduler {
     private final static Logger logger = LoggerFactory.getLogger(Scheduler.class);
 
@@ -31,15 +41,25 @@ public class Scheduler {
 
     @Autowired
     private DeployEnvConfig mEnvConfig;
-
-    private TaskExecutorConfig mTaskExecutorBean;
+    @Autowired
+    private DeviceService mDeviceService;
 
     private ThreadPoolTaskExecutor mTaskExecutor = null;
 
-    // 本地模块扫描锁
-    private AtomicBoolean mScanLock = new AtomicBoolean(false);
+    private Map<String, DevicePO>  mDeviceMap     = new Hashtable<String,DevicePO>();
 
-    // 初始化锁
+    @Autowired
+    public void setTaskExecutor(ThreadPoolTaskExecutor scheduler_task_executor) {
+        this.mTaskExecutor = scheduler_task_executor;
+    }
+
+    /**
+     * 本地模块扫描锁
+     */
+    private AtomicBoolean mScanLock = new AtomicBoolean(false);
+    /**
+     * 初始化锁
+     */
     private AtomicBoolean mInitLock = new AtomicBoolean(false);
 
     /**
@@ -58,10 +78,16 @@ public class Scheduler {
         return mInstance;
     }
 
+    private Scheduler() {
+    }
+
     public boolean init() {
         if(mInitLock.compareAndSet(false, true)) {
-            mTaskExecutor = TaskExecutorConfig.taskExecutor();
-            mTaskExecutor.initialize();
+            logger.info("taskExecutor instance="+mTaskExecutor);
+
+            synchronized (mDeviceMap) {
+                loadDevices(mDeviceMap);
+            }
 
             mAppManager = new AppManager();
             mAppManager.init();
@@ -71,19 +97,36 @@ public class Scheduler {
         return mInitLock.get();
     }
 
+    public AppManager getAppManager() {
+       return mAppManager;
+    }
+
+    public ScheduleContext getSechduleContext(String host) {
+       return mContextMaps.get(host);
+    }
+
     /**
-     * 从数据库Device表中生成对应的ScheduleContext与Device对应信息
+     * 从数据库读取设备信息到内存
      */
-    public void loadDevices() {
-
+    private void loadDevices(Map<String,DevicePO> deviceMap) {
+        List<DevicePO> list = mDeviceService.list(null);
+        int total = list.size();
+        for(int i=0; i<total; i++) {
+            DevicePO device = list.get(i);
+            deviceMap.put(device.getIpAddress(), device);
+        }
     }
 
-    public void addDevice() {
-
+    public void addDevice(DevicePO device) {
+        if(device != null && !StrUtil.isEmpty(device.getIpAddress())) {
+            mDeviceMap.put(device.getIpAddress(), device);
+        }
     }
 
-    public void delDevice() {
-
+    public void delDevice(DevicePO device) {
+        if(device != null && !StrUtil.isEmpty(device.getIpAddress())) {
+            mDeviceMap.remove(device.getIpAddress());
+        }
     }
 
     public void depoly() {
@@ -108,12 +151,23 @@ public class Scheduler {
        return false;
     }
 
-    private boolean scanModules() {
-       return false;
+    /**
+     * 对比发布文件,扫描modules和scripts新增功能
+     * @return
+     */
+    public boolean scan() {
+        boolean scanResult=false;
+        if (mScanLock.compareAndSet(false, true)) {
+            final String releaseFile = mEnvConfig.getHomeDir()+"/"+mEnvConfig.getReleaseDescFile();
+            boolean isFile = true;
+            if(isFile) {
+
+            }
+
+        }
+
+        return scanResult;
     }
 
-    private boolean scanScripts() {
-        return false;
-    }
 }
 

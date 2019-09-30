@@ -19,13 +19,22 @@ public class AppModulePO extends BasePO{
      */
     private String name;
     /**
-     * 路径
+     * 脚本路径
      */
     private String path;
     /**
-     * 版本
+     * 包目录，相对目录
      */
-    private String version;
+    private String pack_dir;
+    /**
+     * 包版本
+     */
+    private String pack_ver;
+    /**
+     * 包文件名
+     */
+    private String pack_file;
+
     /**
      * 描述信息
      */
@@ -34,4 +43,10 @@ public class AppModulePO extends BasePO{
      * 帮助信息
      */
     private String help;
+
+    /**
+     * 删除模块标记
+     */
+    private int allow_delete;
+
 }

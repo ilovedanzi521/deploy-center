@@ -2,11 +2,15 @@ package com.win.dfas.deploy.schedule.bean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+@Configuration
 public class TaskExecutorConfig {
     private final static Logger logger = LoggerFactory.getLogger(TaskExecutorConfig.class);
 
+    @Bean(name = "scheduler_task_executor")
     public static ThreadPoolTaskExecutor taskExecutor() {
         logger.info("Start taskExecutor ...");
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
@@ -25,6 +29,7 @@ public class TaskExecutorConfig {
         // 等待所有任务结束后再关闭线程池
         executor.setWaitForTasksToCompleteOnShutdown(true);
 
+        executor.initialize();
         return executor;
     }
 }

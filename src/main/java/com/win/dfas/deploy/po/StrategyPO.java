@@ -30,4 +30,9 @@ public class StrategyPO extends BasePO{
      * 帮助信息
      */
     private String help;
+
+    /**
+     * 删除标记
+     */
+    private int allow_delete;
 }
