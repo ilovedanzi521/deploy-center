@@ -5,9 +5,10 @@ import cn.hutool.core.util.StrUtil;
 import com.win.dfas.deploy.po.AppModulePO;
 import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.po.StrategyPO;
-import com.win.dfas.deploy.schedule.bean.DeployEnvConfig;
+import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,7 +26,8 @@ public class ScheduleContext {
 
     private AppManager mAppManager;
 
-    private DeployEnvConfig mEnvConfig;
+    @Autowired
+    private DeployEnvBean mEnvConfig;
 
     private DevicePO mHost;
 
@@ -34,7 +36,7 @@ public class ScheduleContext {
      */
     private final static String sCommShell = "shell.sh";
 
-    public ScheduleContext(AppManager app, DeployEnvConfig env, DevicePO device) {
+    public ScheduleContext(AppManager app, DeployEnvBean env, DevicePO device) {
        this.mAppManager = app;
        this.mEnvConfig = env;
        this.mHost = device;

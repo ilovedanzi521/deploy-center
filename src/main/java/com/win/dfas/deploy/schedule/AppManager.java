@@ -2,12 +2,12 @@ package com.win.dfas.deploy.schedule;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.win.dfas.deploy.po.AppModulePO;
 import com.win.dfas.deploy.po.StrategyPO;
-import com.win.dfas.deploy.schedule.bean.DeployEnvConfig;
+import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
 import com.win.dfas.deploy.service.AppModuleService;
 import com.win.dfas.deploy.service.StrategyService;
+import com.win.dfas.deploy.util.SpringContextUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +26,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class AppManager {
     private final static Logger logger = LoggerFactory.getLogger(AppManager.class);
 
-    @Autowired
-    private DeployEnvConfig mEnvConfig;
-    @Autowired
+    private DeployEnvBean mEnvConfig;
     private AppModuleService mModuleService;
-    @Autowired
     private StrategyService mStrategyService;
 
     private Map<String, AppModulePO> mModuleFiles = new HashMap<String, AppModulePO>();
@@ -39,6 +36,10 @@ public class AppManager {
     private AtomicBoolean mScanLock = new AtomicBoolean(false);
 
     public boolean init() {
+        mEnvConfig = SpringContextUtils.getBean("deploy_env_bean", DeployEnvBean.class);
+        mModuleService = SpringContextUtils.getBean(AppModuleService.class);
+        mStrategyService = SpringContextUtils.getBean(StrategyService.class);
+
         return scan()==0;
     }
 

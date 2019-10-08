@@ -61,16 +61,15 @@ mybatis-plus:
     jdbc-type-for-null: 'null'
 
 deploy-center:
-  home_dir: /root/repo
-  deploy_dir: /root/deploy
-  modules_dir: ${deploy-center.home_dir}/modules
-  scripts_dir: ${deploy-center.home_dir}/scripts
-  packages_dir: ${deploy-center.home_dir}/packages
-  ftp-server:
-    host: 192.168.0.70
-    port: 21
-    user: ftp
-    pswd: ftp
-    repo-dir: /pub/repo
-  relased-description: release_version.txt
+  homeDir: ~/repo
+  deployDir: ~/deploy
+  modulesDir: ~/repo/modules
+  scriptsDir: ~/repo/scripts
+  packagesDir: ~/repo/packages
+  ftpHost: 192.168.0.70
+  ftpPort: 21
+  ftpUser: ftp
+  ftpPswd: ftp
+  ftpRepoDir: /pub/repo
+  releaseDescFile: release_version.txt
 

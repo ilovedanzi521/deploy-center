@@ -2,22 +2,16 @@ package com.win.dfas.deploy.schedule;
 
 import cn.hutool.core.util.StrUtil;
 import com.win.dfas.deploy.po.DevicePO;
-import com.win.dfas.deploy.schedule.bean.DeployEnvConfig;
-import com.win.dfas.deploy.schedule.bean.TaskExecutorConfig;
+import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
 import com.win.dfas.deploy.service.DeviceService;
+import com.win.dfas.deploy.util.SpringContextUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +25,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @创建时间 2019/09/25
  */
 @Component
-@Configuration
 public class Scheduler {
     private final static Logger logger = LoggerFactory.getLogger(Scheduler.class);
 
@@ -39,19 +32,13 @@ public class Scheduler {
 
     private AppManager mAppManager = null;
 
-    @Autowired
-    private DeployEnvConfig mEnvConfig;
-    @Autowired
+    private DeployEnvBean mEnvConfig;
+
     private DeviceService mDeviceService;
 
     private ThreadPoolTaskExecutor mTaskExecutor = null;
 
     private Map<String, DevicePO>  mDeviceMap     = new Hashtable<String,DevicePO>();
-
-    @Autowired
-    public void setTaskExecutor(ThreadPoolTaskExecutor scheduler_task_executor) {
-        this.mTaskExecutor = scheduler_task_executor;
-    }
 
     /**
      * 本地模块扫描锁
@@ -83,7 +70,13 @@ public class Scheduler {
 
     public boolean init() {
         if(mInitLock.compareAndSet(false, true)) {
+            mEnvConfig = SpringContextUtils.getBean("deploy_env_bean", DeployEnvBean.class);
+            mTaskExecutor = SpringContextUtils.getBean("scheduler_task_executor", ThreadPoolTaskExecutor.class);
+            mDeviceService = SpringContextUtils.getBean(DeviceService.class);
+
             logger.info("taskExecutor instance="+mTaskExecutor);
+            logger.info("deviceService: "+mDeviceService);
+            logger.info("deployEnv: "+mEnvConfig);
 
             synchronized (mDeviceMap) {
                 loadDevices(mDeviceMap);
@@ -110,6 +103,9 @@ public class Scheduler {
      */
     private void loadDevices(Map<String,DevicePO> deviceMap) {
         List<DevicePO> list = mDeviceService.list(null);
+        if(list == null || list.size() ==0) {
+            return;
+        }
         int total = list.size();
         for(int i=0; i<total; i++) {
             DevicePO device = list.get(i);
@@ -156,17 +152,7 @@ public class Scheduler {
      * @return
      */
     public boolean scan() {
-        boolean scanResult=false;
-        if (mScanLock.compareAndSet(false, true)) {
-            final String releaseFile = mEnvConfig.getHomeDir()+"/"+mEnvConfig.getReleaseDescFile();
-            boolean isFile = true;
-            if(isFile) {
-
-            }
-
-        }
-
-        return scanResult;
+        return false;
     }
 
 }

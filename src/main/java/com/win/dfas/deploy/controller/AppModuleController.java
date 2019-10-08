@@ -1,11 +1,20 @@
 package com.win.dfas.deploy.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.win.dfas.deploy.po.AppModulePO;
+import com.win.dfas.deploy.schedule.Scheduler;
+import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
 import com.win.dfas.deploy.service.AppModuleService;
+import com.win.dfas.deploy.service.impl.AppModuleServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.repository.query.Param;
+import org.springframework.web.bind.annotation.*;
+
+import javax.sound.midi.SysexMessage;
+import javax.sql.DataSource;
+import java.util.List;
+import java.util.Random;
 
 /**
  * @包名 com.win.dfas.deploy.controller
@@ -17,8 +26,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/app/module")
 public class AppModuleController extends BaseController<AppModulePO> {
-    @Autowired
+    @Autowired(required = true)
     private AppModuleService appModuleService;
+
+    @Autowired(required = true)
+    private DeployEnvBean mEnvConfig;
 
     @Override
     public IService<AppModulePO> getBaseService() {
