@@ -1,8 +1,11 @@
 package com.win.dfas.deploy.po;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.win.dfas.deploy.common.validator.group.AddGroup;
 import lombok.Data;
-import org.springframework.context.annotation.Description;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * @包名 com.win.dfas.deploy.po
@@ -13,7 +16,6 @@ import org.springframework.context.annotation.Description;
  */
 @Data
 @TableName("dc_devcie")
-@Description("设备信息")
 public class DevicePO extends BasePO{
 
     /**
@@ -27,22 +29,31 @@ public class DevicePO extends BasePO{
     /**
      * ip地址
      */
+    @NotBlank(message = "ip地址不能为空！",groups = AddGroup.class)
     private String ipAddress;
     /**
      * 用户名
      */
+    @NotBlank(message = "用户名不能为空！",groups = AddGroup.class)
     private String userName;
     /**
      * 端口
      */
+    @NotNull(message = "端口不能为空！",groups = AddGroup.class)
     private Integer port;
     /**
      * os操作系统类型
      */
+    @NotBlank(message = "操作系统不能为空！",groups = AddGroup.class)
     private String osType;
     /**
      * 连接状态
      */
     private Integer status;
+
+    /**
+     * 设备描述
+     */
+    private String desc;
 
 }

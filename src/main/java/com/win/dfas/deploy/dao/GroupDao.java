@@ -11,4 +11,5 @@ import com.win.dfas.deploy.po.GroupPO;
  * @创建时间 2019/09/26 14:34
  */
 public interface GroupDao extends BaseMapper<GroupPO> {
+
 }

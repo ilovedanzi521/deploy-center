@@ -1,9 +1,11 @@
 package com.win.dfas.deploy.controller;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.win.dfas.common.vo.WinResponseData;
 import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.service.DeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,5 +25,11 @@ public class DeviceController extends BaseController<DevicePO> {
     @Override
     public IService<DevicePO> getBaseService() {
         return this.deviceService;
+    }
+
+    @GetMapping("/list")
+    public WinResponseData list(){
+
+        return WinResponseData.handleSuccess(deviceService.list(null));
     }
 }
