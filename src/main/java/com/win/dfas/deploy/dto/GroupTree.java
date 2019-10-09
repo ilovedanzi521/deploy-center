@@ -2,6 +2,9 @@ package com.win.dfas.deploy.dto;
 
 import lombok.Data;
 
+import java.util.Date;
+import java.util.List;
+
 /**
  * @包名 com.win.dfas.deploy.dto
  * @类名 GroupTree
@@ -25,17 +28,33 @@ public class GroupTree {
      */
     private String osType;
     /**
+     * 用户名
+     */
+    private String userName;
+    /**
+     * 端口
+     */
+    private Integer port;
+    /**
      * 设备连接状态
      */
     private Integer status;
     /**
-     * 组描述
+     * 描述
      */
     private String desc;
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
 
     /**
      * 子节点
      */
-    private GroupTree children;
+    private List<GroupTree> children;
 
 }

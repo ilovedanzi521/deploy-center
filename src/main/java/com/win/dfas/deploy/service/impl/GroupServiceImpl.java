@@ -1,15 +1,21 @@
 package com.win.dfas.deploy.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.win.dfas.deploy.bo.DeviceGroupBO;
+import com.win.dfas.deploy.common.exception.BaseException;
 import com.win.dfas.deploy.dao.GroupDao;
+import com.win.dfas.deploy.dto.GroupTree;
+import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.po.GroupDeviceRefPO;
 import com.win.dfas.deploy.po.GroupPO;
 import com.win.dfas.deploy.service.GroupDeviceRefService;
 import com.win.dfas.deploy.service.GroupService;
 import com.win.dfas.deploy.vo.request.DeviceParamsVO;
 import com.win.dfas.deploy.vo.request.GroupVO;
+import com.win.dfas.deploy.vo.response.PageVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.sql.Wrapper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,10 +45,30 @@ public class GroupServiceImpl extends ServiceImpl<GroupDao, GroupPO> implements 
     private GroupDeviceRefService groupDeviceRefService;
 
     @Override
-    public IPage<GroupPO> getGroupTreePageInfo(DeviceParamsVO deviceParamsVO) {
-        Page<GroupPO> page = new Page<>(deviceParamsVO.getReqPageNum(),deviceParamsVO.getReqPageSize());
-        IPage<GroupPO> iPage = this.page(page,null);
-        return iPage;
+    public PageVO<GroupTree> getGroupTreePageInfo(DeviceParamsVO deviceParamsVO) {
+        Page<DeviceGroupBO> groupPage = (Page<DeviceGroupBO>) this.getPageList(deviceParamsVO);
+        //转成树形表格
+        return new PageVO(groupPage,toGroupTree(groupPage.getRecords()));
+    }
+
+    private List<GroupTree> toGroupTree(List<DeviceGroupBO> records) {
+        List<GroupTree> treeList = new ArrayList<>(records.size());
+        for (DeviceGroupBO deviceGroupBO: records){
+            GroupTree groupTree = new GroupTree();
+            BeanUtils.copyProperties(deviceGroupBO,groupTree);
+            List<DevicePO> devices = deviceGroupBO.getDevices();
+            if (!CollectionUtils.isEmpty(devices)){
+                List<GroupTree> children = new ArrayList<>(devices.size());
+                for (DevicePO devicePO: devices) {
+                    GroupTree nodeTree = new GroupTree();
+                    BeanUtils.copyProperties(devicePO,nodeTree);
+                    children.add(nodeTree);
+                }
+                groupTree.setChildren(children);
+            }
+            treeList.add(groupTree);
+        }
+        return treeList;
     }
 
     @Override
@@ -60,6 +85,12 @@ public class GroupServiceImpl extends ServiceImpl<GroupDao, GroupPO> implements 
         return false;
     }
 
+    /**
+     * 保存组关联设备信息
+     * @param groupId
+     * @param deviceIds
+     * @return
+     */
     private Boolean saveRefDevices(Long groupId, List<Long> deviceIds) {
         List<GroupDeviceRefPO> refPOList = new ArrayList<>(deviceIds.size());
         for (Long deviceId: deviceIds){
@@ -80,22 +111,45 @@ public class GroupServiceImpl extends ServiceImpl<GroupDao, GroupPO> implements 
         if (!StringUtils.isEmpty(desc)){
             GroupPO groupPO = new GroupPO();
             BeanUtils.copyProperties(groupVO,groupPO);
-            this.updateById(groupPO);
+            Boolean updateGroup = this.updateById(groupPO);
+            if (!updateGroup){
+                throw new BaseException("组更新失败");
+            }
         }
         if (CollectionUtils.isEmpty(deviceIds)){
             return true;
         }else {
             //更新设备信息
-            Map<String,Object> columnMap = new HashMap<>();
+            Map<String,Object> columnMap = new HashMap<>(1);
             columnMap.put("group_id",groupId);
             Boolean delRefs = this.groupDeviceRefService.removeByMap(columnMap);
-            if (delRefs){
-                Boolean saveRefs = saveRefDevices(groupId, groupVO.getDeviceIds());
-                if (saveRefs){
-                    return true;
-                }
+            Boolean saveRefs = saveRefDevices(groupId, groupVO.getDeviceIds());
+            if (delRefs && saveRefs){
+                return true;
+            }else{
+                throw new BaseException("组关联信息更新失败");
             }
         }
-        return false;
+    }
+
+    @Override
+    public DeviceGroupBO getInfo(Long id) {
+        return baseMapper.getOne(id);
+    }
+
+    @Override
+    public IPage<DeviceGroupBO> getPageList(DeviceParamsVO deviceParamsVO) {
+        Page<DeviceGroupBO> page = new Page<>(deviceParamsVO.getReqPageNum(),deviceParamsVO.getReqPageSize());
+        //条件构造器对象
+        QueryWrapper<DeviceGroupBO> queryWrapper = new QueryWrapper<DeviceGroupBO>();
+        queryWrapper.orderByDesc("create_time");
+        IPage<DeviceGroupBO> pageList;
+        try {
+             pageList = this.baseMapper.getPageList(page,queryWrapper);
+        } catch (Exception e) {
+            log.error("查询设置组分页列表失败",e);
+            throw new BaseException("查询设置组分页列表失败",e);
+        }
+        return pageList;
     }
 }

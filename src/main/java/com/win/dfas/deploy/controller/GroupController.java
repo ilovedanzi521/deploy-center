@@ -2,15 +2,19 @@ package com.win.dfas.deploy.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.pagehelper.PageInfo;
 import com.win.dfas.common.vo.WinResponseData;
+import com.win.dfas.deploy.bo.DeviceGroupBO;
 import com.win.dfas.deploy.common.annotation.SysLog;
 import com.win.dfas.deploy.common.validator.ValidatorUtils;
 import com.win.dfas.deploy.common.validator.group.AddGroup;
 import com.win.dfas.deploy.common.validator.group.UpdateGroup;
+import com.win.dfas.deploy.dto.GroupTree;
 import com.win.dfas.deploy.po.GroupPO;
 import com.win.dfas.deploy.service.GroupService;
 import com.win.dfas.deploy.vo.request.DeviceParamsVO;
 import com.win.dfas.deploy.vo.request.GroupVO;
+import com.win.dfas.deploy.vo.response.PageVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -33,10 +37,10 @@ public class GroupController extends BaseController<GroupPO> {
         return this.groupService;
     }
 
-    @GetMapping("/pageList")
+    @PostMapping("/pageList")
     public WinResponseData pageList(@RequestBody DeviceParamsVO deviceParamsVO){
-        IPage<GroupPO> pageInfo = this.groupService.getGroupTreePageInfo(deviceParamsVO);
-        return WinResponseData.handleSuccess(pageInfo);
+        PageVO<GroupTree> pageVO = this.groupService.getGroupTreePageInfo(deviceParamsVO);
+        return WinResponseData.handleSuccess(pageVO);
     }
 
     /**
@@ -65,5 +69,10 @@ public class GroupController extends BaseController<GroupPO> {
         }else {
             return WinResponseData.handleError("更新组失败！");
         }
+    }
+
+    @GetMapping("/getInfo/{id}")
+    public WinResponseData getInfo(@PathVariable Long id){
+        return WinResponseData.handleSuccess(this.groupService.getInfo(id));
     }
 }

@@ -3,7 +3,7 @@ import Login from "@/page/login/view/index.vue";
 import Home from "@/page/home/view/index.vue";
 import Directional from "@/page/fram/view/Directional.vue";
 import DeployIndex from "@/page/deploy/view/index.vue";
-import DeployDevice from "@/page/deploy/view/device.vue";
+import DeployGroup from "@/page/deploy/view/group.vue";
 import DeployUser from "@/page/deploy/view/userList.vue";
 
 
@@ -39,9 +39,9 @@ const routerChildren = [
         component: DeployIndex,
     },
     {
-        path: "/deployDevice",
-        name: "deployDevice",
-        component: DeployDevice,
+        path: "/deployGroup",
+        name: "deployGroup",
+        component: DeployGroup,
     },
     {
         path: "/deployUser",
