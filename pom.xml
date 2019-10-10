@@ -62,11 +62,11 @@
             <version>1.1.10</version>
         </dependency>
 
-        <!--mybatis-plus依赖-->
+        <!--mybatis-plus依赖,版本不低于3.0.7，否则无法使用自定义条件构造器-->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>3.0.1</version>
+            <version>3.0.7</version>
         </dependency>
 
         <!--工具包-->

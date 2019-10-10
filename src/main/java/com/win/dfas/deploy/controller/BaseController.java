@@ -3,7 +3,11 @@ package com.win.dfas.deploy.controller;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.win.dfas.common.vo.WinResponseData;
 import com.win.dfas.deploy.common.annotation.SysLog;
+import com.win.dfas.deploy.common.validator.ValidatorUtils;
+import com.win.dfas.deploy.common.validator.group.AddGroup;
+import com.win.dfas.deploy.common.validator.group.UpdateGroup;
 import com.win.dfas.deploy.po.BasePO;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,7 +28,8 @@ public abstract class BaseController<T extends BasePO> {
 
     @SysLog
     @PostMapping("/save")
-    public WinResponseData save(@RequestBody T t){
+    protected WinResponseData save(@RequestBody T t){
+        ValidatorUtils.validateEntity(t, AddGroup.class);
         Boolean flag = this.getBaseService().save(t);
         if (!flag){
             return WinResponseData.handleError("新增异常");
@@ -35,6 +40,7 @@ public abstract class BaseController<T extends BasePO> {
     @SysLog
     @PostMapping("/update")
     public WinResponseData updateById(@RequestBody T t){
+        ValidatorUtils.validateEntity(t, UpdateGroup.class);
         Boolean flag = this.getBaseService().updateById(t);
         if (!flag){
             return WinResponseData.handleError("修改异常");

@@ -3,6 +3,7 @@ package com.win.dfas.deploy.common.handler;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import com.win.dfas.common.vo.WinResponseData;
 import com.win.dfas.deploy.common.exception.UserInvalidException;
+import com.win.dfas.deploy.common.exception.ValidateException;
 import lombok.extern.log4j.Log4j;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -49,6 +50,11 @@ public class GlobalExceptionHandler {
         log.error("url = {}, errMsg ={}", request.getRequestURL(), ExceptionUtil.stacktraceToString(ex));
 
         return WinResponseData.handleError(ex.getMessage());
+    }
+    @ExceptionHandler(ValidateException.class)
+    public WinResponseData ValidateExceptionHandler(ValidateException e){
+
+        return WinResponseData.handleError("验证异常："+e.getMessage());
     }
 
 
