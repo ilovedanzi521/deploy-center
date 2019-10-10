@@ -24,12 +24,12 @@ CREATE TABLE IF NOT EXISTS dc_devcie(
 	UNIQUE KEY (ip_address)
 ) COMMENT='机器信息表';
 CREATE TABLE IF NOT EXISTS dc_group_device_ref(
-	group_id BIGINT(20) NOT NULL auto_increment COMMENT '组ID',
-	device_id BIGINT(20) NOT NULL auto_increment COMMENT '机器ID'
+	group_id BIGINT(20) NOT NULL COMMENT '组ID',
+	device_id BIGINT(20) NOT NULL COMMENT '机器ID'
 ) COMMENT='组与机器关联表';
 CREATE TABLE IF NOT EXISTS dc_device_module_ref(
-	device_id BIGINT(20) NOT NULL auto_increment COMMENT '机器ID',
-	module_id BIGINT(20) NOT NULL auto_increment COMMENT '应用模块id'
+	device_id BIGINT(20) NOT NULL COMMENT '机器ID',
+	module_id BIGINT(20) NOT NULL COMMENT '应用模块id'
 ) COMMENT='机器模块关联表';
 
 --应用模块信息表
@@ -71,9 +71,9 @@ CREATE TABLE IF NOT EXISTS dc_device_module_ref(
 --任务信息表
 CREATE TABLE IF NOT EXISTS dc_task(
 	id BIGINT(20) NOT NULL auto_increment COMMENT '主键ID',
-	strategy_id BIGINT(20) NOT NULL auto_increment COMMENT '策略ID',
-	group_id BIGINT(20) NOT NULL auto_increment COMMENT '组ID',
-	status int(2) NOT NULL COMMENT '状态：0-未部署;1-已部署;2-部署失败',
+	strategy_id BIGINT(20) NOT NULL COMMENT '策略ID',
+	group_id BIGINT(20) NOT NULL COMMENT '组ID',
+	status int(2) NOT NULL COMMENT '状态：0-未部署;1-已部署;2-部署失败;3-进行中',
 	create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
 	update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
 	PRIMARY KEY (id),
