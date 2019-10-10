@@ -16,7 +16,7 @@
 
     <!-- 根据任务ID查询对应要执行的设备列表 -->
     <select id="selectDeviceByTask" parameterType="long" resultType="com.win.dfas.deploy.po.DevicePO">
-        select dc_device.id, dc_devcie.name, dc_devcie.alias, dc_devcie.ip_address, dc_devcie.status
+        select dc_devcie.id, dc_devcie.name, dc_devcie.alias, dc_devcie.ip_address, dc_devcie.status
         from
             dc_devcie,dc_group_device_ref,dc_task
         where
