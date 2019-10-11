@@ -1,0 +1,136 @@
+
+import BaseController from "../../common/controller/BaseController";
+import {OperationTypeEnum} from "../../common/enum/OperationTypeEnum";
+import {DeviceRepVO, GroupReqVO, GroupTreeVO} from "../vo/GroupVO";
+import {Component, Emit, Prop} from "vue-property-decorator";
+import {WinRspType} from "../../common/enum/BaseEnum";
+import {BaseConst} from "../../common/const/BaseConst";
+import {GroupValidConst} from "../const/ValidateConst";
+import DeployService from "../service/DeployService";
+import {WinResponseData} from "../../common/vo/BaseVO";
+
+@Component
+export default class GroupDialogController extends BaseController{
+    /** 部署服务*/
+    private deployService: DeployService = new DeployService();
+    // 接受父组件的值
+    @Prop({
+        type: Object,
+        required: false,
+        default: () => ({})
+    })
+    private toChildMsg!: {
+        dialogTitle: string;
+        type: OperationTypeEnum;
+        data: GroupTreeVO;
+    };
+    /*定义校验函数*/
+    public $refs: {
+        validate: HTMLFormElement;
+    };
+    // 弹窗标题
+    private dialogTitle: string = "";
+    // 控制dialog显隐
+    private dialogVisibleSon: boolean = false;
+    // 确定按钮或删除按钮标志
+    private dialogSumbitText: string = "";
+    /*保存加载中*/
+    private saveLoading: boolean = false;
+    // 字段样式
+    private spanWidth: number = 8;
+    private deviceIds: number[]=[];
+    private devices: DeviceRepVO[]=[];
+    private deviceTransferData: any =[];
+    /**
+     * 按钮是否显示
+     */
+    private buttonShow: boolean = true;
+    /**
+     * 所有字段是否置灰
+     */
+    private allDisabled: boolean = false;
+
+    private groupReqVO: GroupReqVO = new GroupReqVO();
+
+    // 校验规则
+    private rules = {
+        name: [
+            {
+                required: true,
+                message: GroupValidConst.NAME_NOTNULL,
+                trigger: "blur"
+            }
+        ],
+        deviceIds: [
+            {
+                required: true,
+                message: GroupValidConst.DEVICE_NOTNULL,
+                trigger: "change"
+            }
+        ]
+    };
+    private mounted(){
+        console.log("进入组对话框...........");
+        console.log(this.toChildMsg);
+        this.initDeviceTransferData();
+        this.dialogTitle = this.toChildMsg.dialogTitle;
+        this.transfChildMsg(this.toChildMsg.data);
+        if (this.toChildMsg.type === OperationTypeEnum.ADD) {
+            this.dialogSumbitText = BaseConst.CONFIRM;
+        }
+        this.dialogVisibleSon = true;
+    }
+    // 提交
+    private submitDialog(formName: string) {
+        this.$refs[formName].validate((valid: boolean) => {
+            if (valid) {
+
+            } else {
+                this.win_message_error("表单验证未通过");
+                return false;
+            }
+        });
+    }
+    /*关闭组对话框*/
+    private closeGroupDialog(){
+        this.send(WinRspType.CANCEL);
+    }
+
+    @Emit("bindSend")
+    // tslint:disable-next-line: no-empty
+    private send(msg: WinRspType) {}
+
+    /*初始化设备穿梭框已选数据*/
+    private transfChildMsg(treeVO: GroupTreeVO) {
+        let me = this;
+        this.groupReqVO.id = treeVO.id;
+        this.groupReqVO.name = treeVO.name;
+        this.groupReqVO.desc = treeVO.desc;
+        treeVO.children.forEach(function (item) {
+            me.groupReqVO.deviceIds.push(item.id);
+        });
+    }
+
+    /*初始化设备穿梭框可选数据*/
+    private initDeviceTransferData() {
+        let me = this;
+        console.log("查设备可选数据...........");
+        this.deployService.deviceList()
+            .then((winResponseData: WinResponseData) =>{
+                if (WinRspType.SUCC === winResponseData.winRspType) {
+                    console.log(winResponseData.data);
+                    this.devices = winResponseData.data;
+                    if (this.devices && this.devices.length>0){
+                        this.devices.forEach(function (item) {
+                            me.deviceTransferData.push({
+                                key: item.id,
+                                label: `${item.ipAddress}(${item.name})`,
+                            });
+                        })
+                    }
+                } else {
+                    this.errorMessage(winResponseData.msg);
+                }
+            })
+    }
+}

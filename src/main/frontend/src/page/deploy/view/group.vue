@@ -1,23 +1,46 @@
 <template>
     <div>
-        <h1 style="color: red">设备管理</h1>
-
-        <div class="content-fl">
-            <div class="content-fl-warp">
-                <win-table :data="groupTreeList" style="width: 100%;margin-bottom: 20px;" row-key="id" border default-expand-all :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
-                    <win-table-column prop="name" :min-width="80" label="组（设备)名称" sortable></win-table-column>
-                    <win-table-column prop="ipAddress" :min-width="100" label="ip地址"></win-table-column>
-                    <win-table-column prop="desc" :min-width="100" label="描述"></win-table-column>
-                    <win-table-column prop="osType" :min-width="100" label="系统类型"></win-table-column>
-                    <win-table-column prop="userName" :min-width="100" label="用户名"></win-table-column>
-                    <win-table-column prop="port" :min-width="100" label="端口号"></win-table-column>
-                    <win-table-column prop="createTime" :min-width="150" label="创建时间"></win-table-column>
-                    <win-table-column prop="status" :min-width="150" label="连接状态"></win-table-column>
-                </win-table>
-                <div class="paginatio-contanier">
-                    <win-pagination name="subDic" v-bind:childMsg="pageVO" @callFather="groupPageQuery"></win-pagination>
-                </div>
+        <!-- 设备组弹框end：新增/删除 -->
+        <div class="col-md-12" style="margin-top:5px;">
+            <ul class="btn-edit fr">
+                <li>
+                    <el-button-group>
+                        <win-button type="info" icon="el-icon-plus" round @click="groupOperation('','ADD')">新增设备组</win-button>
+                        <win-button v-popover:popover1 type="info" icon="el-icon-delete" round :disabled="selected.length == 0" @click="delGroupBatch">删除设备组</win-button>
+                    </el-button-group>
+                </li>
+            </ul>
+        </div>
+        <div style="margin-top:9px;">
+            <!--树形表格-->
+            <win-table style="width: 100%;margin-bottom: 20px;" row-key="id" border resizable element-loading-text="拼命加载中..." indexFixed selectionFixed
+                       :data="groupTreeList"
+                       :tree-config="{children: 'children', expandAll: true}"
+                       :loading="groupLoading">
+                <win-table-column field="name" title="组（设备)名称" min-width="130" tree-node></win-table-column>
+                <win-table-column field="ipAddress" title="ip地址" min-width="100"></win-table-column>
+                <win-table-column field="desc" title="描述" min-width="130"></win-table-column>
+                <win-table-column field="osType" title="系统类型" min-width="80"></win-table-column>
+                <win-table-column field="userName" title="用户名" min-width="80"></win-table-column>
+                <win-table-column field="port" title="端口号" min-width="60"></win-table-column>
+                <win-table-column field="createTime" title="创建时间" min-width="100"></win-table-column>
+                <win-table-column field="status" title="连接状态" min-width="80"></win-table-column>
+                <vxe-table-column title="操作" min-width="100">
+                    <template v-slot="{ row }">
+                        <el-button size="mini" @click="handleEdit(row)">编辑</el-button>
+                        <el-button size="mini" type="danger" @click="handleDelete(row)">删除</el-button>
+                    </template>
+                </vxe-table-column>
+                <template v-slot:empty>
+                    <span style="color: red;">没有更多数据了！</span>
+                </template>
+            </win-table>
+            <!--分页组件-->
+            <div class="page-contanier">
+                <win-pagination name="groupPage" v-bind:childMsg="pageVO" @callFather="groupPageQuery"></win-pagination>
             </div>
+            <!-- 设备组弹框begin：新增/删除 -->
+            <GroupDialog v-if="isGroupDialog" :toChildMsg="groupDialogMsg" @bindSend="toGroupDialogForm" ></GroupDialog>
         </div>
     </div>
 </template>
@@ -35,54 +58,10 @@
     .container {
         padding: 16px 18px;
         overflow: hidden;
-        .content-fr {
-            position: relative;
-            box-sizing: border-box;
-            float: left;
-            width: 27%;
-            box-sizing: border-box;
-            .content-fr-warp {
-                background: #0b1431ff;
-                height: 720px;
-                overflow-x: hidden;
-            }
-        }
-        .content-fl {
-            position: relative;
-            width: 72%;
-            box-sizing: border-box;
-            top: 28px;
-            float: right;
-            .content-fl-warp {
-                border: 1px solid #f58b0eff;
-                padding: 2px;
-                background: #38415bff;
-                box-sizing: border-box;
-            }
-        }
         .page-contanier {
             position: absolute;
             width: 100%;
             right: 10px;
-        }
-
-        .search-contanier {
-            margin-bottom: 14px;
-            overflow: hidden;
-            .add-botton {
-                display: inline-block;
-                width: 132px;
-                height: 36px;
-                font-size: 14px;
-                line-height: 36px;
-                border-radius: 20px;
-                background: #2b3551ff;
-                color: #fff;
-                text-align: center;
-            }
-        }
-        .paginatio-contanier {
-            margin-top: 5px;
         }
     }
 </style>
