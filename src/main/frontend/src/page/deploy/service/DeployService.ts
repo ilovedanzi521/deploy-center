@@ -1,6 +1,6 @@
 import {WinResponseData} from "../../common/vo/BaseVO";
 import AxiosFun from "../../../api/AxiosFun";
-import {DeviceReqVO, GroupQueryVO} from "../vo/GroupVO";
+import {DeviceRepVO, DeviceReqVO, GroupQueryVO, GroupReqVO} from "../vo/GroupVO";
 
 export default class DeployService {
     userList() {
@@ -14,7 +14,15 @@ export default class DeployService {
         return AxiosFun.get("http://localhost:8888/deploy/device/list", null);
     }
 
-    deviceConnectTest(vo: DeviceReqVO): Promise<WinResponseData> {
-        return AxiosFun.post("http://localhost:8888/deploy/device/connectTest", null);
+    deviceConnectTest(vo: DeviceRepVO): Promise<WinResponseData> {
+        return AxiosFun.post("http://localhost:8888/deploy/device/connectTest", vo);
+    }
+
+    insertDevice(vo: DeviceRepVO): Promise<WinResponseData> {
+        return AxiosFun.post("http://localhost:8888/deploy/device/save", vo);
+    }
+
+    saveGroup(vo: GroupReqVO): Promise<WinResponseData> {
+        return AxiosFun.post("http://localhost:8888/deploy/group/safeSave", vo);
     }
 }

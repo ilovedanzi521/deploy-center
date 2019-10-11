@@ -12,13 +12,9 @@ export class GroupReqVO{
     deviceIds: number[];
 }
 export class DeviceReqVO extends BaseReqVO{
-    name:string;
-    alias:string;
     ipAddress:String;
     userName:string;
     port:number;
-    osType:string;
-    desc:string;
 }
 
 /*********************response VO****************/
@@ -45,7 +41,7 @@ export class DeviceRepVO extends BaseRepVO{
     userName:string;
     port:number;
     osType:string;
-    status:number;
+    status:number=0;
     desc:string;
 }
 
