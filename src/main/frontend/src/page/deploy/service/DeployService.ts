@@ -1,6 +1,6 @@
 import {WinResponseData} from "../../common/vo/BaseVO";
 import AxiosFun from "../../../api/AxiosFun";
-import {GroupQueryVO} from "../vo/GroupVO";
+import {DeviceReqVO, GroupQueryVO} from "../vo/GroupVO";
 
 export default class DeployService {
     userList() {
@@ -12,5 +12,9 @@ export default class DeployService {
 
     deviceList(): Promise<WinResponseData> {
         return AxiosFun.get("http://localhost:8888/deploy/device/list", null);
+    }
+
+    deviceConnectTest(vo: DeviceReqVO): Promise<WinResponseData> {
+        return AxiosFun.post("http://localhost:8888/deploy/device/connectTest", null);
     }
 }

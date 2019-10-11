@@ -1,13 +1,14 @@
 
 import BaseController from "../../common/controller/BaseController";
 import {OperationTypeEnum} from "../../common/enum/OperationTypeEnum";
-import {DeviceRepVO, GroupReqVO, GroupTreeVO} from "../vo/GroupVO";
+import {DeviceRepVO, DeviceReqVO, GroupReqVO, GroupTreeVO} from "../vo/GroupVO";
 import {Component, Emit, Prop} from "vue-property-decorator";
 import {WinRspType} from "../../common/enum/BaseEnum";
 import {BaseConst} from "../../common/const/BaseConst";
 import {GroupValidConst} from "../const/ValidateConst";
 import DeployService from "../service/DeployService";
 import {WinResponseData} from "../../common/vo/BaseVO";
+import {GroupConst} from "../const/DeployConst";
 
 @Component
 export default class GroupDialogController extends BaseController{
@@ -36,8 +37,6 @@ export default class GroupDialogController extends BaseController{
     private dialogSumbitText: string = "";
     /*保存加载中*/
     private saveLoading: boolean = false;
-    // 字段样式
-    private spanWidth: number = 8;
     private deviceIds: number[]=[];
     private devices: DeviceRepVO[]=[];
     private deviceTransferData: any =[];
@@ -51,6 +50,16 @@ export default class GroupDialogController extends BaseController{
     private allDisabled: boolean = false;
 
     private groupReqVO: GroupReqVO = new GroupReqVO();
+
+    /*是否展示设备对话框*/
+    private deviceDialogVisible: boolean = false;
+    /*设备对话框标题*/
+    private deviceDialogTitle: string = "";
+    /*设备对话框-提交按钮*/
+    private deviceSubmitText :string = "";
+
+    private deviceRepVO: DeviceRepVO=new DeviceRepVO();
+    private deviceReqVO: DeviceReqVO = new DeviceReqVO();
 
     // 校验规则
     private rules = {
@@ -66,6 +75,16 @@ export default class GroupDialogController extends BaseController{
                 required: true,
                 message: GroupValidConst.DEVICE_NOTNULL,
                 trigger: "change"
+            }
+        ]
+    };
+    // 校验规则
+    private deviceRules = {
+        ipAddress: [
+            {
+                required: true,
+                message: GroupValidConst.NAME_NOTNULL,
+                trigger: "blur"
             }
         ]
     };
@@ -86,7 +105,7 @@ export default class GroupDialogController extends BaseController{
             if (valid) {
 
             } else {
-                this.win_message_error("表单验证未通过");
+                this.win_message_error("组表单验证未通过");
                 return false;
             }
         });
@@ -114,6 +133,7 @@ export default class GroupDialogController extends BaseController{
     /*初始化设备穿梭框可选数据*/
     private initDeviceTransferData() {
         let me = this;
+        me.deviceTransferData = [];
         console.log("查设备可选数据...........");
         this.deployService.deviceList()
             .then((winResponseData: WinResponseData) =>{
@@ -132,5 +152,47 @@ export default class GroupDialogController extends BaseController{
                     this.errorMessage(winResponseData.msg);
                 }
             })
+    }
+
+    public deviceOperation(row: DeviceRepVO, type: OperationTypeEnum){
+        console.log("deviceOperation");
+        console.log(OperationTypeEnum);
+        console.log(row);
+        if (type === OperationTypeEnum.ADD) {
+            this.deviceDialogTitle = GroupConst.ADD_DEVICE;
+            this.deviceSubmitText = BaseConst.CONFIRM;
+        }
+        this.deviceDialogVisible = true;
+    }
+    public submitDeviceDialog(formName: string){
+        this.$refs[formName].validate((valid: boolean) => {
+            if (valid) {
+
+            } else {
+                this.win_message_error("设备表单验证未通过");
+                return false;
+            }
+        });
+    }
+    public connectTest(formName: string){
+        this.$refs[formName].validate((valid: boolean) => {
+            if (valid) {
+                this.deviceReqVO.ipAddress = this.deviceRepVO.ipAddress;
+                this.deviceReqVO.userName = this.deviceRepVO.userName;
+                this.deviceReqVO.port = this.deviceRepVO.port;
+                this.deployService.deviceConnectTest(this.deviceReqVO)
+                    .then((winResponseData: WinResponseData) =>{
+                        if (WinRspType.SUCC === winResponseData.winRspType) {
+                            console.log(winResponseData.data);
+                            this.deviceRepVO = winResponseData.data;
+                        } else {
+                            this.errorMessage(winResponseData.msg);
+                        }
+                })
+            } else {
+                this.win_message_error("设备表单验证未通过");
+                return false;
+            }
+        });
     }
 }

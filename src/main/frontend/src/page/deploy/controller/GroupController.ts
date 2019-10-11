@@ -12,7 +12,6 @@ import GroupDialog from "../view/groupDialog.vue";
 
 
 @Component({ components: {GroupDialog} })
-
 export default class GroupController extends BaseController {
     /** 部署服务*/
     private deployService: DeployService = new DeployService();

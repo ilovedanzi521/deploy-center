@@ -1,14 +1,24 @@
 import {BaseRepVO, BaseReqVO} from "../../common/vo/BaseVO";
 /**********************request VO***********************/
 //组查询VO
-export class GroupQueryVO extends BaseReqVO {
-
+export class GroupQueryVO {
+    reqPageNum: number = 1;
+    reqPageSize: number = 2;
 }
 export class GroupReqVO{
     id: number;
     name: string;
     desc: string;
     deviceIds: number[];
+}
+export class DeviceReqVO extends BaseReqVO{
+    name:string;
+    alias:string;
+    ipAddress:String;
+    userName:string;
+    port:number;
+    osType:string;
+    desc:string;
 }
 
 /*********************response VO****************/
