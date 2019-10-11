@@ -17,7 +17,7 @@ spring:
     #进行该配置后，每次启动程序，程序都会运行resources/db/schema-h2文件，对数据库的结构进行操作，相当于新建一个表。
     schema: classpath:db/schema-h2.sql
     #进行该配置后，每次启动程序，程序都会运行resources/data.sql文件，对数据库的数据操作，相当于往表中插入数据。
-    #    data: classpath:db/data.sql
+    #data: classpath:db/data.sql
     druid:
       initial-size: 10
       max-active: 100
@@ -61,11 +61,12 @@ mybatis-plus:
     jdbc-type-for-null: 'null'
 
 deploy-center:
-  homeDir: ~/repo
+  homeDir: C:\\Users\\chenj\\project\\ysstech\\dfas_group\\dfas_cloud_core\\dfas-deploy-center\\repo
   deployDir: ~/deploy
   modulesDir: ~/repo/modules
   scriptsDir: ~/repo/scripts
   packagesDir: ~/repo/packages
+  logsDir: ~/repo/logs
   ftpHost: 192.168.0.70
   ftpPort: 21
   ftpUser: ftp

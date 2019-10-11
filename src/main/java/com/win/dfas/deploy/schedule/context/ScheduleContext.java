@@ -1,14 +1,14 @@
-package com.win.dfas.deploy.schedule;
+package com.win.dfas.deploy.schedule.context;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import com.win.dfas.deploy.po.AppModulePO;
 import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.po.StrategyPO;
+import com.win.dfas.deploy.schedule.AppManager;
 import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,10 +25,7 @@ public class ScheduleContext {
     private final static Logger logger = LoggerFactory.getLogger(ScheduleContext.class);
 
     private AppManager mAppManager;
-
-    @Autowired
     private DeployEnvBean mEnvConfig;
-
     private DevicePO mHost;
 
     /**
@@ -36,11 +33,24 @@ public class ScheduleContext {
      */
     private final static String sCommShell = "shell.sh";
 
-    public ScheduleContext(AppManager app, DeployEnvBean env, DevicePO device) {
+    public ScheduleContext(AppManager app, DeployEnvBean envCfg, DevicePO device) {
        this.mAppManager = app;
-       this.mEnvConfig = env;
+       this.mEnvConfig =  envCfg;
        this.mHost = device;
     }
+
+    public void setDevice(DevicePO device) {
+        this.mHost = device;
+    }
+
+    public DevicePO getDevice() {
+        return mHost;
+    }
+
+    public AppManager getAppManager() {
+        return mAppManager;
+    }
+
     /**
      * 测试远程机器是否能正常连接
      * @return
@@ -60,10 +70,15 @@ public class ScheduleContext {
      * 获取ssh远程执行命令头部
      * @return
      */
-    private String getSshHeadStr() {
+    public String getSshHeadStr() {
         return  "ssh -p "+mHost.getPort()+" "+mHost.getIpAddress()+" ";
     }
 
+    /**
+     * 执行模块的packPath命令,返回packPath执行的结果
+     * @param moduleName
+     * @return
+     */
     public String packPath(String moduleName) {
         String remoteShellPath = getModuleShellPath(moduleName);
         String command = getSshHeadStr()+remoteShellPath;
@@ -75,17 +90,28 @@ public class ScheduleContext {
         return resultStr;
     }
 
+    /**
+     * 获取模块脚本shell的绝对路径
+     * @param moduleName
+     * @return
+     */
    public String getModuleShellPath(String moduleName) {
         AppModulePO module = mAppManager.getModuleByName(moduleName);
-        String shellPath = mEnvConfig.getHomeDir()+"/modules/"+module.getPath();
+        String shellPath = mEnvConfig.getHomeDir()+File.separator+"modules"+File.separator+module.getPath();
         return shellPath;
     }
 
+    /**
+     * 获取策略脚本shell的绝对路径
+     * @param strategyName
+     * @return
+     */
     public String getStrategyShellPath(String strategyName) {
         StrategyPO strategy = mAppManager.getStrategyByName(strategyName);
-        String shellPath = mEnvConfig.getHomeDir()+"/scripts/"+strategy.getPath();
+        String shellPath = mEnvConfig.getHomeDir()+File.separator+"scripts"+File.separator+strategy.getPath();
         return shellPath;
     }
+
 
     /**
      * 查询远程机器的服务状态
@@ -151,94 +177,40 @@ public class ScheduleContext {
         logger.info("moduleStop return: \n" + resultStr);
     }
 
-    public void strategyExecuteJavaMs(String caller, Long strategyID, Long javaMsModuleID, Long jdkModuleID) {
-        AppModulePO javaMsModule = mAppManager.getModuleById(javaMsModuleID);
-        AppModulePO jdkModule = mAppManager.getModuleById(jdkModuleID);
-        StrategyPO strategy = mAppManager.getStrategyById(strategyID);
-
-        strategyExecuteJavaMs(caller, strategy, javaMsModule, jdkModule);
-    }
-
-    public void strategyExecuteJavaMs(String caller, String strategyName, String javaMsModuleName, String jdkModuleName) {
-        StrategyPO strategy = mAppManager.getStrategyByName(strategyName);
-        AppModulePO jdkModule = mAppManager.getModuleByName(jdkModuleName);
-        AppModulePO jmsModule = mAppManager.getModuleByName(javaMsModuleName);
-
-        strategyExecuteJavaMs(caller, strategyName, javaMsModuleName, jdkModuleName);
-    }
-
     /**
-     * 执行策略调用其函数
-     * params:
-     *      caller - 调用的函数名： "deploy", "undeploy"
-     *      strategyName - 策略名称
-     *      javaMsModuleName - java服务模块名
-     *      jdkModuleName - jdk模块名
-     */
-    public void strategyExecuteJavaMs(String caller, StrategyPO strategy, AppModulePO jmsModule, AppModulePO jdkModule) {
-        if(StrUtil.isEmpty(caller) || strategy==null || jmsModule==null || jdkModule==null) {
-           logger.error("strategyExecuteJavaMs parameter error: caller="+caller+
-                   "strategy="+strategy+
-                   "jmsModule="+jmsModule+
-                   "jdkModule="+jdkModule);
-           return;
-        }
-        String remoteShellPath = getModuleShellPath(strategy.getName());
-        String command = getSshHeadStr()+remoteShellPath;
-
-        // 创建该模块保存的日志目录
-        String logDir = mEnvConfig.getHomeDir()+"/logs/"+strategy.getName();
-        String logFilename = logDir+"/"+strategy.getName();
-        String[] mkParams = {"-p", logDir };
-        envExecShell("mkdir", mkParams);
-
-        String[] params = { caller,
-                "--PACK_DIR="+jmsModule.getPack_dir(),
-                "--PACK_VER="+jmsModule.getPack_ver(),
-                "--PACK_FILE="+jmsModule.getPack_file(),
-                "--JDK_DIR="+jdkModule.getPack_dir(),
-                "--JDK_VER="+jdkModule.getPack_ver(),
-                "--JDK_FILE="+jdkModule.getPack_file()
-        };
-        logger.info("strategy java_ms "+caller+" command: " + command + " params: ", params.toString());
-
-        String resultStr = envExecShell(command, params);
-        logger.info("strategy java_ms "+caller+" return: \n" + resultStr);
-
-        // 写日志文件
-        logger.info("strategy java_ms "+caller+" write logs to file: "+logFilename);
-        File logFile = FileUtil.writeString(resultStr, logFilename, "utf-8");
-    }
-
-    /**
-     * 获取策略中已使用的模块
-     * 注意：在本地执行即可，不用远程执行
-     */
-    public String[] strategyListModules(String strategyName) {
-        String remoteShellPath = getModuleShellPath(strategyName);
-        String command = remoteShellPath;
-
-        StrategyPO strategy = mAppManager.getStrategyByName(strategyName);
-        String[] params = {"list_modules" };
-        logger.info("moduleStop command: " + command + " params: ", params.toString());
-
-        String resultStr = envExecShell(command, params);
-        logger.info("moduleStop return: \n" + resultStr);
-
-        String[] arrayStr = StrUtil.split(resultStr, "\n");
-        return arrayStr;
-    }
-
-    /**
-     * 查看策略日志
-     * @param strategyId
+     * 返回策略执行的日志保存路径
      * @return
      */
-    public String scriptViewLog(String strategyId) {
-        return "";
+    public String getLogPath() {
+        String logDir = mEnvConfig.getLogsDir()+File.separator+mHost.getName();
+        return logDir;
     }
 
-    public static String envExecShell(String command, String[] params) {
+    /**
+     * 获取策略保存的日志文件路径
+     * @param strategyName
+     * @return
+     */
+    public String getLogFile(String strategyName) {
+        String logFile = getLogPath()+File.separator+strategyName+".log";
+        return logFile;
+    }
+    /**
+     * 查看策略日志
+     * @param strategyName
+     * @return
+     */
+    public String scriptViewLog(String strategyName) {
+        return FileUtil.readString(getLogFile(strategyName),"utf-8");
+    }
+
+    /**
+     * 执行命令
+     * @param command
+     * @param params
+     * @return
+     */
+    public String envExecShell(String command, String[] params) {
         logger.info(command, params.toString());
         BufferedReader br = null;
         StringBuffer sb = null;

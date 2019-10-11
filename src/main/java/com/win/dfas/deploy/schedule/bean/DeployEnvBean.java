@@ -21,6 +21,8 @@ public class DeployEnvBean {
 
     private String scriptsDir;
 
+    private String logsDir;
+
     private String ftpHost;
 
     private String ftpPort;

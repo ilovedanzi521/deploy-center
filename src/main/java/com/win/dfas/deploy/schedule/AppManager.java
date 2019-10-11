@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import cn.hutool.core.io.file.FileReader;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -34,6 +35,9 @@ public class AppManager {
     private Map<String, StrategyPO> mStrategyFiles = new HashMap<String, StrategyPO>();
 
     private AtomicBoolean mScanLock = new AtomicBoolean(false);
+
+    public AppManager() {
+    }
 
     public boolean init() {
         mEnvConfig = SpringContextUtils.getBean("deploy_env_bean", DeployEnvBean.class);
@@ -88,8 +92,9 @@ public class AppManager {
      * 从仓库中读取发布版本描述文件
      */
     private void loadReleaseDescFile(Map<String, AppModulePO> moduleMaps, Map<String, StrategyPO> strategyMaps) {
-        final String releaseFile = mEnvConfig.getHomeDir()+"/"+mEnvConfig.getReleaseDescFile();
+        final String releaseFile = mEnvConfig.getHomeDir()+ File.separator+mEnvConfig.getReleaseDescFile();
         boolean isFile = FileUtil.isFile(releaseFile);
+        logger.info("loadReleaseDescFile: "+releaseFile+ " isFile: "+isFile);
         if(isFile) {
             FileReader fr = new FileReader(releaseFile, "utf-8");
             List<String> frLines = fr.readLines();
@@ -98,6 +103,7 @@ public class AppManager {
             boolean parseScriptFlag=false;
             for(int i=0; i<total; i++) {
                 String line = StrUtil.trim(frLines.get(i));
+                logger.debug("loadReleaseDescFile line"+i+": "+line);
                 if (StrUtil.isEmpty(line) || line.startsWith("#")) {
                     continue;
                 } else if(line.startsWith("[module]")) {
@@ -124,16 +130,16 @@ public class AppManager {
     }
 
     private AppModulePO parseModule(String line) {
-        String[] elements = StrUtil.splitToArray(line, ' ');
-        if(elements != null && elements.length >= 6) {
-            String path = elements[0];
-            String name = elements[1];
-            String pack_dir = elements[2];
-            String pack_ver = elements[3];
-            String pack_file = elements[4];
-            String allow_delete = elements[5];
+        List<String> elements = StrUtil.splitTrim(line, "\t");
+        if(elements != null && elements.size() >= 6) {
+            String path = elements.get(0);
+            String name = elements.get(1);
+            String pack_dir = elements.get(2);
+            String pack_ver = elements.get(3);
+            String pack_file = elements.get(4);
+            String allow_delete = elements.get(5);
 
-            String packPath = pack_dir+"/"+pack_ver+"/"+pack_file;
+            String packPath = pack_dir+File.separator+pack_ver+File.separator+pack_file;
 
             logger.debug("parseModule lines: shellName="+path+" moudleName="+name+" packpath="+packPath);
             AppModulePO module = new AppModulePO();
@@ -149,11 +155,11 @@ public class AppManager {
     }
 
     private StrategyPO parseStrategy(String line) {
-        String[] elements = StrUtil.splitToArray(line, ' ');
-        if(elements != null && elements.length >= 2) {
-            String path = elements[0];
-            String name = elements[1];
-            String allow_delete = elements[2];
+        List<String> elements = StrUtil.splitTrim(line, "\t");
+        if(elements != null && elements.size() >= 2) {
+            String path = elements.get(0);
+            String name = elements.get(1);
+            String allow_delete = elements.get(2);
 
             logger.debug("parseStrategy lines: shellName="+path+" name="+name+" allow_delete="+allow_delete);
             StrategyPO strategy = new StrategyPO();
@@ -169,8 +175,23 @@ public class AppManager {
         return mModuleService.getById(id);
     }
 
-    public AppModulePO getModuleByName(String name) {
-        return mModuleFiles.get(name);
+    public AppModulePO getModuleByPath(String path) {
+        return mModuleFiles.get(path);
+    }
+
+    public AppModulePO getModuleByName(String path) {
+        if(StrUtil.isEmpty(path)){
+            return null;
+        }
+
+        Iterator<AppModulePO> it = mModuleFiles.values().iterator();
+        while(it.hasNext()) {
+            AppModulePO m = it.next();
+            if (m != null && path.equals(m.getName())) {
+               return m;
+            }
+        }
+        return null;
     }
 
     public StrategyPO getStrategyById(Long id) {
@@ -189,6 +210,7 @@ public class AppManager {
      *      false - 没有更新版本
      */
     private boolean checkModulesUpdate(Map<String, AppModulePO> moduleFileMap) {
+        logger.info("checkModuleUpdate start.");
         // 1. 检查modules
         // 获取db已经存在的modules
         Map<String,AppModulePO> moduleDbMap = new HashMap<String,AppModulePO>();
@@ -235,14 +257,17 @@ public class AppManager {
            Iterator<AppModulePO> dbIt = moduleDbMap.values().iterator();
            while(dbIt.hasNext()) {
                AppModulePO moduleDb = dbIt.next();
+               logger.info("checkModuleUpdate remove "+moduleDb.toString());
                mModuleService.removeById(moduleDb.getId());
            }
         }
 
+        logger.info("checkModuleUpdate end.");
         return true;
     }
 
     private boolean checkStrategyUpdate(Map<String, StrategyPO> strategyFileMap) {
+        logger.info("checkStrategyUpdate start.");
         // 1. 检查modules
         // 获取db已经存在的strategy
         Map<String,StrategyPO> strategyDbMap = new HashMap<String,StrategyPO>();
@@ -267,6 +292,7 @@ public class AppManager {
 
                 // 2.3 更新module表
                 strategyDb.setPath(strategy.getPath());
+                strategyDb.setAllow_delete(strategy.getAllow_delete());
                 mStrategyService.update(strategyDb, null);
 
                 // 2.4 已经比较过，从列表中删除
@@ -279,10 +305,12 @@ public class AppManager {
             Iterator<StrategyPO> dbIt = strategyDbMap.values().iterator();
             while(dbIt.hasNext()) {
                 StrategyPO strategy = dbIt.next();
+                logger.info("checkStrategyUpdate remove "+strategy.toString());
                 mStrategyService.removeById(strategy.getId());
             }
         }
 
+        logger.info("checkStrategyUpdate end.");
         return true;
     }
 }

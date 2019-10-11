@@ -1,6 +1,9 @@
 package com.win.dfas.deploy.schedule.config;
 
+import com.win.dfas.deploy.schedule.AppManager;
+import com.win.dfas.deploy.schedule.Scheduler;
 import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
+import com.win.dfas.deploy.service.AppModuleService;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +23,11 @@ public class ScheduleCenterConfig {
     @ConfigurationProperties(prefix = "deploy-center")
     public DeployEnvBean generateDeployEnv() {
         return new DeployEnvBean();
+    }
+
+    @Bean("app_manager")
+    public AppManager getAppManager() {
+        return new AppManager();
     }
 
     @Bean(name = "scheduler_task_executor")
