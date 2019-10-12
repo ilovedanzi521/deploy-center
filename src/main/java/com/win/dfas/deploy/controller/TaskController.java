@@ -8,16 +8,14 @@ import com.win.dfas.deploy.schedule.Scheduler;
 import com.win.dfas.deploy.service.TaskService;
 import com.win.dfas.deploy.service.impl.TaskServiceImpl;
 import com.win.dfas.deploy.util.SpringContextUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.web.HttpRequestHandler;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -32,11 +30,10 @@ import java.util.List;
  * @创建人 heshansen
  * @创建时间 2019/09/27 11:41
  */
+@Slf4j
 @RestController
 @RequestMapping("/task")
 public class TaskController extends BaseController<TaskPO> {
-    private final static Logger logger = LoggerFactory.getLogger(TaskController.class);
-
     @Autowired
     private ApplicationContext applicationContext;
 
@@ -57,14 +54,25 @@ public class TaskController extends BaseController<TaskPO> {
         return this.taskService;
     }
 
+    @RequestMapping("/deploy")
+    @ResponseBody
+    public String deploy(@RequestParam long id) {
+       TaskPO task = taskService.getOne(null);
+       long taskId = task.getId();
+       Scheduler.get().init();
+       Scheduler.get().depoly(taskId);
+
+       return "0";
+    }
+
     @RequestMapping("/find")
     @ResponseBody
     public StrategyPO queryTask(HttpServletRequest request, HttpServletResponse response, @RequestParam int id) {
-        logger.info("task service impl: "+taskServiceImpl + " param id="+id+" contextPath="+request.getContextPath()+" servletPath="+request.getServletPath());
-        logger.info(mHttpRequest.getQueryString());
-        logger.info(applicationContext.getApplicationName()+ " "+ applicationContext.getDisplayName()+" "+applicationContext.getId());
+        log.info("task service impl: "+taskServiceImpl + " param id="+id+" contextPath="+request.getContextPath()+" servletPath="+request.getServletPath());
+        log.info(mHttpRequest.getQueryString());
+        log.info(applicationContext.getApplicationName()+ " "+ applicationContext.getDisplayName()+" "+applicationContext.getId());
         StrategyPO strategy = taskServiceImpl.selectStrategyByTask(id);
-        logger.info("query task: " + strategy);
+        log.info("query task: " + strategy);
 
         return strategy;
     }
@@ -73,10 +81,10 @@ public class TaskController extends BaseController<TaskPO> {
     @ResponseBody
     public List<DevicePO> queryDevice(HttpServletRequest request, HttpServletResponse response, @RequestParam int id) {
         List<DevicePO> list = taskServiceImpl.selectDeviceByTask(id);
-        logger.info("device list: " + list.size());
+        log.info("device list: " + list.size());
         for(int i=0; i<list.size(); i++) {
             DevicePO dev = list.get(i);
-            logger.info("device: " +  dev);
+            log.info("device: " +  dev);
         }
 
         return list;
