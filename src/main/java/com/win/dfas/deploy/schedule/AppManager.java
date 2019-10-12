@@ -64,6 +64,17 @@ public class AppManager {
             mStrategyFiles.clear();
             loadReleaseDescFile(mModuleFiles, mStrategyFiles);
 
+            Iterator<AppModulePO> it = mModuleFiles.values().iterator();
+            while(it.hasNext()) {
+                log.info(it.next().toString());
+            }
+
+            Iterator<StrategyPO> st = mStrategyFiles.values().iterator();
+            while(st.hasNext()) {
+                log.info(st.next().toString());
+            }
+
+            /*
             boolean forTest=true;
             if(forTest) {
                 List<StrategyPO> list = mStrategyService.list();
@@ -81,9 +92,11 @@ public class AppManager {
                 checkModulesUpdate(mModuleFiles);
                 checkStrategyUpdate(mStrategyFiles);
             }
+            */
 
             scanResult=0;
             mScanLock.set(false);
+
         }
 
         log.info("Scan done. result="+scanResult);

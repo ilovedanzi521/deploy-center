@@ -175,7 +175,6 @@ public class Scheduler {
         // 3. 创建新的异步任务
         DeployTask task = new DeployTask(DeployTask.CMD_DEPLOY, taskObj);
         mTaskExecutor.execute(task);
-//        mTaskExecutor.submit(task);
     }
 
     public void undepoly(long taskId) {
@@ -198,7 +197,7 @@ public class Scheduler {
 
         // 3. 创建新的异步任务
         DeployTask task = new DeployTask(DeployTask.CMD_UNDEPLOY, taskObj);
-        mTaskExecutor.submit(task);
+        mTaskExecutor.execute(task);
     }
 
     public boolean delModule() {

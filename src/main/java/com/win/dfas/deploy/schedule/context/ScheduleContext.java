@@ -1,6 +1,7 @@
 package com.win.dfas.deploy.schedule.context;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.RuntimeUtil;
 import cn.hutool.core.util.StrUtil;
 import com.win.dfas.deploy.po.AppModulePO;
 import com.win.dfas.deploy.po.DevicePO;
@@ -15,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @包名 com.win.dfas.deploy.schedule.SchduleContext
@@ -25,10 +27,15 @@ import java.util.Arrays;
  */
 @Slf4j
 public class ScheduleContext {
-
+    private final static String TAG = "ScheduleContext";
     private AppManager mAppManager;
     private DeployEnvBean mEnvConfig;
     private DevicePO mHost;
+
+    /**
+     * 初始化远程机器环境的shell脚本
+     */
+    private final static String sInitShell = "init.sh";
 
     /**
      * 通用命令执行脚本
@@ -54,14 +61,32 @@ public class ScheduleContext {
     }
 
     /**
+     * 初始化远程设备环境
+     * @return
+     */
+    public List<String> initRemoteDevice() {
+        String command = mEnvConfig.getHomeDir() + File.separator + sInitShell;
+        // 要加上ssh头部
+        String[] params = {
+               command, mHost.getIpAddress(),String.valueOf(mHost.getPort()) };
+        List<String> resultList = RuntimeUtil.execForLines(params);
+        return resultList;
+    }
+
+    /**
      * 测试远程机器是否能正常连接
      * @return
      *      hostname - 返回主机名字
      */
     public String devConnect() {
         String command = getSshHeadStr()+mEnvConfig.getHomeDir()+"/"+sCommShell;
-        String[] params = {"hostname"};
-        log.info("devConnect command: "+command+" params: ", params.toString());
+        String[] params = {
+                "ssh",
+                "-p",
+                String.valueOf(mHost.getPort()),
+                mHost.getIpAddress(),
+                "hostname"};
+        log.info("devConnect command: "+Arrays.toString(params));
 
         String resultStr = envExecShell(command, params);
         log.info("devConnect return: \n" + resultStr);
@@ -171,7 +196,12 @@ public class ScheduleContext {
         String command = getSshHeadStr()+remoteShellPath;
 
         AppModulePO module = mAppManager.getModuleByName(moduleName);
-        String[] params = {"stop",
+        String[] params = {
+                "ssh",
+                "-p",
+                String.valueOf(mHost.getPort()),
+                mHost.getIpAddress(),
+                "stop",
                 "--PACK_DIR="+module.getPack_dir(),
                 "--PACK_VER="+module.getPack_ver(),
                 "--PACK_FILE="+module.getPack_file()};

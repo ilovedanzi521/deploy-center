@@ -56,6 +56,7 @@ public class GroupController extends BaseController<GroupPO> {
             return WinResponseData.handleError("新增组失败！");
         }
     }
+
     @SysLog("修改设备组")
     @PostMapping("/safeUpdate")
     public WinResponseData safeUpdate(@RequestBody GroupVO groupVO){

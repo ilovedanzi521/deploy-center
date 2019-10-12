@@ -4,16 +4,20 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.RuntimeUtil;
 import cn.hutool.core.util.StrUtil;
 import com.win.dfas.deploy.po.AppModulePO;
+import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.po.StrategyPO;
 import com.win.dfas.deploy.schedule.AppManager;
 import com.win.dfas.deploy.schedule.context.ScheduleContext;
 import com.win.dfas.deploy.schedule.context.StrategyInterface;
 import com.win.dfas.deploy.util.SpringContextUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.jni.Proc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.plugin2.util.SystemUtil;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,7 +31,7 @@ import java.util.List;
  */
 @Slf4j
 public class JavaMicroServiceStrategyImpl implements StrategyInterface {
-
+    private final static String TAG = "JavaMicroServiceStrategyImpl";
     private AppManager mAppManager;
     private ScheduleContext mContext;
 
@@ -55,22 +59,6 @@ public class JavaMicroServiceStrategyImpl implements StrategyInterface {
         return true;
     }
 
-    @Override
-    public void setListModules(List<AppModulePO> moduleList) {
-        int moduleTotal = moduleList.size();
-        for(int i=0; i<moduleTotal; i++) {
-            AppModulePO module = moduleList.get(i);
-            if("Java-SDK".equalsIgnoreCase(module.getName()) && isUseJdk()) {
-                setJavaModule(module);
-            }
-            // NOTE: 暂仅支持一个javasdk和一个java 微服务的安装
-            if(isJavaMicroService()) {
-                setJavaMicroServiceModule(module);
-            }
-        }
-    }
-
-
     public void setStrategy(StrategyPO strategy) {
         this.mStrategy = strategy;
     }
@@ -95,22 +83,45 @@ public class JavaMicroServiceStrategyImpl implements StrategyInterface {
         return strategyExecuteJavaMs(caller, mStrategy, mJavaMsModule, mJavaModule);
     }
 
+    @Override
+    public void setListModules(List<AppModulePO> moduleList) {
+        int moduleTotal = moduleList.size();
+        for(int i=0; i<moduleTotal; i++) {
+            AppModulePO module = moduleList.get(i);
+            if(isUseJdk() && module != null && module.getName()!= null && StrUtil.containsIgnoreCase(module.getName(),"Java-SDK")){
+                setJavaModule(module);
+            }
+            // NOTE: 暂仅支持一个javasdk和一个java 微服务的安装
+            if(isJavaMicroService()) {
+                setJavaMicroServiceModule(module);
+            }
+        }
+    }
+
     /**
      * 获取策略中需使用的模块
      * 注意：在本地执行即可，不用远程执行
      */
     @Override
     public List<AppModulePO> list_modules() {
+        DevicePO host = mContext.getDevice();
         String remoteShellPath = mContext.getStrategyShellPath(mStrategy.getPath());
         String command = remoteShellPath;
+        String logFileName = mContext.getLogFile(mStrategy.getName());
 
         String caller ="list_modules";
-        String[] params = { command, "list_modules" };
+        String[] params = {
+                "ssh",
+                "-p",
+                String.valueOf(host.getPort()),
+                host.getIpAddress(),
+                command,
+                caller
+        };
         log.info("exec list_modules: [" + command + "] params: "+ Arrays.toString(params));
 
         List<String> resultList = RuntimeUtil.execForLines(params);
-        //String resultStr = mContext.envExecShell(command, params);
-        log.info("exec "+Arrays.toString(params)+" result ===> ");
+        FileUtil.writeLines(resultList, logFileName, "utf-8");
         for(int i=0; i<resultList.size(); i++) {
             log.info(resultList.get(i));
         }
@@ -123,36 +134,6 @@ public class JavaMicroServiceStrategyImpl implements StrategyInterface {
             moduleObjList.add(module);
         }
         return moduleObjList;
-    }
-
-    /**
-     * 执行JavaMs的策略调用
-     * @param caller - 调用的函数名: "deploy", "undeploy"
-     * @param strategyID - 策略ID
-     * @param javaMsModuleID - JavaMs模块ID
-     * @param jdkModuleID - JDK模块ID
-     */
-    public boolean strategyExecuteJavaMs(String caller, Long strategyID, Long javaMsModuleID, Long jdkModuleID) {
-        AppModulePO javaMsModule = mAppManager.getModuleById(javaMsModuleID);
-        AppModulePO jdkModule = mAppManager.getModuleById(jdkModuleID);
-        StrategyPO strategy = mAppManager.getStrategyById(strategyID);
-
-        return strategyExecuteJavaMs(caller, strategy, javaMsModule, jdkModule);
-    }
-
-    /**
-     * 执行JavaMs的策略调用
-     * @param caller - 调用的函数名: "deploy", "undeploy"
-     * @param strategyName - 策略名
-     * @param javaMsModuleName - JavaMs模块名
-     * @param jdkModuleName - JDK模块名
-     */
-    public boolean strategyExecuteJavaMs(String caller, String strategyName, String javaMsModuleName, String jdkModuleName) {
-        StrategyPO strategy = mAppManager.getStrategyByName(strategyName);
-        AppModulePO jdkModule = mAppManager.getModuleByName(jdkModuleName);
-        AppModulePO jmsModule = mAppManager.getModuleByName(javaMsModuleName);
-
-        return strategyExecuteJavaMs(caller, strategyName, javaMsModuleName, jdkModuleName);
     }
 
     /**
@@ -170,17 +151,31 @@ public class JavaMicroServiceStrategyImpl implements StrategyInterface {
                     " jmsModule="+jmsModule+
                     " jdkModule="+jdkModule);
             return false;
+        } else {
+            log.info(strategy.toString());
+            log.info(jmsModule.toString());
+            log.info(jdkModule.toString());
         }
-        String remoteShellPath = mContext.getStrategyShellPath(strategy.getPath());
-        String command = mContext.getSshHeadStr()+remoteShellPath;
 
-        // 创建该模块保存的日志目录
+        // 创建该模块保存的日志目录, 日志目录在本地创建
         String logDir = mContext.getLogPath();
         String logFilename = mContext.getLogFile(strategy.getName());
-        String[] mkParams = {"-p", logDir};
-        mContext.envExecShell("mkdir", mkParams);
+        String[] mkParams = {"mkdir", "-p", logDir};
+        log.info(TAG+" exec "+Arrays.toString(mkParams));
 
-        String[] params = { caller,
+        List<String> mkResults = RuntimeUtil.execForLines(mkParams);
+        FileUtil.writeLines(mkResults, logFilename, "utf-8");
+
+        DevicePO host = mContext.getDevice();
+        String remoteShellPath = mContext.getStrategyShellPath(strategy.getPath());
+        String command = remoteShellPath;
+        String[] scriptParams = {
+                "ssh",
+                "-p",
+                String.valueOf(host.getPort()),
+                host.getIpAddress(),
+                command,
+                caller,
                 "--PACK_DIR=" +jmsModule.getPack_dir(),
                 "--PACK_VER=" +jmsModule.getPack_ver(),
                 "--PACK_FILE="+jmsModule.getPack_file(),
@@ -188,15 +183,17 @@ public class JavaMicroServiceStrategyImpl implements StrategyInterface {
                 "--JDK_VER="  +jdkModule.getPack_ver(),
                 "--JDK_FILE=" +jdkModule.getPack_file()
         };
-        log.info("strategy java_ms "+caller+" command: " + command + " params: ", params.toString());
+        log.info(TAG+" exec "+Arrays.toString(scriptParams));
 
-        改用Runtime.exec命令
-        String resultStr = mContext.envExecShell(command, params);
-        log.info("strategy java_ms "+caller+" return: \n" + resultStr);
+        //改用Runtime.exec命令
+        List<String> resultList = RuntimeUtil.execForLines(scriptParams);
+        log.info(TAG+" exec "+command+" "+caller+" ===> ");
+        for(int i=0; i<resultList.size(); i++) {
+            log.info(resultList.get(i));
+        }
 
-        // 写日志文件
-        log.info("strategy java_ms "+caller+" write logs to file: "+logFilename);
-        File logFile = FileUtil.writeString(resultStr, logFilename, "utf-8");
+        FileUtil.writeLines(resultList, logFilename, "utf-8");
+        log.info(TAG+" strategy java_ms "+caller+" write logs to file: "+logFilename);
         return true;
     }
 }

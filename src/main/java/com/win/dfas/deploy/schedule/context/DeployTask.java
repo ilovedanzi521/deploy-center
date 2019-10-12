@@ -1,11 +1,14 @@
 package com.win.dfas.deploy.schedule.context;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.druid.proxy.jdbc.WrapperProxy;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.win.dfas.deploy.dao.DeviceModuleDao;
 import com.win.dfas.deploy.po.*;
 import com.win.dfas.deploy.schedule.Scheduler;
+import com.win.dfas.deploy.schedule.utils.ShellUtils;
 import com.win.dfas.deploy.service.DeviceModuleService;
 import com.win.dfas.deploy.service.impl.TaskServiceImpl;
 import com.win.dfas.deploy.util.SpringContextUtils;
@@ -24,7 +27,7 @@ import java.util.concurrent.CountDownLatch;
  */
 @Slf4j
 public class DeployTask implements Runnable{
-
+    private final static String TAG = "DeployTask";
     /**
      * 部署和卸载命令字
      */
@@ -69,7 +72,7 @@ public class DeployTask implements Runnable{
    @Override
     public void run() {
         int status= mCmd==CMD_DEPLOY ? DEPLOY_DOING : UNDEPLOY_DOING;
-        log.info("DeployTask"+"Start id="+mTaskId);
+        log.info(TAG+" Start id="+mTaskId);
 
         // 1. 从taskId中查询出策略
        final StrategyPO strategy = mTaskImpl.selectStrategyByTask(mTaskId);
@@ -78,7 +81,7 @@ public class DeployTask implements Runnable{
            saveStatus(status);
            return;
         }
-        log.info("DeployTask"+ "find strategy="+strategy.toString() + " deployStatus="+status);
+        log.info(TAG+" find strategy="+strategy.toString() + " deployStatus="+status);
 
         // 2. 从taskId中查询出设备列表
         List<DevicePO> devList = mTaskImpl.selectDeviceByTask(mTaskId);
@@ -87,8 +90,8 @@ public class DeployTask implements Runnable{
             saveStatus(status);
             return;
         }
-        log.info("DeployTask"+ "find devices total="+devList.size()+" deployStatus="+status);
-        log.info("DeployTask"+ "devices: "+ devList.toString());
+        log.info(TAG+ " find devices total="+devList.size()+" deployStatus="+status);
+        log.info(TAG+ " devices: "+ devList.toString());
 
         // 获取device对应的ScheduleContext对象
         List<ScheduleContext> remoteContextList = new ArrayList<ScheduleContext>();
@@ -122,6 +125,7 @@ public class DeployTask implements Runnable{
         try{
             taskCount.await();
             status= mCmd==CMD_DEPLOY ? DEPLOY_DONE : UNDEPLOY_DONE;
+            log.error("DeployTask finished status="+status);
         } catch (InterruptedException e) {
             status= mCmd==CMD_DEPLOY ? DEPLOY_ERROR : UNDEPLOY_ERROR;
             log.error("DeployTask"+ "taskCount await interrupted.", e);
@@ -135,7 +139,7 @@ public class DeployTask implements Runnable{
      * 该任务是具体执行远程单台机器的部署任务
      */
     private class RemoteDeployTask implements Runnable {
-        private final static String TAG = "RemoteDeployTask ";
+        private final static String TAG = "RemoteDeployTask";
         private ScheduleContext remoteContext;
         private StrategyPO strategy;
         private CountDownLatch taskCount;
@@ -150,12 +154,26 @@ public class DeployTask implements Runnable{
         public void run() {
             try {
                 DevicePO device = remoteContext.getDevice();
+                String logFilename = remoteContext.getLogFile(strategy.getName());
                 log.info(TAG+ "[" + device.getName() + "," + device.getIpAddress() + "] deploy start.");
 
-                // 1. 创建一个策略实现类，类型为java微服务
-                StrategyInterface strategyImpl = StrategyFactory.createStrategyImpl(StrategyFactory.STRATEGY_TYPE_JAVA_MS, remoteContext, strategy);
+                // 1. 初始化远程节点的环境
+                log.info(TAG+" initRemoteDevice ["+remoteContext.getDevice().toSimpleString()+"] start ...");
+                List<String> resultList = remoteContext.initRemoteDevice();
+                FileUtil.writeLines(resultList, logFilename, "utf-8");
+                for(int i=0; i<resultList.size(); i++) {
+                    log.info(resultList.get(i));
+                }
 
-                // 2. 通过list_modules获取策略需要的模块,并设置到strategyImpl中
+                boolean isSuccess = ShellUtils.isSuccess(resultList);
+                if(!isSuccess) {
+                    log.info(TAG+" initRemoteDevice failed.");
+                    return;
+                }
+
+                // 2. 创建一个策略实现类，类型为java微服务,
+                //    通过list_modules获取策略需要的模块,并设置到strategyImpl中
+                StrategyInterface strategyImpl = StrategyFactory.createStrategyImpl(StrategyFactory.STRATEGY_TYPE_JAVA_MS, remoteContext, strategy);
                 List<AppModulePO> moduleObjList = strategyImpl.list_modules();
                 strategyImpl.setListModules(moduleObjList);
 
@@ -176,7 +194,7 @@ public class DeployTask implements Runnable{
                         log.info(TAG+ "update deviceModuleRefPO " + i + ": " + refObj.toString());
                     }
                 }
-                log.info(TAG+ "[" + device.getName() + "," + device.getIpAddress() + "] deploy end. result=" + result);
+                log.info(TAG+ "[" + device.toSimpleString() + "] deploy end. result=" + result);
             } catch (Exception e) {
                 log.info(TAG+ "deploy exception. ", e);
             } finally {
