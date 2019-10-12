@@ -13,7 +13,8 @@
         </div>
         <div style="margin-top:9px;">
             <!--树形表格-->
-            <win-table style="width: 100%;margin-bottom: 20px;" row-id="id" border resizable element-loading-text="拼命加载中..." indexFixed selectionFixed
+            <win-table style="width: 100%;margin-bottom: 20px;" border resizable element-loading-text="拼命加载中..." indexFixed selectionFixed
+                       @cell-dblclick="view" @select-all="handleSelectAll" @select-change="handleSelectChange"
                        :data="groupTreeList"
                        :tree-config="{children: 'children', expandAll: true}"
                        :loading="groupLoading">
@@ -37,14 +38,6 @@
             </win-table>
             <!--分页组件-->
             <div class="page-contanier">
-<!--                <vxe-pager-->
-<!--                    :loading="groupLoading"-->
-<!--                    :current-page="pageVO.pageNum"-->
-<!--                    :page-size="pageVO.pageSize"-->
-<!--                    :total="pageVO.total"-->
-<!--                    :layouts="['PrevPage', 'JumpNumber', 'NextPage', 'FullJump', 'Sizes', 'Total']"-->
-<!--                    @page-change="groupPageQuery">-->
-<!--                </vxe-pager>-->
                 <win-pagination name="groupPage" v-bind:childMsg="pageVO" @callFather="groupPageQuery"></win-pagination>
             </div>
             <!-- 设备组弹框begin：新增/删除 -->

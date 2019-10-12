@@ -72,7 +72,7 @@
             <div slot="footer" class="dialog-footer" >
                 <win-button type="info" @click="connectTest('deviceForm')">连接测试</win-button>
                 <win-button @click="deviceDialogVisible = false">取消</win-button>
-                <win-button type="primary" @click="submitDeviceDialog('deviceForm')">{{deviceSubmitText}}</win-button>
+                <win-button type="primary"  @click="submitDeviceDialog('deviceForm')">{{deviceSubmitText}}</win-button>
             </div>
         </el-dialog>
     </win-fdialog>

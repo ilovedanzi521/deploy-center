@@ -1,7 +1,12 @@
 package com.win.dfas.deploy.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.win.dfas.common.util.LongJsonDeserializer;
+import com.win.dfas.common.util.LongJsonSerializer;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -13,7 +18,10 @@ import java.util.List;
  * @创建时间 2019/10/08 10:37
  */
 @Data
-public class GroupTree {
+public class GroupTree implements Serializable {
+    private static final long serialVersionUID = 3881976947210781694L;
+    @JsonSerialize(using = LongJsonSerializer.class)
+    @JsonDeserialize(using = LongJsonDeserializer.class)
     private Long id;
     /**
      * 组（机器）名称

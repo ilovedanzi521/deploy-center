@@ -25,4 +25,12 @@ export default class DeployService {
     saveGroup(vo: GroupReqVO): Promise<WinResponseData> {
         return AxiosFun.post("http://localhost:8888/deploy/group/safeSave", vo);
     }
+
+    removeGroupById(id: number): Promise<WinResponseData> {
+        return AxiosFun.winDelete("http://localhost:8888/deploy/group/safeRemove/"+id);
+    }
+
+    removeDeviceById(id: number): Promise<WinResponseData> {
+        return AxiosFun.winDelete("http://localhost:8888/deploy/device/remove/"+id);
+    }
 }

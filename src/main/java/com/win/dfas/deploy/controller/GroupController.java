@@ -67,6 +67,17 @@ public class GroupController extends BaseController<GroupPO> {
             return WinResponseData.handleError("更新组失败！");
         }
     }
+    @SysLog("删除设备组")
+    @DeleteMapping("/safeRemove/{id}")
+    public WinResponseData safeRemove(@PathVariable Long id){
+
+        Boolean success = this.groupService.safeRemove(id);
+        if (success){
+            return WinResponseData.handleSuccess("删除组成功！");
+        }else {
+            return WinResponseData.handleError("删除组失败！");
+        }
+    }
 
     @GetMapping("/getInfo/{id}")
     public WinResponseData getInfo(@PathVariable Long id){

@@ -1,6 +1,7 @@
 package com.win.dfas.deploy.controller;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.win.dfas.common.vo.BaseRepVO;
 import com.win.dfas.common.vo.WinResponseData;
 import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.service.DeviceService;
@@ -8,6 +9,9 @@ import com.win.dfas.deploy.vo.request.DeviceReqVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.constraints.Null;
+import java.util.List;
 
 /**
  * @包名 com.win.dfas.deploy.controller
@@ -29,8 +33,8 @@ public class DeviceController extends BaseController<DevicePO> {
 
     @GetMapping("/list")
     public WinResponseData list(){
-
-        return WinResponseData.handleSuccess(deviceService.list(null));
+        List<DevicePO> list = deviceService.list(null);
+        return WinResponseData.handleSuccess(list);
     }
 
     @PostMapping("/connectTest")

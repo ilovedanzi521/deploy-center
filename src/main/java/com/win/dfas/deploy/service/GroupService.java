@@ -51,4 +51,11 @@ public interface GroupService extends IService<GroupPO> {
      * @return
      */
     IPage<DeviceGroupBO> getPageList(DeviceParamsVO deviceParamsVO);
+
+    /**
+     * 安全删除设备组（包括其关联信息）
+     * @param id
+     * @return
+     */
+    Boolean safeRemove(Long id);
 }

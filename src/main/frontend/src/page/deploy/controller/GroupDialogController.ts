@@ -123,21 +123,17 @@ export default class GroupDialogController extends BaseController{
     }
     // 提交
     private submitDialog(formName: string) {
+        this.saveLoading = true;
         console.log("submitDialog...........");
         this.$refs[formName].validate((valid: boolean) => {
             if (valid) {
                 console.log(this.groupReqVO);
                 this.deployService.saveGroup(this.groupReqVO)
                     .then((winResponseData: WinResponseData) =>{
-                        if (WinRspType.SUCC === winResponseData.winRspType) {
-                            console.log(winResponseData.data);
-                            this.dialogVisibleSon = false;
-                            this.win_message_success(winResponseData.msg);
-                        } else {
-                            this.errorMessage(winResponseData.msg);
-                        }
+                        this.groupDialogMessage(winResponseData);
                 });
             } else {
+                this.saveLoading = false;
                 this.win_message_error("组表单验证未通过");
                 return false;
             }
@@ -240,5 +236,17 @@ export default class GroupDialogController extends BaseController{
                 return false;
             }
         });
+    }
+
+    // 消息
+    private groupDialogMessage(winResponseData: WinResponseData) {
+        this.saveLoading = false;
+        if (WinRspType.SUCC === winResponseData.winRspType) {
+            this.dialogVisibleSon = false;
+            this.win_message_success(winResponseData.msg);
+            this.send(WinRspType.SUCC);
+        } else {
+            this.win_message_error(winResponseData.msg);
+        }
     }
 }

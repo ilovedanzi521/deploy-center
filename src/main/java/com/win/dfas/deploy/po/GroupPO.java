@@ -14,6 +14,7 @@ import lombok.Data;
 @TableName("dc_group")
 public class GroupPO extends BasePO {
 
+    private static final long serialVersionUID = -3030340942837664507L;
     /**
      * 设备组名
      */

@@ -1,5 +1,9 @@
 package com.win.dfas.deploy.po;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.win.dfas.common.util.LongJsonDeserializer;
+import com.win.dfas.common.util.LongJsonSerializer;
 import com.win.dfas.deploy.common.validator.group.UpdateGroup;
 import lombok.Data;
 
@@ -16,9 +20,12 @@ import java.util.Date;
  */
 @Data
 public class BasePO implements Serializable {
+    private static final long serialVersionUID = -8173822571749959422L;
     /**
      * 数据库唯一id
      */
+    @JsonSerialize(using = LongJsonSerializer.class)
+    @JsonDeserialize(using = LongJsonDeserializer.class)
     @NotNull(message = "主键ID不能为空",groups = UpdateGroup.class)
     private Long id;
     /**

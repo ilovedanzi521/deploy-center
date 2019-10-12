@@ -9,6 +9,7 @@ import {OperationTypeEnum} from "../../common/enum/OperationTypeEnum";
 import {GroupDetailVO, GroupQueryVO, GroupTreeVO} from "../vo/GroupVO";
 import {GroupConst} from "../const/DeployConst";
 import GroupDialog from "../view/groupDialog.vue";
+import {BaseConst} from "../../common/const/BaseConst";
 
 
 @Component({ components: {GroupDialog} })
@@ -84,6 +85,13 @@ export default class GroupController extends BaseController {
                 data: this.copy(row)
             };
         }
+        if (type === OperationTypeEnum.VIEW) {
+            this.groupDialogMsg = {
+                dialogTitle: BaseConst.VIEW + row.name,
+                type: OperationTypeEnum.VIEW,
+                data: row
+            };
+        }
         this.isGroupDialog = true;
     }
     public delGroupBatch(){
@@ -92,8 +100,13 @@ export default class GroupController extends BaseController {
     public handleEdit(row) {
         console.log(row);
     }
-    public handleDelete(row) {
+    public handleDelete(row: GroupTreeVO) {
         console.log(row);
+        if (row.ipAddress && !row.children){
+            this.delDeviceOne(row.id);
+        }else {
+            this.delGroupOne(row.id);
+        }
     }
     // 子组件回调函数
     private toGroupDialogForm(msg: WinRspType) {
@@ -104,5 +117,52 @@ export default class GroupController extends BaseController {
         }
     }
 
+    private delGroupOne(id: number) {
+        this.win_message_box_warning("确认删除选中组","提示")
+            .then(() => {
+                this.deployService.removeGroupById(id)
+                    .then((winResponseData: WinResponseData) =>{
+                        if (WinRspType.SUCC === winResponseData.winRspType) {
+                            this.queryGroupTreeList(this.groupQueryVO);
+                            this.successMessage(winResponseData.msg);
+                        } else {
+                            this.errorMessage(winResponseData.msg);
+                        }
+                    });
+            });
+
+    }
+
+    private delDeviceOne(id: number) {
+        this.win_message_box_warning("确认删除选中设备","提示")
+            .then(() => {
+                this.deployService.removeDeviceById(id)
+                    .then((winResponseData: WinResponseData) =>{
+                        if (WinRspType.SUCC === winResponseData.winRspType) {
+                            this.queryGroupTreeList(this.groupQueryVO);
+                            this.successMessage(winResponseData.msg);
+                        } else {
+                            this.errorMessage(winResponseData.msg);
+                        }
+                    });
+            });
+    }
+
+    // 双击查看
+    private view({ cellValue, row, rowIndex, column, columnIndex }) {
+        this.groupOperation(row, OperationTypeEnum.VIEW);
+    }
+
+    // 选中行事件
+    private handleSelectChange({ selection }) {
+        this.selected = selection;
+    }
+
+    /**
+     * 全选操作
+     */
+    private handleSelectAll({ selection, checked }) {
+        this.selected = selection;
+    }
 }
 

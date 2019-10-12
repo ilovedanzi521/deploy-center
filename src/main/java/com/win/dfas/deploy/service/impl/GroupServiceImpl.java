@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.win.dfas.common.entity.BaseEntity;
 import com.win.dfas.common.util.ObjectUtils;
 import com.win.dfas.deploy.bo.DeviceGroupBO;
 import com.win.dfas.deploy.common.exception.BaseException;
@@ -152,5 +153,19 @@ public class GroupServiceImpl extends ServiceImpl<GroupDao, GroupPO> implements 
             throw new BaseException("查询设置组分页列表失败",e);
         }
         return pageList;
+    }
+
+    /**
+     * 安全删除设备组（先删除组关联设备表信息，再删除组信息）
+     * @param id
+     * @return
+     */
+    @Override
+    public Boolean safeRemove(Long id) {
+        Map<String, Object> params = new HashMap<>(1);
+        params.put("group_id",id);
+        this.groupDeviceRefService.removeByMap(params);
+
+        return this.removeById(id);
     }
 }

@@ -18,6 +18,7 @@ import javax.validation.constraints.NotNull;
 @TableName("dc_devcie")
 public class DevicePO extends BasePO{
 
+    private static final long serialVersionUID = 3073640331832451270L;
     /**
      * 机器名称
      */

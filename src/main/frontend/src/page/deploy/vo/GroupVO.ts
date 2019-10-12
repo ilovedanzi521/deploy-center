@@ -1,9 +1,8 @@
 import {BaseRepVO, BaseReqVO} from "../../common/vo/BaseVO";
 /**********************request VO***********************/
 //组查询VO
-export class GroupQueryVO {
-    reqPageNum: number = 1;
-    reqPageSize: number = 2;
+export class GroupQueryVO extends BaseReqVO{
+
 }
 export class GroupReqVO{
     id: number;
