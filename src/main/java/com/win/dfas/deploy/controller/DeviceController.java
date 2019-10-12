@@ -4,10 +4,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.win.dfas.common.vo.WinResponseData;
 import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.service.DeviceService;
+import com.win.dfas.deploy.vo.request.DeviceReqVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @包名 com.win.dfas.deploy.controller
@@ -31,5 +31,11 @@ public class DeviceController extends BaseController<DevicePO> {
     public WinResponseData list(){
 
         return WinResponseData.handleSuccess(deviceService.list(null));
+    }
+
+    @PostMapping("/connectTest")
+    public WinResponseData connectTest(@Validated @RequestBody DevicePO device){
+
+        return WinResponseData.handleSuccess(deviceService.connectTest(device));
     }
 }

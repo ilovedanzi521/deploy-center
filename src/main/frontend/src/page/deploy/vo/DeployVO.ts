@@ -1,9 +1,5 @@
 import { BaseReqVO, BaseRepVO } from "../../common/vo/BaseVO";
 /**********************request VO***********************/
-//组查询VO
-export class GroupQueryVO extends BaseReqVO {
-
-}
 export class DeployPageVO {
     /**
      * 总数量
@@ -28,7 +24,4 @@ export class DeployPageVO {
 }
 
 /*********************response VO****************/
-//响应设备组树形VO
-export class GroupTreeVO {
 
-}
