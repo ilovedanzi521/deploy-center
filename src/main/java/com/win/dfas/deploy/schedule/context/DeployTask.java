@@ -1,14 +1,18 @@
 package com.win.dfas.deploy.schedule.context;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.druid.proxy.jdbc.WrapperProxy;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.win.dfas.deploy.dao.DeviceModuleDao;
 import com.win.dfas.deploy.po.*;
 import com.win.dfas.deploy.schedule.Scheduler;
+import com.win.dfas.deploy.schedule.utils.ShellUtils;
 import com.win.dfas.deploy.service.DeviceModuleService;
 import com.win.dfas.deploy.service.impl.TaskServiceImpl;
 import com.win.dfas.deploy.util.SpringContextUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +25,9 @@ import java.util.concurrent.CountDownLatch;
 /**
  * 部署任务
  */
+@Slf4j
 public class DeployTask implements Runnable{
-    private final static Logger logger = LoggerFactory.getLogger(DeployTask.class);
-
+    private final static String TAG = "DeployTask";
     /**
      * 部署和卸载命令字
      */
@@ -68,7 +72,7 @@ public class DeployTask implements Runnable{
    @Override
     public void run() {
         int status= mCmd==CMD_DEPLOY ? DEPLOY_DOING : UNDEPLOY_DOING;
-        logger.info("DeployTask","Start id="+mTaskId);
+        log.info(TAG+" Start id="+mTaskId);
 
         // 1. 从taskId中查询出策略
        final StrategyPO strategy = mTaskImpl.selectStrategyByTask(mTaskId);
@@ -77,7 +81,7 @@ public class DeployTask implements Runnable{
            saveStatus(status);
            return;
         }
-        logger.info("DeployTask", "find strategy="+strategy.toString() + " deployStatus="+status);
+        log.info(TAG+" find strategy="+strategy.toString() + " deployStatus="+status);
 
         // 2. 从taskId中查询出设备列表
         List<DevicePO> devList = mTaskImpl.selectDeviceByTask(mTaskId);
@@ -86,8 +90,8 @@ public class DeployTask implements Runnable{
             saveStatus(status);
             return;
         }
-        logger.info("DeployTask", "find devices total="+devList.size()+" deployStatus="+status);
-        logger.info("DeployTask", "devices: "+ devList.toString());
+        log.info(TAG+ " find devices total="+devList.size()+" deployStatus="+status);
+        log.info(TAG+ " devices: "+ devList.toString());
 
         // 获取device对应的ScheduleContext对象
         List<ScheduleContext> remoteContextList = new ArrayList<ScheduleContext>();
@@ -121,9 +125,10 @@ public class DeployTask implements Runnable{
         try{
             taskCount.await();
             status= mCmd==CMD_DEPLOY ? DEPLOY_DONE : UNDEPLOY_DONE;
+            log.error("DeployTask finished status="+status);
         } catch (InterruptedException e) {
             status= mCmd==CMD_DEPLOY ? DEPLOY_ERROR : UNDEPLOY_ERROR;
-            logger.error("DeployTask", "taskCount await interrupted.", e);
+            log.error("DeployTask"+ "taskCount await interrupted.", e);
         }
 
        // 5. 设置部署状态DEPLOY_DONE or DEPLOY_ERROR
@@ -134,7 +139,7 @@ public class DeployTask implements Runnable{
      * 该任务是具体执行远程单台机器的部署任务
      */
     private class RemoteDeployTask implements Runnable {
-        private final static String TAG = "RemoteDeployTask ";
+        private final static String TAG = "RemoteDeployTask";
         private ScheduleContext remoteContext;
         private StrategyPO strategy;
         private CountDownLatch taskCount;
@@ -147,40 +152,54 @@ public class DeployTask implements Runnable{
 
         @Override
         public void run() {
-            DevicePO device = remoteContext.getDevice();
-            logger.info(TAG, "["+device.getName()+","+device.getIpAddress()+"] deploy start.");
-
-            // 1. 创建一个策略实现类，类型为java微服务
-            StrategyInterface strategyImpl = StrategyFactory.createStrategyImpl(StrategyFactory.STRATEGY_TYPE_JAVA_MS, remoteContext, strategy);
-
-            // 2. 通过list_modules获取策略需要的模块,并设置到strategyImpl中
-            List<AppModulePO> moduleObjList = strategyImpl.list_modules();
-            strategyImpl.setListModules(moduleObjList);
-
-            // 3. 执行deploy命令
-            boolean result = false;
             try {
-                result = strategyImpl.deploy();
-            } catch (Exception e) {
-                logger.info(TAG, "deploy exception. ", e);
-            }
+                DevicePO device = remoteContext.getDevice();
+                String logFilename = remoteContext.getLogFile(strategy.getName());
+                log.info(TAG+ "[" + device.getName() + "," + device.getIpAddress() + "] deploy start.");
 
-            // 4. 执行完成后，添加和更新服务到设备对应的表中
-            if(result) {
-                int moduleTotal = moduleObjList.size();
-                logger.info(TAG, "saveOrUpdate deviceModule size: "+moduleTotal);
-
-                for(int i=0; i<moduleTotal; i++) {
-                    AppModulePO module = moduleObjList.get(i);
-                    DeviceModuleRefPO refObj = new DeviceModuleRefPO();
-                    refObj.setDeviceId(device.getId());
-                    refObj.setModuleId(module.getId());
-                    mDeviceModuleService.saveOrUpdate(refObj);
-                    logger.info(TAG, "update deviceModuleRefPO "+i+": " + refObj.toString());
+                // 1. 初始化远程节点的环境
+                log.info(TAG+" initRemoteDevice ["+remoteContext.getDevice().toSimpleString()+"] start ...");
+                List<String> resultList = remoteContext.initRemoteDevice();
+                FileUtil.writeLines(resultList, logFilename, "utf-8");
+                for(int i=0; i<resultList.size(); i++) {
+                    log.info(resultList.get(i));
                 }
+
+                boolean isSuccess = ShellUtils.isSuccess(resultList);
+                if(!isSuccess) {
+                    log.info(TAG+" initRemoteDevice failed.");
+                    return;
+                }
+
+                // 2. 创建一个策略实现类，类型为java微服务,
+                //    通过list_modules获取策略需要的模块,并设置到strategyImpl中
+                StrategyInterface strategyImpl = StrategyFactory.createStrategyImpl(StrategyFactory.STRATEGY_TYPE_JAVA_MS, remoteContext, strategy);
+                List<AppModulePO> moduleObjList = strategyImpl.list_modules();
+                strategyImpl.setListModules(moduleObjList);
+
+                // 3. 执行deploy命令
+                boolean result = strategyImpl.deploy();
+
+                // 4. 执行完成后，添加和更新服务到设备对应的表中
+                if (result) {
+                    int moduleTotal = moduleObjList.size();
+                    log.info(TAG+ "saveOrUpdate deviceModule size: " + moduleTotal);
+
+                    for (int i = 0; i < moduleTotal; i++) {
+                        AppModulePO module = moduleObjList.get(i);
+                        DeviceModuleRefPO refObj = new DeviceModuleRefPO();
+                        refObj.setDeviceId(device.getId());
+                        refObj.setModuleId(module.getId());
+                        mDeviceModuleService.saveOrUpdate(refObj);
+                        log.info(TAG+ "update deviceModuleRefPO " + i + ": " + refObj.toString());
+                    }
+                }
+                log.info(TAG+ "[" + device.toSimpleString() + "] deploy end. result=" + result);
+            } catch (Exception e) {
+                log.info(TAG+ "deploy exception. ", e);
+            } finally {
+                taskCount.countDown();
             }
-            logger.info(TAG, "["+device.getName()+","+device.getIpAddress()+"] deploy end. result="+result);
-            taskCount.countDown();
         }
     };
 
@@ -201,44 +220,44 @@ public class DeployTask implements Runnable{
 
         @Override
         public void run() {
-            DevicePO device = remoteContext.getDevice();
-            logger.info(TAG, "["+device.getName()+","+device.getIpAddress()+"] undeploy start.");
-
-            // 1. 创建一个策略实现类，类型为java微服务
-            StrategyInterface strategyImpl = StrategyFactory.createStrategyImpl(StrategyFactory.STRATEGY_TYPE_JAVA_MS, remoteContext, strategy);
-
-            // 2. 通过list_modules获取策略需要的模块,并设置到strategyImpl中
-            List<AppModulePO> moduleObjList = strategyImpl.list_modules();
-            strategyImpl.setListModules(moduleObjList);
-
-            // 3. 执行deploy命令
-            boolean result = false;
             try {
-                result = strategyImpl.undeploy();
-            } catch (Exception e) {
-                logger.info(TAG, "undeploy exception.", e);
-            }
+                DevicePO device = remoteContext.getDevice();
+                log.info(TAG+ "[" + device.getName() + "," + device.getIpAddress() + "] undeploy start.");
 
-            // 4. 执行完成后，删除服务和设备对应关系
-            if(result) {
-                int moduleTotal = moduleObjList.size();
-                logger.info(TAG, "saveOrUpdate deviceModule size: "+moduleTotal);
+                // 1. 创建一个策略实现类，类型为java微服务
+                StrategyInterface strategyImpl = StrategyFactory.createStrategyImpl(StrategyFactory.STRATEGY_TYPE_JAVA_MS, remoteContext, strategy);
 
-                for(int i=0; i<moduleTotal; i++) {
-                    AppModulePO module = moduleObjList.get(i);
-                    DeviceModuleRefPO refObj = new DeviceModuleRefPO();
-                    refObj.setDeviceId(device.getId());
-                    refObj.setModuleId(module.getId());
+                // 2. 通过list_modules获取策略需要的模块,并设置到strategyImpl中
+                List<AppModulePO> moduleObjList = strategyImpl.list_modules();
+                strategyImpl.setListModules(moduleObjList);
 
-                    UpdateWrapper<DeviceModuleRefPO> wrapper = new UpdateWrapper<>();
-                    wrapper.eq("deviceId", refObj.getDeviceId());
-                    wrapper.eq("moduleId", refObj.getModuleId());
-                    mDeviceModuleService.remove(wrapper);
-                    logger.info(TAG, "delete deviceModuleRefPO "+i+": " + refObj.toString());
+                // 3. 执行deploy命令
+                boolean result = strategyImpl.undeploy();
+
+                // 4. 执行完成后，删除服务和设备对应关系
+                if (result) {
+                    int moduleTotal = moduleObjList.size();
+                    log.info(TAG+ "saveOrUpdate deviceModule size: " + moduleTotal);
+
+                    for (int i = 0; i < moduleTotal; i++) {
+                        AppModulePO module = moduleObjList.get(i);
+                        DeviceModuleRefPO refObj = new DeviceModuleRefPO();
+                        refObj.setDeviceId(device.getId());
+                        refObj.setModuleId(module.getId());
+
+                        QueryWrapper<DeviceModuleRefPO> wrapper = new QueryWrapper<>();
+                        wrapper.eq("deviceId", refObj.getDeviceId());
+                        wrapper.eq("moduleId", refObj.getModuleId());
+                        mDeviceModuleService.remove(wrapper);
+                        log.info(TAG, "delete deviceModuleRefPO " + i + ": " + refObj.toString());
+                    }
                 }
+                log.info(TAG+ "[" + device.getName() + "," + device.getIpAddress() + "] undeploy end. result=" + result);
+            } catch (Exception e) {
+                log.info(TAG+ "undeploy exception. ", e);
+            } finally {
+                taskCount.countDown();
             }
-            logger.info(TAG, "["+device.getName()+","+device.getIpAddress()+"] undeploy end. result="+result);
-            taskCount.countDown();
         }
     };
 }

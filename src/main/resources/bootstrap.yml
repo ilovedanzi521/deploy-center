@@ -61,12 +61,12 @@ mybatis-plus:
     jdbc-type-for-null: 'null'
 
 deploy-center:
-  homeDir: C:\\Users\\chenj\\project\\ysstech\\dfas_group\\dfas_cloud_core\\dfas-deploy-center\\repo
-  deployDir: ~/deploy
-  modulesDir: ~/repo/modules
-  scriptsDir: ~/repo/scripts
-  packagesDir: ~/repo/packages
-  logsDir: ~/repo/logs
+  homeDir: /root/repo
+  deployDir: /root/deploy
+  modulesDir: /root/repo/modules
+  scriptsDir: /root/repo/scripts
+  packagesDir: /root/repo/packages
+  logsDir: /root/repo/logs
   ftpHost: 192.168.0.70
   ftpPort: 21
   ftpUser: ftp

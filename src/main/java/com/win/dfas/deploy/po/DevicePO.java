@@ -57,4 +57,8 @@ public class DevicePO extends BasePO{
      */
     private String desc;
 
+
+    public String toSimpleString() {
+       return name+","+ipAddress+","+alias;
+    }
 }

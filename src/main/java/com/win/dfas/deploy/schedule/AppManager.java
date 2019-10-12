@@ -2,17 +2,24 @@ package com.win.dfas.deploy.schedule;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.win.dfas.deploy.dao.DeviceModuleDao;
 import com.win.dfas.deploy.po.AppModulePO;
+import com.win.dfas.deploy.po.DeviceModuleRefPO;
 import com.win.dfas.deploy.po.StrategyPO;
 import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
 import com.win.dfas.deploy.service.AppModuleService;
+import com.win.dfas.deploy.service.DeviceModuleService;
 import com.win.dfas.deploy.service.StrategyService;
 import com.win.dfas.deploy.util.SpringContextUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import cn.hutool.core.io.file.FileReader;
 
+import javax.swing.*;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -24,15 +31,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @创建人 chenji
  * @创建时间 2019/09/25
  */
+@Slf4j
 public class AppManager {
-    private final static Logger logger = LoggerFactory.getLogger(AppManager.class);
 
     private DeployEnvBean mEnvConfig;
     private AppModuleService mModuleService;
     private StrategyService mStrategyService;
+    private DeviceModuleDao mDeviceModuleDao;
 
-    private Map<String, AppModulePO> mModuleFiles = new HashMap<String, AppModulePO>();
-    private Map<String, StrategyPO> mStrategyFiles = new HashMap<String, StrategyPO>();
+    private Map<String, AppModulePO> mModuleFiles = new Hashtable<String, AppModulePO>();
+    private Map<String, StrategyPO> mStrategyFiles = new Hashtable<String, StrategyPO>();
 
     private AtomicBoolean mScanLock = new AtomicBoolean(false);
 
@@ -43,24 +51,55 @@ public class AppManager {
         mEnvConfig = SpringContextUtils.getBean("deploy_env_bean", DeployEnvBean.class);
         mModuleService = SpringContextUtils.getBean(AppModuleService.class);
         mStrategyService = SpringContextUtils.getBean(StrategyService.class);
+        mDeviceModuleDao = SpringContextUtils.getBean(DeviceModuleDao.class);
 
         return scan()==0;
     }
 
     public int scan() {
-        logger.info("Start scan ...");
+        log.info("Start scan ...");
         int scanResult=1;
         if (mScanLock.compareAndSet(false, true)) {
+            mModuleFiles.clear();
+            mStrategyFiles.clear();
             loadReleaseDescFile(mModuleFiles, mStrategyFiles);
 
-            checkModulesUpdate(mModuleFiles);
-            checkStrategyUpdate(mStrategyFiles);
+            Iterator<AppModulePO> it = mModuleFiles.values().iterator();
+            while(it.hasNext()) {
+                log.info(it.next().toString());
+            }
+
+            Iterator<StrategyPO> st = mStrategyFiles.values().iterator();
+            while(st.hasNext()) {
+                log.info(st.next().toString());
+            }
+
+            /*
+            boolean forTest=true;
+            if(forTest) {
+                List<StrategyPO> list = mStrategyService.list();
+                for(int i=0; i<list.size(); i++) {
+                   StrategyPO strategy = list.get(i);
+                   mStrategyFiles.put(strategy.getPath(),strategy);
+                }
+
+                List<AppModulePO> list_m = mModuleService.list();
+                for(int i=0; i<list_m.size(); i++) {
+                    AppModulePO mod = list_m.get(i);
+                    mModuleFiles.put(mod.getPath(), mod);
+                }
+            } else {
+                checkModulesUpdate(mModuleFiles);
+                checkStrategyUpdate(mStrategyFiles);
+            }
+            */
 
             scanResult=0;
             mScanLock.set(false);
+
         }
 
-        logger.info("Scan done. result="+scanResult);
+        log.info("Scan done. result="+scanResult);
         return scanResult;
     }
 
@@ -94,7 +133,7 @@ public class AppManager {
     private void loadReleaseDescFile(Map<String, AppModulePO> moduleMaps, Map<String, StrategyPO> strategyMaps) {
         final String releaseFile = mEnvConfig.getHomeDir()+ File.separator+mEnvConfig.getReleaseDescFile();
         boolean isFile = FileUtil.isFile(releaseFile);
-        logger.info("loadReleaseDescFile: "+releaseFile+ " isFile: "+isFile);
+        log.info("loadReleaseDescFile: "+releaseFile+ " isFile: "+isFile);
         if(isFile) {
             FileReader fr = new FileReader(releaseFile, "utf-8");
             List<String> frLines = fr.readLines();
@@ -103,7 +142,7 @@ public class AppManager {
             boolean parseScriptFlag=false;
             for(int i=0; i<total; i++) {
                 String line = StrUtil.trim(frLines.get(i));
-                logger.debug("loadReleaseDescFile line"+i+": "+line);
+                log.debug("loadReleaseDescFile line"+i+": "+line);
                 if (StrUtil.isEmpty(line) || line.startsWith("#")) {
                     continue;
                 } else if(line.startsWith("[module]")) {
@@ -141,7 +180,7 @@ public class AppManager {
 
             String packPath = pack_dir+File.separator+pack_ver+File.separator+pack_file;
 
-            logger.debug("parseModule lines: shellName="+path+" moudleName="+name+" packpath="+packPath);
+            log.debug("parseModule lines: shellName="+path+" moudleName="+name+" packpath="+packPath);
             AppModulePO module = new AppModulePO();
             module.setName(name);
             module.setPath(path);
@@ -161,7 +200,7 @@ public class AppManager {
             String name = elements.get(1);
             String allow_delete = elements.get(2);
 
-            logger.debug("parseStrategy lines: shellName="+path+" name="+name+" allow_delete="+allow_delete);
+            log.debug("parseStrategy lines: shellName="+path+" name="+name+" allow_delete="+allow_delete);
             StrategyPO strategy = new StrategyPO();
             strategy.setName(name);
             strategy.setPath(path);
@@ -172,22 +211,29 @@ public class AppManager {
     }
 
     public AppModulePO getModuleById(Long id) {
-        return mModuleService.getById(id);
+        Iterator<AppModulePO> it = mModuleFiles.values().iterator();
+        while(it.hasNext()) {
+            AppModulePO m = it.next();
+            if (m != null && id.equals(m.getId())) {
+                return m;
+            }
+        }
+        return null;
     }
 
     public AppModulePO getModuleByPath(String path) {
         return mModuleFiles.get(path);
     }
 
-    public AppModulePO getModuleByName(String path) {
-        if(StrUtil.isEmpty(path)){
+    public AppModulePO getModuleByName(String name) {
+        if(StrUtil.isEmpty(name)){
             return null;
         }
 
         Iterator<AppModulePO> it = mModuleFiles.values().iterator();
         while(it.hasNext()) {
             AppModulePO m = it.next();
-            if (m != null && path.equals(m.getName())) {
+            if (m != null && name.equals(m.getName())) {
                return m;
             }
         }
@@ -198,19 +244,34 @@ public class AppManager {
         return mStrategyService.getById(id);
     }
 
-    public StrategyPO getStrategyByName(String name) {
-        return mStrategyFiles.get(name);
+    public StrategyPO getStrategyByPath(String path) {
+        return mStrategyFiles.get(path);
     }
 
+    public StrategyPO getStrategyByName(String name) {
+        if(StrUtil.isEmpty(name)){
+            return null;
+        }
+
+        Iterator<StrategyPO> it = mStrategyFiles.values().iterator();
+        while(it.hasNext()) {
+            StrategyPO m = it.next();
+            if (m != null && name.equals(m.getName())) {
+                return m;
+            }
+        }
+        return null;
+    }
     /**
      * 检查mAppModulesList是否和数据库版本匹配，
-     * 不匹配则更新数据库
+     * 不匹配则更新数据库,数据库有多余则删除,
+     * 同时更新设备模块关联表
      * @return
      *      true - 有更新
      *      false - 没有更新版本
      */
     private boolean checkModulesUpdate(Map<String, AppModulePO> moduleFileMap) {
-        logger.info("checkModuleUpdate start.");
+        log.info("checkModuleUpdate start.");
         // 1. 检查modules
         // 获取db已经存在的modules
         Map<String,AppModulePO> moduleDbMap = new HashMap<String,AppModulePO>();
@@ -223,18 +284,18 @@ public class AppManager {
             AppModulePO moduleDb = moduleDbMap.get(module.getPath());
             if(moduleDb == null) {
                 // 2.1 新模块发现,添加
-                logger.debug("checkAndUpdate found new module: "+module.toString());
+                log.debug("checkAndUpdate found new module: "+module.toString());
                 mModuleService.saveOrUpdate(module);
 
             }else if(!moduleDb.equals(module)){
                 String packPath=module.getPack_dir()+"/"+module.getPack_ver()+"/"+module.getPack_file();
 
                 // 2.2 发现模块有变更,更新
-                logger.debug("checkAndUpdate has old module updated. ");
-                logger.debug("OLD ==>");
-                logger.debug(moduleDb.toString());
-                logger.debug("New ==>");
-                logger.debug(module.toString());
+                log.debug("checkAndUpdate has old module updated. ");
+                log.debug("OLD ==>");
+                log.debug(moduleDb.toString());
+                log.debug("New ==>");
+                log.debug(module.toString());
 
                 // 2.3 更新module表
                 moduleDb.setName(module.getName());
@@ -257,17 +318,25 @@ public class AppManager {
            Iterator<AppModulePO> dbIt = moduleDbMap.values().iterator();
            while(dbIt.hasNext()) {
                AppModulePO moduleDb = dbIt.next();
-               logger.info("checkModuleUpdate remove "+moduleDb.toString());
+
+               DeviceModuleRefPO ref = new DeviceModuleRefPO();
+               ref.setModuleId(moduleDb.getId());
+               QueryWrapper<DeviceModuleRefPO> wrapper = new QueryWrapper<>();
+               wrapper.setEntity(ref);
+               log.info("checkModuleUpdate remove deviceModule "+ref.toString());
+               mDeviceModuleDao.delete(wrapper);
+
+               log.info("checkModuleUpdate remove "+moduleDb.toString());
                mModuleService.removeById(moduleDb.getId());
            }
         }
 
-        logger.info("checkModuleUpdate end.");
+        log.info("checkModuleUpdate end.");
         return true;
     }
 
     private boolean checkStrategyUpdate(Map<String, StrategyPO> strategyFileMap) {
-        logger.info("checkStrategyUpdate start.");
+        log.info("checkStrategyUpdate start.");
         // 1. 检查modules
         // 获取db已经存在的strategy
         Map<String,StrategyPO> strategyDbMap = new HashMap<String,StrategyPO>();
@@ -280,15 +349,15 @@ public class AppManager {
             StrategyPO strategyDb = strategyDbMap.get(strategy.getPath());
             if(strategyDb == null) {
                 // 2.1 新模块发现,添加
-                logger.debug("checkAndUpdate found new strategy: "+strategy.toString());
+                log.debug("checkAndUpdate found new strategy: "+strategy.toString());
                 mStrategyService.saveOrUpdate(strategy);
             }else if(!strategyDb.equals(strategy)) {
                 // 2.2 发现策略有变更,更新
-                logger.debug("checkAndUpdate has old strategy updated. ");
-                logger.debug("OLD ==>");
-                logger.debug(strategyDb.toString());
-                logger.debug("New ==>");
-                logger.debug(strategy.toString());
+                log.debug("checkAndUpdate has old strategy updated. ");
+                log.debug("OLD ==>");
+                log.debug(strategyDb.toString());
+                log.debug("New ==>");
+                log.debug(strategy.toString());
 
                 // 2.3 更新module表
                 strategyDb.setPath(strategy.getPath());
@@ -305,12 +374,12 @@ public class AppManager {
             Iterator<StrategyPO> dbIt = strategyDbMap.values().iterator();
             while(dbIt.hasNext()) {
                 StrategyPO strategy = dbIt.next();
-                logger.info("checkStrategyUpdate remove "+strategy.toString());
+                log.info("checkStrategyUpdate remove "+strategy.toString());
                 mStrategyService.removeById(strategy.getId());
             }
         }
 
-        logger.info("checkStrategyUpdate end.");
+        log.info("checkStrategyUpdate end.");
         return true;
     }
 }

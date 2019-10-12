@@ -65,8 +65,8 @@ CREATE TABLE IF NOT EXISTS dc_strategy(
 	UNIQUE KEY (name)
 ) COMMENT='策略信息表';
 CREATE TABLE IF NOT EXISTS dc_device_module_ref(
-	strategy_id BIGINT(20) NOT NULL auto_increment COMMENT '策略ID',
-	module_id BIGINT(20) NOT NULL auto_increment COMMENT '应用模块id'
+	strategy_id BIGINT(20) NOT NULL COMMENT '策略ID',
+	module_id BIGINT(20) NOT NULL COMMENT '应用模块id'
 ) COMMENT='策略模块关联表';
 
 --任务信息表

@@ -9,6 +9,7 @@ import com.win.dfas.deploy.schedule.context.ScheduleContext;
 import com.win.dfas.deploy.service.DeviceService;
 import com.win.dfas.deploy.service.TaskService;
 import com.win.dfas.deploy.util.SpringContextUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -24,10 +25,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @创建人 chenji
  * @创建时间 2019/09/25
  */
-@Component
+@Slf4j
 public class Scheduler {
     private final static String TAG = "Scheduler";
-    private final static Logger logger = LoggerFactory.getLogger(Scheduler.class);
 
     private static Scheduler mInstance = null;
 
@@ -40,22 +40,15 @@ public class Scheduler {
     private TaskService mTaskService;
 
     private ThreadPoolTaskExecutor mTaskExecutor = null;
-
+    /**
+     * 保存远程机器的SecduleContext对象map结构
+     */
     private Map<String, ScheduleContext>  mContextMap = new Hashtable<String,ScheduleContext>();
 
-    /**
-     * 本地模块扫描锁
-     */
-    private AtomicBoolean mScanLock = new AtomicBoolean(false);
     /**
      * 初始化锁
      */
     private AtomicBoolean mInitLock = new AtomicBoolean(false);
-
-    /**
-     * 保存远程机器的SecduleContext对象map结构
-     */
-    private Map<String, ScheduleContext> mContextMaps;
 
     public static Scheduler get() {
         if(mInstance == null) {
@@ -79,11 +72,11 @@ public class Scheduler {
             mTaskService = SpringContextUtils.getBean(TaskService.class);
             mAppManager = SpringContextUtils.getBean("app_manager", AppManager.class);
 
-            logger.info("taskExecutor instance="+mTaskExecutor);
-            logger.info("deviceService: "+mDeviceService);
-            logger.info("taskService: "+mTaskService);
-            logger.info("deployEnv: "+mEnvConfig.toString());
-            logger.info("appManager: "+mAppManager);
+            log.info("taskExecutor instance="+mTaskExecutor);
+            log.info("deviceService: "+mDeviceService);
+            log.info("taskService: "+mTaskService);
+            log.info("deployEnv: "+mEnvConfig.toString());
+            log.info("appManager: "+mAppManager);
 
             loadDevices();
             mAppManager.init();
@@ -96,7 +89,7 @@ public class Scheduler {
     }
 
     public ScheduleContext getSechduleContext(String host) {
-       return mContextMaps.get(host);
+       return mContextMap.get(host);
     }
 
     /**
@@ -141,8 +134,7 @@ public class Scheduler {
     }
 
     /**
-     * 删除设备从调度中心,从内存中删除
-     * @param device
+     * @param device     * 删除设备从调度中心,从内存中删除
      */
     public boolean delDevice(DevicePO device) {
         if(device != null && !StrUtil.isEmpty(device.getIpAddress())) {
@@ -165,12 +157,12 @@ public class Scheduler {
     public void depoly(long taskId) {
         // 1. 获取组和策略的信息
         TaskPO taskObj = mTaskService.getById(taskId);
-        logger.info(TAG, "deploy taskId="+taskId+" status="+taskObj.getStatus());
+        log.info(TAG, "deploy taskId="+taskId+" status="+taskObj.getStatus());
 
         switch (taskObj.getStatus()) {
             case DeployTask.DEPLOY_DOING:
             case DeployTask.UNDEPLOY_DOING:
-                logger.info(TAG, "deploy already starting...");
+                log.info(TAG, "deploy already starting...");
                 return;
             default:
                 break;
@@ -182,18 +174,18 @@ public class Scheduler {
 
         // 3. 创建新的异步任务
         DeployTask task = new DeployTask(DeployTask.CMD_DEPLOY, taskObj);
-        mTaskExecutor.submit(task);
+        mTaskExecutor.execute(task);
     }
 
     public void undepoly(long taskId) {
         // 1. 获取组和策略的信息
         TaskPO taskObj = mTaskService.getById(taskId);
-        logger.info(TAG, "undeploy taskId="+taskId+" status="+taskObj.getStatus());
+        log.info(TAG, "undeploy taskId="+taskId+" status="+taskObj.getStatus());
 
         switch (taskObj.getStatus()) {
             case DeployTask.DEPLOY_DOING:
             case DeployTask.UNDEPLOY_DOING:
-                logger.info(TAG, "undeploy already starting...");
+                log.info(TAG, "undeploy already starting...");
                 return;
             default:
                 break;
@@ -205,7 +197,7 @@ public class Scheduler {
 
         // 3. 创建新的异步任务
         DeployTask task = new DeployTask(DeployTask.CMD_UNDEPLOY, taskObj);
-        mTaskExecutor.submit(task);
+        mTaskExecutor.execute(task);
     }
 
     public boolean delModule() {
@@ -223,11 +215,11 @@ public class Scheduler {
     }
 
     /**
-     * 部署完成后执行
+     * 更新完应用后执行,用来重新扫描应用和策略
      * @return
      */
-    public boolean upgraded() {
-        return true;
+    public boolean upgradeAfter() {
+        return mAppManager.scan()==0;
     }
 }
 

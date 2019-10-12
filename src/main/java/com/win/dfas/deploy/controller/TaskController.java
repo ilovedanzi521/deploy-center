@@ -1,5 +1,8 @@
 package com.win.dfas.deploy.controller;
 
+import cn.hutool.core.util.RuntimeUtil;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.po.StrategyPO;
@@ -8,21 +11,20 @@ import com.win.dfas.deploy.schedule.Scheduler;
 import com.win.dfas.deploy.service.TaskService;
 import com.win.dfas.deploy.service.impl.TaskServiceImpl;
 import com.win.dfas.deploy.util.SpringContextUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.web.HttpRequestHandler;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -32,53 +34,62 @@ import java.util.List;
  * @创建人 heshansen
  * @创建时间 2019/09/27 11:41
  */
+@Slf4j
 @RestController
 @RequestMapping("/task")
 public class TaskController extends BaseController<TaskPO> {
-    private final static Logger logger = LoggerFactory.getLogger(TaskController.class);
-
-    @Autowired
-    private ApplicationContext applicationContext;
-
-    @Autowired
-    private HttpServletRequest mHttpRequest;
-
-    @Autowired
-    private Environment env;
-
     @Autowired
     private TaskService taskService;
-
-    @Autowired
-    private TaskServiceImpl taskServiceImpl;
 
     @Override
     public IService<TaskPO> getBaseService() {
         return this.taskService;
     }
 
-    @RequestMapping("/find")
-    @ResponseBody
-    public StrategyPO queryTask(HttpServletRequest request, HttpServletResponse response, @RequestParam int id) {
-        logger.info("task service impl: "+taskServiceImpl + " param id="+id+" contextPath="+request.getContextPath()+" servletPath="+request.getServletPath());
-        logger.info(mHttpRequest.getQueryString());
-        logger.info(applicationContext.getApplicationName()+ " "+ applicationContext.getDisplayName()+" "+applicationContext.getId());
-        StrategyPO strategy = taskServiceImpl.selectStrategyByTask(id);
-        logger.info("query task: " + strategy);
-
-        return strategy;
+    @GetMapping("/deploy")
+    public void deploy(@RequestParam long id) {
+        QueryWrapper<TaskPO> wp = new QueryWrapper<TaskPO>();
+        wp.eq("id",id);
+        TaskPO task = taskService.getOne(wp);
+        if(task != null) {
+            Scheduler.get().depoly(task.getId());
+        }
     }
 
-    @RequestMapping("/device")
-    @ResponseBody
-    public List<DevicePO> queryDevice(HttpServletRequest request, HttpServletResponse response, @RequestParam int id) {
-        List<DevicePO> list = taskServiceImpl.selectDeviceByTask(id);
-        logger.info("device list: " + list.size());
-        for(int i=0; i<list.size(); i++) {
-            DevicePO dev = list.get(i);
-            logger.info("device: " +  dev);
+    @GetMapping("/undeploy")
+    public void undeploy(@RequestParam long id) {
+        QueryWrapper<TaskPO> wp = new QueryWrapper<TaskPO>();
+        wp.eq("id",id);
+        TaskPO task = taskService.getOne(wp);
+        if(task != null) {
+            Scheduler.get().undepoly(task.getId());
         }
+    }
 
-        return list;
+    @GetMapping("/exec")
+    public List<String> exec(@RequestParam String ipAddr, @RequestParam String cmd) {
+       String[] params = {
+               "/root/repo/exec.sh",
+               ipAddr,
+               cmd
+       };
+
+       log.info("exec.sh "+ipAddr+" "+cmd+", "+Arrays.toString(params));
+       return RuntimeUtil.execForLines(params);
+    }
+
+    @GetMapping("/shell")
+    public List<String> shell(@RequestParam String ipAddr, @RequestParam String cmd) {
+        String[] params = {
+                "ssh",
+                "-p 22",
+                ipAddr,
+                "/root/repo/shell.sh",
+                cmd
+        };
+
+        log.info(Arrays.toString(params));
+        return RuntimeUtil.execForLines(params);
     }
 }
+
