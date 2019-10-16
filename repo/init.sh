@@ -102,7 +102,5 @@ ssh $REMOTE_HOST -p $REMOTE_PORT chmod u+x $CC_HOME_DIR/env.sh
 		$CC_HOME_DIR/ftp_client.sh 
 		$CC_PACKAGES_DIR/ftp
 
-echo "initialize OK."
+OK
 EOF
-
-

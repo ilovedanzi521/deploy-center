@@ -4,9 +4,9 @@ execute() {
   cmdStr=$@
   result=`${cmdStr} 2>/dev/null`
   code=$?
-  echo $code
+  echo $result
   if [ $code -eq 0 ];then
-    echo $result
+    echo "OK"
   fi
 }
 

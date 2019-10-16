@@ -96,7 +96,7 @@ Deploy() {
   $JavaServiceModulePath start --PACK_DIR=$PACK_DIR --PACK_VER=$PACK_VER --PACK_FILE=$PACK_FILE --JDK_DIR=$JDK_DIR --JDK_VER=$JDK_VER
   echo "[Deploy $JavaServiceModulePath start done]"
 
-  echo "[Deploy done.]"
+  echo "[Deploy OK.]"
 }
 
 Undeploy() {
@@ -106,7 +106,7 @@ Undeploy() {
 
   $JDKModulePath uninstall --JDK_DIR=$JDK_DIR --JDK_VER=$JDK_VER --JDK_FILE=$JDK_FILE
 
-  echo "Undeploy done."
+  echo "Undeploy OK."
 }
 
 ListModules() {

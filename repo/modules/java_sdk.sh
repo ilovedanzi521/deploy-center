@@ -107,7 +107,7 @@ Java() {
 
   if [ -x $JavaCmd ];then
     setJavaEnv
-    $JavaCmd -jar $CC_HOME_DIR/$JarFile &
+    nohup $JavaCmd -jar $CC_HOME_DIR/$JarFile > /tmp/nohup.out 2>&1 &
   else
     echo "ERROR: $JavaCmd not founded."
   fi
@@ -186,7 +186,7 @@ Install(){
   # 3. Extra $jdk_package to $java_home
   echo "Extra $jdk_package_locfile to $CC_DEPLOY_DIR/java"
   mkdir -p $CC_DEPLOY_DIR/java
-  tar -zxvf $jdk_package_locfile -C $CC_DEPLOY_DIR/java
+  tar -zxvf $jdk_package_locfile -C $CC_DEPLOY_DIR/java > /dev/null
 
   code=$?
   if [ $code -ne 0 ];then

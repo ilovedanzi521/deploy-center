@@ -105,7 +105,7 @@ Status(){
   else 
     _PID=$pid
     echo $_PID
-    echo "running"
+    echo "OK"
     return 1
   fi
 }

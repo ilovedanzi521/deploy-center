@@ -1,5 +1,3 @@
-update dc_task set status=0;
-
 insert into dc_devcie(id,name,alias,ip_address,user_name,port,os_type,status) values (1,'node-70','dev-70','192.168.0.70','root',22,'centos7.x', 4);
 insert into dc_devcie(id,name,alias,ip_address,user_name,port,os_type,status) values (2,'node-71','dev-71','192.168.0.71','root',22,'centos7.x', 4);
 insert into dc_devcie(id,name,alias,ip_address,user_name,port,os_type,status) values (3,'node-72','dev-72','192.168.0.72','root',22,'centos7.x', 4);

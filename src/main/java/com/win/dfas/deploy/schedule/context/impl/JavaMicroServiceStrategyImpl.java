@@ -11,13 +11,7 @@ import com.win.dfas.deploy.schedule.context.ScheduleContext;
 import com.win.dfas.deploy.schedule.context.StrategyInterface;
 import com.win.dfas.deploy.util.SpringContextUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.jni.Proc;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import sun.plugin2.util.SystemUtil;
 
-import java.io.File;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,7 +21,7 @@ import java.util.List;
  * 部署需要的参数也不同，所以分别建立实现类,模块依赖通过list_modules函数输出。
  * 该类需要两个模块支持：
  *  1. Java 微服务的安装模块，定义为: mJavaMsModule
- *  2. Java sdk安装模块, 定义为: mJavaModule
+ *  2. Java sdk安装模块, 定义为: mJdkModule
  */
 @Slf4j
 public class JavaMicroServiceStrategyImpl implements StrategyInterface {
@@ -37,7 +31,7 @@ public class JavaMicroServiceStrategyImpl implements StrategyInterface {
 
     private StrategyPO mStrategy;
     private AppModulePO mJavaMsModule;
-    private AppModulePO mJavaModule;
+    private AppModulePO mJdkModule;
 
     public JavaMicroServiceStrategyImpl(ScheduleContext context) {
         this(context, null);
@@ -68,19 +62,19 @@ public class JavaMicroServiceStrategyImpl implements StrategyInterface {
     }
 
     public void setJavaModule(AppModulePO javaModule) {
-        this.mJavaModule = javaModule;
+        this.mJdkModule = javaModule;
     }
 
     @Override
     public boolean deploy() {
         String caller = "deploy";
-        return strategyExecuteJavaMs(caller, mStrategy, mJavaMsModule, mJavaModule);
+        return strategyExecuteJavaMs(caller, mStrategy, mJavaMsModule, mJdkModule);
     }
 
     @Override
     public boolean undeploy() {
         String caller = "undeploy";
-        return strategyExecuteJavaMs(caller, mStrategy, mJavaMsModule, mJavaModule);
+        return strategyExecuteJavaMs(caller, mStrategy, mJavaMsModule, mJdkModule);
     }
 
     @Override
@@ -92,7 +86,7 @@ public class JavaMicroServiceStrategyImpl implements StrategyInterface {
                 setJavaModule(module);
             }
             // NOTE: 暂仅支持一个javasdk和一个java 微服务的安装
-            if(isJavaMicroService()) {
+            else if(isJavaMicroService()) {
                 setJavaMicroServiceModule(module);
             }
         }
@@ -176,12 +170,12 @@ public class JavaMicroServiceStrategyImpl implements StrategyInterface {
                 host.getIpAddress(),
                 command,
                 caller,
-                "--PACK_DIR=" +jmsModule.getPack_dir(),
-                "--PACK_VER=" +jmsModule.getPack_ver(),
-                "--PACK_FILE="+jmsModule.getPack_file(),
-                "--JDK_DIR="  +jdkModule.getPack_dir(),
-                "--JDK_VER="  +jdkModule.getPack_ver(),
-                "--JDK_FILE=" +jdkModule.getPack_file()
+                "--PACK_DIR=" +jmsModule.getPackDir(),
+                "--PACK_VER=" +jmsModule.getPackVer(),
+                "--PACK_FILE="+jmsModule.getPackFile(),
+                "--JDK_DIR="  +jdkModule.getPackDir(),
+                "--JDK_VER="  +jdkModule.getPackVer(),
+                "--JDK_FILE=" +jdkModule.getPackFile()
         };
         log.info(TAG+" exec "+Arrays.toString(scriptParams));
 
@@ -189,7 +183,7 @@ public class JavaMicroServiceStrategyImpl implements StrategyInterface {
         List<String> resultList = RuntimeUtil.execForLines(scriptParams);
         log.info(TAG+" exec "+command+" "+caller+" ===> ");
         for(int i=0; i<resultList.size(); i++) {
-            log.info(resultList.get(i));
+            //log.info(resultList.get(i));
         }
 
         FileUtil.writeLines(resultList, logFilename, "utf-8");

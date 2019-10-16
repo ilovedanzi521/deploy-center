@@ -25,15 +25,15 @@ public class AppModulePO extends BasePO{
     /**
      * 包目录，相对目录
      */
-    private String pack_dir;
+    private String packDir;
     /**
      * 包版本
      */
-    private String pack_ver;
+    private String packVer;
     /**
      * 包文件名
      */
-    private String pack_file;
+    private String packFile;
 
     /**
      * 描述信息
@@ -47,6 +47,6 @@ public class AppModulePO extends BasePO{
     /**
      * 删除模块标记
      */
-    private int allow_delete;
+    private int allowDelete;
 
 }

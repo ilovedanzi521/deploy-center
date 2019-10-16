@@ -1,6 +1,7 @@
 package com.win.dfas.deploy.schedule.context;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.util.RuntimeUtil;
 import cn.hutool.core.util.StrUtil;
 import com.win.dfas.deploy.po.AppModulePO;
@@ -8,15 +9,12 @@ import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.po.StrategyPO;
 import com.win.dfas.deploy.schedule.AppManager;
 import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
+import com.win.dfas.deploy.schedule.utils.ShellUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @包名 com.win.dfas.deploy.schedule.SchduleContext
@@ -31,6 +29,7 @@ public class ScheduleContext {
     private AppManager mAppManager;
     private DeployEnvBean mEnvConfig;
     private DevicePO mHost;
+    private AtomicBoolean mIsInit = new AtomicBoolean(false);
 
     /**
      * 初始化远程机器环境的shell脚本
@@ -64,13 +63,23 @@ public class ScheduleContext {
      * 初始化远程设备环境
      * @return
      */
-    public List<String> initRemoteDevice() {
-        String command = mEnvConfig.getHomeDir() + File.separator + sInitShell;
-        // 要加上ssh头部
-        String[] params = {
-               command, mHost.getIpAddress(),String.valueOf(mHost.getPort()) };
-        List<String> resultList = RuntimeUtil.execForLines(params);
-        return resultList;
+    public boolean initRemoteDevice() throws IORuntimeException {
+        if (mIsInit.get() == false) {
+            String command = mEnvConfig.getHomeDir() + File.separator + sInitShell;
+            // 要加上ssh头部
+            String[] params = {
+                    command, mHost.getIpAddress(), String.valueOf(mHost.getPort())};
+            List<String> resultList = RuntimeUtil.execForLines(params);
+            mIsInit.set(ShellUtils.isSuccess(resultList));
+
+            if(resultList == null) {
+                log.info("initRemoteDevice ===> ");
+                for (int i = 0; i < resultList.size(); i++) {
+                    log.info(resultList.get(i));
+                }
+            }
+        }
+        return mIsInit.get();
     }
 
     /**
@@ -78,25 +87,30 @@ public class ScheduleContext {
      * @return
      *      hostname - 返回主机名字
      */
-    public String devConnect() {
-        String command = getSshHeadStr()+mEnvConfig.getHomeDir()+"/"+sCommShell;
+    public List<String> devConnect() throws IORuntimeException {
+        // 如果remote host没有初始化，则调用远程命令之前必须初始化
+        initRemoteDevice();
+
+        String command = mEnvConfig.getHomeDir()+File.separator+sCommShell;
         String[] params = {
                 "ssh",
                 "-p",
                 String.valueOf(mHost.getPort()),
                 mHost.getIpAddress(),
-                "hostname"};
+                command,
+                "hostname"
+        };
         log.info("devConnect command: "+Arrays.toString(params));
 
-        String resultStr = envExecShell(command, params);
-        log.info("devConnect return: \n" + resultStr);
-        return resultStr;
+        List<String> resultList = RuntimeUtil.execForLines(params);
+        return resultList;
     }
 
     /**
      * 获取ssh远程执行命令头部
      * @return
      */
+    @Deprecated
     public String getSshHeadStr() {
         return  "ssh -p "+mHost.getPort()+" "+mHost.getIpAddress()+" ";
     }
@@ -106,15 +120,28 @@ public class ScheduleContext {
      * @param moduleName
      * @return
      */
-    public String packPath(String moduleName) {
+    public String packPath(String moduleName) throws IORuntimeException{
         String remoteShellPath = getModuleShellPath(moduleName);
-        String command = getSshHeadStr()+remoteShellPath;
-        String[] params = {"packPath"};
+        String command = remoteShellPath;
+        String[] params = {
+                "ssh",
+                "-p",
+                String.valueOf(mHost.getPort()),
+                mHost.getIpAddress(),
+                command,
+                "packPath"
+        };
         log.info("packPath command: "+command+" params: ", params.toString());
 
-        String resultStr = envExecShell(command, params);
-        log.info("packPath return: \n" + resultStr);
-        return resultStr;
+        // 如果remote host没有初始化，则调用远程命令之前必须初始化
+        initRemoteDevice();
+
+        List<String> resultList = RuntimeUtil.execForLines(params);
+        if(resultList != null && resultList.size()>0) {
+            return resultList.get(0);
+        }
+
+        return "";
     }
 
     /**
@@ -149,51 +176,78 @@ public class ScheduleContext {
      *      PID -  服务已运行(PID>0)
      *      <0  -  异常
      */
-    public int moduleStatus(String moduleName) {
+    public int moduleStatus(String moduleName) throws IORuntimeException{
         String remoteShellPath = getModuleShellPath(moduleName);
         String command = getSshHeadStr()+remoteShellPath;
+        String caller = "status";
 
         AppModulePO module = mAppManager.getModuleByName(moduleName);
-        String[] params = {"status",
-                "--PACK_DIR="+module.getPack_dir(),
-                "--PACK_VER="+module.getPack_ver(),
-                "--PACK_FILE="+module.getPack_file()};
+        String[] params = {
+                "ssh",
+                "-p",
+                String.valueOf(mHost.getPort()),
+                mHost.getIpAddress(),
+                command,
+                caller,
+                "--PACK_DIR="+module.getPackDir(),
+                "--PACK_VER="+module.getPackVer(),
+                "--PACK_FILE="+module.getPackFile()
+        };
         log.info("moduleStatus command: " + command + " params: ", params.toString());
 
-        String resultStr = envExecShell(command, params);
-        log.info("moduleStatus return: \n" + resultStr);
+        // 如果remote host没有初始化，则调用远程命令之前必须初始化
+        initRemoteDevice();
 
-        String[] arrayStr = StrUtil.split(resultStr, "\n");
-        if(arrayStr != null && arrayStr.length >= 1) {
-            return Integer.parseInt(arrayStr[0]);
+        List<String> resultList = RuntimeUtil.execForLines(params);
+
+        boolean isSuccess = ShellUtils.isSuccess(resultList);
+        int pid=0;
+        if(resultList != null && resultList.size()>0) {
+            try {
+                pid = Integer.parseInt(resultList.get(0));
+            } catch (Exception e) {
+                log.error("get pid error.", e);
+            }
         }
-        return -1;
+
+        log.info("moduleStatus return: " + isSuccess);
+        return pid;
     }
 
     /**
      * 启动远程服务
      */
-    public void moduleStart(String moduleName) {
+    public void moduleStart(String moduleName) throws IORuntimeException{
         String remoteShellPath = getModuleShellPath(moduleName);
         String command = getSshHeadStr()+remoteShellPath;
 
+        // 如果remote host没有初始化，则调用远程命令之前必须初始化
+        initRemoteDevice();
+
         AppModulePO module = mAppManager.getModuleByName(moduleName);
-        String[] params = {"start",
-                "--PACK_DIR="+module.getPack_dir(),
-                "--PACK_VER="+module.getPack_ver(),
-                "--PACK_FILE="+module.getPack_file()};
+        String[] params = {
+                "ssh",
+                "-p",
+                String.valueOf(mHost.getPort()),
+                mHost.getIpAddress(),
+                command,
+                "start",
+                "--PACK_DIR="+module.getPackDir(),
+                "--PACK_VER="+module.getPackVer(),
+                "--PACK_FILE="+module.getPackFile()};
         log.info("moduleStart command: " + command + " params: ", params.toString());
 
-        String resultStr = envExecShell(command, params);
-        log.info("moduleStart return: \n" + resultStr);
+        List<String> resultList = RuntimeUtil.execForLines(params);
+        return;
     }
 
     /**
      * 停止远程服务
      */
-    public void moduleStop(String moduleName) {
+    public void moduleStop(String moduleName) throws IORuntimeException{
         String remoteShellPath = getModuleShellPath(moduleName);
-        String command = getSshHeadStr()+remoteShellPath;
+        String command = remoteShellPath;
+        String caller = "stop";
 
         AppModulePO module = mAppManager.getModuleByName(moduleName);
         String[] params = {
@@ -202,13 +256,17 @@ public class ScheduleContext {
                 String.valueOf(mHost.getPort()),
                 mHost.getIpAddress(),
                 "stop",
-                "--PACK_DIR="+module.getPack_dir(),
-                "--PACK_VER="+module.getPack_ver(),
-                "--PACK_FILE="+module.getPack_file()};
+                "--PACK_DIR="+module.getPackDir(),
+                "--PACK_VER="+module.getPackVer(),
+                "--PACK_FILE="+module.getPackFile()
+        };
         log.info("moduleStop command: " + command + " params: ", params.toString());
 
-        String resultStr = envExecShell(command, params);
-        log.info("moduleStop return: \n" + resultStr);
+        // 如果remote host没有初始化，则调用远程命令之前必须初始化
+        initRemoteDevice();
+
+        RuntimeUtil.execForLines(params);
+        return;
     }
 
     /**
@@ -244,6 +302,7 @@ public class ScheduleContext {
      * @param params
      * @return
      */
+    /*
     public String envExecShell(String command, String[] params) {
         log.info("envExecShell "+command +" "+ Arrays.toString(params));
         BufferedReader br = null;
@@ -271,4 +330,5 @@ public class ScheduleContext {
         }
         return sb.toString();
     }
+    */
 }

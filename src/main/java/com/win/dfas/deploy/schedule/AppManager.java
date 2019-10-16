@@ -64,6 +64,15 @@ public class AppManager {
             mStrategyFiles.clear();
             loadReleaseDescFile(mModuleFiles, mStrategyFiles);
 
+            checkModulesUpdate(mModuleFiles);
+            checkStrategyUpdate(mStrategyFiles);
+
+            // 重新从数据库中读取modules和straties,否则PO将没有ID
+            mModuleFiles.clear();
+            loadModules(mModuleFiles);
+            mStrategyFiles.clear();
+            loadStrategy(mStrategyFiles);
+
             Iterator<AppModulePO> it = mModuleFiles.values().iterator();
             while(it.hasNext()) {
                 log.info(it.next().toString());
@@ -73,26 +82,6 @@ public class AppManager {
             while(st.hasNext()) {
                 log.info(st.next().toString());
             }
-
-            /*
-            boolean forTest=true;
-            if(forTest) {
-                List<StrategyPO> list = mStrategyService.list();
-                for(int i=0; i<list.size(); i++) {
-                   StrategyPO strategy = list.get(i);
-                   mStrategyFiles.put(strategy.getPath(),strategy);
-                }
-
-                List<AppModulePO> list_m = mModuleService.list();
-                for(int i=0; i<list_m.size(); i++) {
-                    AppModulePO mod = list_m.get(i);
-                    mModuleFiles.put(mod.getPath(), mod);
-                }
-            } else {
-                checkModulesUpdate(mModuleFiles);
-                checkStrategyUpdate(mStrategyFiles);
-            }
-            */
 
             scanResult=0;
             mScanLock.set(false);
@@ -184,10 +173,10 @@ public class AppManager {
             AppModulePO module = new AppModulePO();
             module.setName(name);
             module.setPath(path);
-            module.setPack_dir(pack_dir);
-            module.setPack_ver(pack_ver);
-            module.setPack_file(pack_file);
-            module.setAllow_delete(Integer.parseInt(allow_delete));
+            module.setPackDir(pack_dir);
+            module.setPackVer(pack_ver);
+            module.setPackFile(pack_file);
+            module.setAllowDelete(Integer.parseInt(allow_delete));
             return module;
         }
         return null;
@@ -288,7 +277,7 @@ public class AppManager {
                 mModuleService.saveOrUpdate(module);
 
             }else if(!moduleDb.equals(module)){
-                String packPath=module.getPack_dir()+"/"+module.getPack_ver()+"/"+module.getPack_file();
+                String packPath=module.getPackDir()+"/"+module.getPackVer()+"/"+module.getPackFile();
 
                 // 2.2 发现模块有变更,更新
                 log.debug("checkAndUpdate has old module updated. ");
@@ -300,12 +289,12 @@ public class AppManager {
                 // 2.3 更新module表
                 moduleDb.setName(module.getName());
                 moduleDb.setPath(module.getPath());
-                moduleDb.setPack_dir(module.getPack_dir());
-                moduleDb.setPack_ver(module.getPack_ver());
-                moduleDb.setPack_file(module.getPack_file());
+                moduleDb.setPackDir(module.getPackDir());
+                moduleDb.setPackVer(module.getPackVer());
+                moduleDb.setPackFile(module.getPackFile());
                 moduleDb.setHelp(module.getHelp());
                 moduleDb.setDesc(module.getDesc());
-                moduleDb.setAllow_delete(module.getAllow_delete());
+                moduleDb.setAllowDelete(module.getAllowDelete());
                 mModuleService.saveOrUpdate(moduleDb);
 
                 // 2.4 已经比较过，从列表中删除

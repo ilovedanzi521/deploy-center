@@ -2,6 +2,7 @@ package com.win.dfas.deploy.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.win.dfas.deploy.dao.AppModuleDao;
 import com.win.dfas.deploy.po.AppModulePO;
 import com.win.dfas.deploy.schedule.Scheduler;
 import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
@@ -35,5 +36,11 @@ public class AppModuleController extends BaseController<AppModulePO> {
     @Override
     public IService<AppModulePO> getBaseService() {
         return this.appModuleService;
+    }
+
+    @GetMapping("/list")
+    @ResponseBody
+    public List<AppModulePO> list() {
+       return appModuleService.list();
     }
 }

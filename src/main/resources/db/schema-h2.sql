@@ -30,7 +30,8 @@ CREATE TABLE IF NOT EXISTS dc_group_device_ref(
 ) COMMENT='组与机器关联表';
 CREATE TABLE IF NOT EXISTS dc_device_module_ref(
 	device_id BIGINT(20) NOT NULL COMMENT '机器ID',
-	module_id BIGINT(20) NOT NULL COMMENT '应用模块id'
+	module_id BIGINT(20) NOT NULL COMMENT '应用模块id',
+	primary key(device_id, module_id)
 ) COMMENT='机器模块关联表';
 
 --应用模块信息表
