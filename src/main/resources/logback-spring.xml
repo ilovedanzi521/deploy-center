@@ -41,7 +41,7 @@
 		<!--<logger name="com.win.dfas.deploy" level="DEBUG">-->
 			<!--<appender-ref ref="LOGCONSOLE" />-->
 		<!--</logger>-->
-		<root level="DEBUG">
+		<root level="INFO">
             <appender-ref ref="LOGCONSOLE" />
         </root>
 	</springProfile>

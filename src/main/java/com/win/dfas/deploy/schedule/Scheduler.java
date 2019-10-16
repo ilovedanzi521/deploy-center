@@ -101,9 +101,11 @@ public class Scheduler {
         if(list == null || list.size() ==0) {
             return;
         }
+        log.info("loadDevices ===> ");
         int total = list.size();
         for(int i=0; i<total; i++) {
             DevicePO device = list.get(i);
+            log.info(device.toSimpleString());
             addDevice(device);
         }
     }
@@ -121,7 +123,7 @@ public class Scheduler {
      * @param device
      */
     public void addDevice(DevicePO device) {
-        if(device == null || StrUtil.isEmpty(device.getIpAddress())) {
+        if(device == null) {
             return;
         }
 

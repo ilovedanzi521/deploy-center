@@ -53,11 +53,7 @@ public class DeviceController extends BaseController<DevicePO> {
     @GetMapping("/connectDev")
     public WinResponseData connectDevice(@RequestParam String ipAddr) {
         ScheduleContext context = Scheduler.get().getRemoteContext(ipAddr);
-        DevicePO device = null;
-        if(context != null) {
-            device = context.getDevice();
-        }
-        return WinResponseData.handleSuccess(deviceService.connectTest(device));
+        return WinResponseData.handleSuccess(deviceService.connectTest(context.getDevice()));
     }
 
     @GetMapping("saveDevmod")

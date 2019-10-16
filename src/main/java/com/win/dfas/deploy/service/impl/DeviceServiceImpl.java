@@ -65,7 +65,6 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DevicePO> implemen
             device.setAlias(devName);
             device.setStatus(DeviceEnum.ConnectStatus.FAILURE.getValue());
         }
-
         return device;
     }
 }
