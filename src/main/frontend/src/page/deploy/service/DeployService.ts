@@ -14,7 +14,7 @@ export default class DeployService {
         return AxiosFun.get("http://localhost:8888/deploy/device/list", null);
     }
 
-    deviceConnectTest(vo: DeviceRepVO): Promise<WinResponseData> {
+    deviceConnectTest(vo: DeviceReqVO): Promise<WinResponseData> {
         return AxiosFun.post("http://localhost:8888/deploy/device/connectTest", vo);
     }
 

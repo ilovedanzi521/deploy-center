@@ -7,7 +7,6 @@ import com.win.dfas.deploy.common.validator.ValidatorUtils;
 import com.win.dfas.deploy.common.validator.group.AddGroup;
 import com.win.dfas.deploy.common.validator.group.UpdateGroup;
 import com.win.dfas.deploy.po.BasePO;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

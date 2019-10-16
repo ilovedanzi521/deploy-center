@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS dc_group(
 	PRIMARY KEY (id),
 	UNIQUE KEY (name)
 ) COMMENT='组信息表';
-CREATE TABLE IF NOT EXISTS dc_devcie(
+CREATE TABLE IF NOT EXISTS dc_device(
 	id BIGINT(20) NOT NULL auto_increment COMMENT '主键ID',
 	name VARCHAR(32) NOT NULL COMMENT '机器名称',
 	alias VARCHAR(32) NULL DEFAULT NULL COMMENT '机器别名',
@@ -64,11 +64,6 @@ CREATE TABLE IF NOT EXISTS dc_strategy(
 	PRIMARY KEY (id),
 	UNIQUE KEY (name)
 ) COMMENT='策略信息表';
-CREATE TABLE IF NOT EXISTS dc_device_module_ref(
-	strategy_id BIGINT(20) NOT NULL COMMENT '策略ID',
-	module_id BIGINT(20) NOT NULL COMMENT '应用模块id'
-) COMMENT='策略模块关联表';
-
 --任务信息表
 CREATE TABLE IF NOT EXISTS dc_task(
 	id BIGINT(20) NOT NULL auto_increment COMMENT '主键ID',

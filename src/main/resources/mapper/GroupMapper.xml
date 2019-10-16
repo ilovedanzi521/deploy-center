@@ -12,7 +12,7 @@
     <!--根据组id查其关联设备列表-->
     <select id="selectDevicesByGroupId" resultType="com.win.dfas.deploy.po.DevicePO">
       SELECT device.* FROM dc_group_device_ref as ref
-      inner join dc_devcie as device
+      inner join dc_device as device
       on ref.device_id=device.id WHERE ref.group_id = #{id}
     </select>
     <!--根据组id查单个设备详情机器关联设备列表-->

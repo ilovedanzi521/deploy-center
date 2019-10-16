@@ -24,12 +24,16 @@
                 <win-table-column field="osType" title="系统类型" min-width="80"></win-table-column>
                 <win-table-column field="userName" title="用户名" min-width="80"></win-table-column>
                 <win-table-column field="port" title="端口号" min-width="60"></win-table-column>
-                <win-table-column field="createTime" title="创建时间" min-width="100"></win-table-column>
-                <win-table-column field="status" title="连接状态" min-width="80"></win-table-column>
+                <win-table-column field="createTime" title="创建时间" min-width="100" :formatter="formatGroupTable"></win-table-column>
+                <win-table-column field="status" title="连接状态" min-width="80">
+                    <template v-slot="{ row }" >
+                        <el-tag v-if="row.ipAddress==null ? false : true" :type="deviceStatusType(row.status)" @click="connectTest(row)">{{formatDeviceStatus(row.status)}}</el-tag>
+                    </template>
+                </win-table-column>
                 <vxe-table-column title="操作" min-width="100">
                     <template v-slot="{ row }">
-                        <el-button size="mini" @click="handleEdit(row)">编辑</el-button>
-                        <el-button size="mini" type="danger" @click="handleDelete(row)">删除</el-button>
+                        <el-button v-if="row.ipAddress==null ? true : false" size="mini" @click="groupOperation(row,'UPDATE')">编辑</el-button>
+                        <el-button v-if="row.ipAddress==null ? true : false" size="mini" type="danger" @click="handleDelete(row)">删除</el-button>
                     </template>
                 </vxe-table-column>
                 <template v-slot:empty>

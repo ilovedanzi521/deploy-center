@@ -9,8 +9,9 @@ import {DeviceValidCanst, GroupValidConst} from "../const/ValidateConst";
 import DeployService from "../service/DeployService";
 import {WinResponseData} from "../../common/vo/BaseVO";
 import {GroupConst} from "../const/DeployConst";
+import DeviceDialog from "../view/deviceDialog.vue";
 
-@Component
+@Component({ components: {DeviceDialog} })
 export default class GroupDialogController extends BaseController{
     /** 部署服务*/
     private deployService: DeployService = new DeployService();
@@ -51,16 +52,21 @@ export default class GroupDialogController extends BaseController{
 
     private groupReqVO: GroupReqVO = new GroupReqVO();
 
-    /*是否展示设备对话框*/
-    private deviceDialogVisible: boolean = false;
-    /*设备对话框标题*/
-    private deviceDialogTitle: string = "";
-    /*设备对话框-提交按钮*/
-    private deviceSubmitText :string = "";
-    private deviceStatusText : string = "未连接";
-
-    private deviceRepVO: DeviceRepVO=new DeviceRepVO();
-    private deviceReqVO: DeviceReqVO = new DeviceReqVO();
+    /*###################################33*/
+    private isDeviceDialog: boolean=false;
+    private deviceDialogMsg: {
+        dialogTitle: string;
+        type: OperationTypeEnum;
+        data: DeviceRepVO;
+    };
+    // 子组件回调函数
+    private toDeviceDialogForm(msg: WinRspType) {
+        this.isDeviceDialog = false;
+        if (msg === WinRspType.SUCC) {
+            this.initDeviceTransferData();
+        }
+    }
+    /*###################################33*/
 
     // 校验规则
     private rules = {
@@ -79,37 +85,7 @@ export default class GroupDialogController extends BaseController{
             }
         ]
     };
-    // 校验规则
-    private deviceRules = {
-        ipAddress: [
-            {
-                required: true,
-                message: DeviceValidCanst.ipAddress_notnull,
-                trigger: "blur"
-            }
-        ],
-        osType: [
-            {
-                required: true,
-                message: DeviceValidCanst.osType_notnull,
-                trigger: "blur"
-            }
-        ],
-        userName: [
-            {
-                required: true,
-                message: DeviceValidCanst.userName_notnull,
-                trigger: "blur"
-            }
-        ],
-        port: [
-            {
-                required: true,
-                message: DeviceValidCanst.port_notnull,
-                trigger: "blur"
-            }
-        ],
-    };
+
     private mounted(){
         console.log("进入组对话框...........");
         console.log(this.toChildMsg);
@@ -151,9 +127,10 @@ export default class GroupDialogController extends BaseController{
     /*初始化设备穿梭框已选数据*/
     private transfChildMsg(treeVO: GroupTreeVO) {
         let me = this;
-        this.groupReqVO.id = treeVO.id;
-        this.groupReqVO.name = treeVO.name;
-        this.groupReqVO.desc = treeVO.desc;
+        me.groupReqVO.id = treeVO.id;
+        me.groupReqVO.name = treeVO.name;
+        me.groupReqVO.desc = treeVO.desc;
+        me.groupReqVO.deviceIds=[];
         treeVO.children.forEach(function (item) {
             me.groupReqVO.deviceIds.push(item.id);
         });
@@ -182,62 +159,6 @@ export default class GroupDialogController extends BaseController{
             })
     }
 
-    public deviceOperation(row: DeviceRepVO, type: OperationTypeEnum){
-        console.log("deviceOperation");
-        console.log(OperationTypeEnum);
-        console.log(row);
-        if (type === OperationTypeEnum.ADD) {
-            this.deviceDialogTitle = GroupConst.ADD_DEVICE;
-            this.deviceSubmitText = GroupConst.SAVE;
-        }
-        this.deviceDialogVisible = true;
-    }
-    public submitDeviceDialog(formName: string){
-        console.log("********submitDeviceDialog**********");
-        this.$refs[formName].validate((valid: boolean) => {
-            if (valid) {
-                this.deployService.insertDevice(this.deviceRepVO)
-                    .then((winResponseData: WinResponseData) =>{
-                        if (WinRspType.SUCC === winResponseData.winRspType) {
-                            console.log(winResponseData.data);
-                            this.initDeviceTransferData();
-                            this.deviceDialogVisible = false;
-                            this.win_message_success(winResponseData.msg);
-                        } else {
-                            this.errorMessage(winResponseData.msg);
-                        }
-                    })
-            } else {
-                this.win_message_error("设备表单验证未通过");
-                return false;
-            }
-        });
-    }
-    public connectTest(formName: string){
-        this.$refs[formName].validate((valid: boolean) => {
-            if (valid) {
-                this.deployService.deviceConnectTest(this.deviceRepVO)
-                    .then((winResponseData: WinResponseData) =>{
-                        if (WinRspType.SUCC === winResponseData.winRspType) {
-                            this.deviceRepVO = winResponseData.data;
-                            if (this.deviceRepVO.status == -1){
-                                this.deviceStatusText= "连接失败";
-                            }else if (this.deviceRepVO.status == 1){
-                                this.deviceStatusText= "连接正常";
-                            }else {
-                                this.deviceStatusText= "未连接";
-                            }
-                        } else {
-                            this.errorMessage(winResponseData.msg);
-                        }
-                })
-            } else {
-                this.win_message_error("设备表单验证未通过");
-                return false;
-            }
-        });
-    }
-
     // 消息
     private groupDialogMessage(winResponseData: WinResponseData) {
         this.saveLoading = false;
@@ -248,5 +169,19 @@ export default class GroupDialogController extends BaseController{
         } else {
             this.win_message_error(winResponseData.msg);
         }
+    }
+
+    /** 新增/修改设备组*/
+    public deviceOperation(row: DeviceRepVO, type: OperationTypeEnum){
+        console.log("*******************************deviceOperation");
+        console.log(row);
+        if (type === OperationTypeEnum.ADD) {
+            this.deviceDialogMsg = {
+                dialogTitle: GroupConst.ADD_GROUP,
+                type: OperationTypeEnum.ADD,
+                data: new DeviceRepVO()
+            };
+        }
+        this.isDeviceDialog = true;
     }
 }

@@ -6,10 +6,12 @@ import BaseController from "../../common/controller/BaseController";
 import DeployService from "../service/DeployService";
 import PageVO from "../../common/vo/PageVO";
 import {OperationTypeEnum} from "../../common/enum/OperationTypeEnum";
-import {GroupDetailVO, GroupQueryVO, GroupTreeVO} from "../vo/GroupVO";
-import {GroupConst} from "../const/DeployConst";
+import {GroupDetailVO, GroupQueryVO, GroupTreeVO, DeviceReqVO} from "../vo/GroupVO";
+import {GroupConst, DeviceStatusConst, BaseTypeConst} from "../const/DeployConst";
 import GroupDialog from "../view/groupDialog.vue";
 import {BaseConst} from "../../common/const/BaseConst";
+import dateUtils from "../../common/util/DateUtils";
+import { DeviceStatus } from "../const/DeviceStatusEnum";
 
 
 @Component({ components: {GroupDialog} })
@@ -35,6 +37,7 @@ export default class GroupController extends BaseController {
         data: GroupTreeVO;
     };
 
+    private deviceReqVO: DeviceReqVO = new DeviceReqVO();
     /** 初始化*/
     private mounted() {
         this.queryGroupTreeList(this.groupQueryVO);
@@ -163,6 +166,55 @@ export default class GroupController extends BaseController {
      */
     private handleSelectAll({ selection, checked }) {
         this.selected = selection;
+    }
+    // 状态格式化
+    private formatDeviceStatus(status:number){
+        if(DeviceStatus.not == status){
+            return DeviceStatusConst.NOT;
+        }else if(DeviceStatus.failure == status){
+            return DeviceStatusConst.FAILURE;
+        }else if(DeviceStatus.normal == status){
+            return DeviceStatusConst.NORMAL;
+        }else{
+            return status;
+        }
+    }
+    // 设备状态显示类型
+    private deviceStatusType(status:number){
+        if(DeviceStatus.not == status){
+            return BaseTypeConst.info;
+        }else if(DeviceStatus.failure == status){
+            return BaseTypeConst.warning;
+        }else if(DeviceStatus.normal == status){
+            return BaseTypeConst.success;
+        }else{
+            return BaseTypeConst.primary;
+        }
+    }
+      // 表格字段格式化
+      private formatGroupTable({ cellValue, row, rowIndex, column, columnIndex }) {
+        if (column.property === "createTime") {
+            return dateUtils.dateFtt("yyyy-MM-dd hh:mm:ss", new Date(cellValue));
+        }
+    }
+    // 连接测试并保存状态
+    private connectTest(row: GroupTreeVO){
+        // this.win_message_box_warning("是否进行设备连接测试？","提示")
+        //     .then(() => {
+        //         this.deviceReqVO.ipAddress = row.ipAddress;
+        //         this.deviceReqVO.port = row.port;
+        //         this.deviceReqVO.userName = row.userName;
+        //         this.deployService.deviceConnectTest(this.deviceReqVO)
+        //             .then((winResponseData: WinResponseData) =>{
+        //                 if (WinRspType.SUCC === winResponseData.winRspType) {
+        //                     this.queryGroupTreeList(this.groupQueryVO);
+        //                     this.successMessage(winResponseData.msg);
+        //                 } else {
+        //                     this.errorMessage(winResponseData.msg);
+        //                 }
+        //             });
+        //     });
+        
     }
 }
 

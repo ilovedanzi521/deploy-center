@@ -24,7 +24,7 @@ import java.util.Random;
 public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DevicePO> implements DeviceService {
     @Override
     public DevicePO connectTest(DevicePO device) {
-        device.setName("随机测试-"+ device.getIpAddress());
+        device.setAlias("自动生成机器名-"+ device.getIpAddress());
         device.setStatus(DeviceEnum.ConnectStatus.FAILURE.getValue());
         return device;
     }
