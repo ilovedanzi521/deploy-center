@@ -1,8 +1,11 @@
 package com.win.dfas.deploy.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.po.StrategyPO;
 import com.win.dfas.deploy.po.TaskPO;
+
+import java.util.List;
 
 /**
  * @包名 com.win.dfas.deploy.service
@@ -12,4 +15,17 @@ import com.win.dfas.deploy.po.TaskPO;
  * @创建时间 2019/09/26 14:39
  */
 public interface TaskService extends IService<TaskPO> {
+    /**
+     * 从任务ID获取对应的策略
+     * @param taskId - task id
+     */
+    public StrategyPO selectStrategyByTask(long taskId);
+
+    /**
+     *  从任务ID获取对应的组设备列表
+     * @param taskId
+     * @return
+     */
+    public List<DevicePO> selectDeviceByTask(long taskId);
+
 }

@@ -10,8 +10,12 @@ import com.win.dfas.deploy.po.StrategyPO;
 import com.win.dfas.deploy.schedule.AppManager;
 import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
 import com.win.dfas.deploy.schedule.utils.ShellUtils;
+import jdk.nashorn.tools.Shell;
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -69,14 +73,12 @@ public class ScheduleContext {
             // 要加上ssh头部
             String[] params = {
                     command, mHost.getIpAddress(), String.valueOf(mHost.getPort())};
-            List<String> resultList = RuntimeUtil.execForLines(params);
+            List<String> resultList = ShellUtils.envExecShell(params);
             mIsInit.set(ShellUtils.isSuccess(resultList));
 
             if(resultList == null) {
                 log.info("initRemoteDevice ===> ");
-                for (int i = 0; i < resultList.size(); i++) {
-                    log.info(resultList.get(i));
-                }
+                ShellUtils.listLog(log, resultList);
             }
         }
         return mIsInit.get();
@@ -102,17 +104,8 @@ public class ScheduleContext {
         };
         log.info("devConnect command: "+Arrays.toString(params));
 
-        List<String> resultList = RuntimeUtil.execForLines(params);
+        List<String> resultList = ShellUtils.envExecShell(params);
         return resultList;
-    }
-
-    /**
-     * 获取ssh远程执行命令头部
-     * @return
-     */
-    @Deprecated
-    public String getSshHeadStr() {
-        return  "ssh -p "+mHost.getPort()+" "+mHost.getIpAddress()+" ";
     }
 
     /**
@@ -136,7 +129,7 @@ public class ScheduleContext {
         // 如果remote host没有初始化，则调用远程命令之前必须初始化
         initRemoteDevice();
 
-        List<String> resultList = RuntimeUtil.execForLines(params);
+        List<String> resultList = ShellUtils.envExecShell(params);
         if(resultList != null && resultList.size()>0) {
             return resultList.get(0);
         }
@@ -178,7 +171,7 @@ public class ScheduleContext {
      */
     public int moduleStatus(String moduleName) throws IORuntimeException{
         String remoteShellPath = getModuleShellPath(moduleName);
-        String command = getSshHeadStr()+remoteShellPath;
+        String command = remoteShellPath;
         String caller = "status";
 
         AppModulePO module = mAppManager.getModuleByName(moduleName);
@@ -198,7 +191,7 @@ public class ScheduleContext {
         // 如果remote host没有初始化，则调用远程命令之前必须初始化
         initRemoteDevice();
 
-        List<String> resultList = RuntimeUtil.execForLines(params);
+        List<String> resultList = ShellUtils.envExecShell(params);
 
         boolean isSuccess = ShellUtils.isSuccess(resultList);
         int pid=0;
@@ -219,7 +212,7 @@ public class ScheduleContext {
      */
     public void moduleStart(String moduleName) throws IORuntimeException{
         String remoteShellPath = getModuleShellPath(moduleName);
-        String command = getSshHeadStr()+remoteShellPath;
+        String command = remoteShellPath;
 
         // 如果remote host没有初始化，则调用远程命令之前必须初始化
         initRemoteDevice();
@@ -237,8 +230,7 @@ public class ScheduleContext {
                 "--PACK_FILE="+module.getPackFile()};
         log.info("moduleStart command: " + command + " params: ", params.toString());
 
-        List<String> resultList = RuntimeUtil.execForLines(params);
-        return;
+        ShellUtils.envExecShell(params);
     }
 
     /**
@@ -265,8 +257,7 @@ public class ScheduleContext {
         // 如果remote host没有初始化，则调用远程命令之前必须初始化
         initRemoteDevice();
 
-        RuntimeUtil.execForLines(params);
-        return;
+        ShellUtils.envExecShell(params);
     }
 
     /**
@@ -287,6 +278,7 @@ public class ScheduleContext {
         String logFile = getLogPath()+File.separator+strategyName+".log";
         return logFile;
     }
+
     /**
      * 查看策略日志
      * @param strategyName
@@ -295,40 +287,4 @@ public class ScheduleContext {
     public String scriptViewLog(String strategyName) {
         return FileUtil.readString(getLogFile(strategyName),"utf-8");
     }
-
-    /**
-     * 执行命令
-     * @param command
-     * @param params
-     * @return
-     */
-    /*
-    public String envExecShell(String command, String[] params) {
-        log.info("envExecShell "+command +" "+ Arrays.toString(params));
-        BufferedReader br = null;
-        StringBuffer sb = new StringBuffer(1024);
-        try {
-            Process p = Runtime.getRuntime().exec(command, params);
-            br = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-            String line = null;
-            while((line = br.readLine()) != null) {
-                sb.append(line);
-                sb.append("\n");
-            }
-            log.info(sb.toString());
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        }
-        return sb.toString();
-    }
-    */
 }

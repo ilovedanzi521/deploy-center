@@ -9,6 +9,7 @@ import com.win.dfas.deploy.po.StrategyPO;
 import com.win.dfas.deploy.schedule.AppManager;
 import com.win.dfas.deploy.schedule.context.ScheduleContext;
 import com.win.dfas.deploy.schedule.context.StrategyInterface;
+import com.win.dfas.deploy.schedule.utils.ShellUtils;
 import com.win.dfas.deploy.util.SpringContextUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -101,7 +102,6 @@ public class JavaMicroServiceStrategyImpl implements StrategyInterface {
         DevicePO host = mContext.getDevice();
         String remoteShellPath = mContext.getStrategyShellPath(mStrategy.getPath());
         String command = remoteShellPath;
-        String logFileName = mContext.getLogFile(mStrategy.getName());
 
         String caller ="list_modules";
         String[] params = {
@@ -114,11 +114,8 @@ public class JavaMicroServiceStrategyImpl implements StrategyInterface {
         };
         log.info("exec list_modules: [" + command + "] params: "+ Arrays.toString(params));
 
-        List<String> resultList = RuntimeUtil.execForLines(params);
-        FileUtil.writeLines(resultList, logFileName, "utf-8");
-        for(int i=0; i<resultList.size(); i++) {
-            log.info(resultList.get(i));
-        }
+        List<String> resultList = ShellUtils.envExecShell(params);
+        ShellUtils.listLog(log, resultList);
 
         List<AppModulePO> moduleObjList = new ArrayList<AppModulePO>();
         int total = resultList.size();
@@ -180,13 +177,8 @@ public class JavaMicroServiceStrategyImpl implements StrategyInterface {
         log.info(TAG+" exec "+Arrays.toString(scriptParams));
 
         //改用Runtime.exec命令
-        List<String> resultList = RuntimeUtil.execForLines(scriptParams);
-        log.info(TAG+" exec "+command+" "+caller+" ===> ");
-        for(int i=0; i<resultList.size(); i++) {
-            //log.info(resultList.get(i));
-        }
+        ShellUtils.envExecShell(logFilename, scriptParams);
 
-        FileUtil.writeLines(resultList, logFilename, "utf-8");
         log.info(TAG+" strategy java_ms "+caller+" write logs to file: "+logFilename);
         return true;
     }

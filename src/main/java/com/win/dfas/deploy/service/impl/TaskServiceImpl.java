@@ -26,6 +26,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskPO> implements Tas
      * 从任务ID获取对应的策略
      * @param taskId - task id
      */
+    @Override
     public StrategyPO selectStrategyByTask(long taskId) {
         StrategyPO strategy = (StrategyPO)this.sqlSessionBatch().selectOne("com.win.dfas.deploy.dao.TaskDao.selectStrategyByTask", taskId);
         return strategy;
@@ -36,6 +37,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskPO> implements Tas
      * @param taskId
      * @return
      */
+    @Override
     public List<DevicePO> selectDeviceByTask(long taskId) {
         List<DevicePO> list = (List)this.sqlSessionBatch().selectList("com.win.dfas.deploy.dao.TaskDao.selectDeviceByTask", taskId);
         return list;

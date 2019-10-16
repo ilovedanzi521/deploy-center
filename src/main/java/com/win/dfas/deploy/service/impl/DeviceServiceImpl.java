@@ -1,7 +1,6 @@
 package com.win.dfas.deploy.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.win.dfas.common.util.SpringContextUtil;
 import com.win.dfas.deploy.common.enumerate.DeviceEnum;
 import com.win.dfas.deploy.dao.DeviceDao;
 import com.win.dfas.deploy.po.DevicePO;
@@ -9,15 +8,12 @@ import com.win.dfas.deploy.schedule.utils.ShellUtils;
 import com.win.dfas.deploy.service.DeviceService;
 import com.win.dfas.deploy.service.ScheduleCenterService;
 import com.win.dfas.deploy.util.SpringContextUtils;
-import com.win.dfas.deploy.vo.request.DeviceReqVO;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * @包名 com.win.dfas.deploy.service.impl
@@ -31,10 +27,12 @@ import java.util.Random;
 @Transactional(rollbackFor = Exception.class)
 public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DevicePO> implements DeviceService {
 
-    ScheduleCenterService mScheduleService;
+    @Autowired
+    private ScheduleCenterService mScheduleService;
 
     public DeviceServiceImpl() {
-        mScheduleService = new ScheduleCenterService();
+        //mScheduleService = new ScheduleCenterService();
+        //mScheduleService = (ScheduleCenterService)SpringContextUtils.getBean("schedule_center_service");
     }
 
     @Override
@@ -46,16 +44,10 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DevicePO> implemen
             isSuccess = ShellUtils.isSuccess(resultList);
             devName = resultList.get(0);
             log.info("ConnectTest devName="+devName+" isSucc="+isSuccess);
-            for (int i=0; i<resultList.size(); i++) {
-                log.info(resultList.get(i));
-            }
+            ShellUtils.listLog(log, resultList);
         }else{
             log.info("ConnectTest failed. resultList ==> ");
-            if(resultList != null) {
-                for (int i=0; i<resultList.size(); i++) {
-                    log.info(resultList.get(i));
-                }
-            }
+            ShellUtils.listLog(log, resultList);
         }
 
         if(isSuccess) {

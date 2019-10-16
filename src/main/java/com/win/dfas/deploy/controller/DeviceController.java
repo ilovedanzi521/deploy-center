@@ -10,6 +10,7 @@ import com.win.dfas.deploy.schedule.Scheduler;
 import com.win.dfas.deploy.schedule.context.ScheduleContext;
 import com.win.dfas.deploy.service.DeviceModuleService;
 import com.win.dfas.deploy.service.DeviceService;
+import com.win.dfas.deploy.service.ScheduleCenterService;
 import com.win.dfas.deploy.vo.request.DeviceReqVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -32,7 +33,7 @@ public class DeviceController extends BaseController<DevicePO> {
     private DeviceService deviceService;
 
     @Autowired
-    private DeviceModuleService devModService;
+    private ScheduleCenterService scheduleService;
 
     @Override
     public IService<DevicePO> getBaseService() {
@@ -47,23 +48,14 @@ public class DeviceController extends BaseController<DevicePO> {
 
     @PostMapping("/connectTest")
     public WinResponseData connectTest(@Validated @RequestBody DevicePO device){
-        return WinResponseData.handleSuccess(deviceService.connectTest(device));
+        DevicePO dev = deviceService.connectTest(device);
+        updateById(dev);
+        return WinResponseData.handleSuccess(dev);
     }
 
     @GetMapping("/connectDev")
-    public WinResponseData connectDevice(@RequestParam String ipAddr) {
-        ScheduleContext context = Scheduler.get().getRemoteContext(ipAddr);
-        return WinResponseData.handleSuccess(deviceService.connectTest(context.getDevice()));
-    }
-
-    @GetMapping("saveDevmod")
-    public String save(@RequestParam long devid, @RequestParam long modid) {
-        DeviceModuleRefPO devModRef = new DeviceModuleRefPO();
-        devModRef.setModuleId(modid);
-        devModRef.setDeviceId(devid);
-        boolean removed = devModService.remove(new QueryWrapper<DeviceModuleRefPO>().eq(
-                "device_id",devModRef.getDeviceId()).eq("module_id",devModRef.getModuleId()));
-
-        return String.valueOf(devModService.save(devModRef));
+    public WinResponseData connectDevice(@RequestParam String ipAddr ) {
+        DevicePO dev = scheduleService.getDevice(ipAddr);
+        return connectTest(dev);
     }
 }

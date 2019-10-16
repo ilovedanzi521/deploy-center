@@ -1,19 +1,15 @@
 package com.win.dfas.deploy.schedule.config;
 
 import com.win.dfas.deploy.schedule.AppManager;
-import com.win.dfas.deploy.schedule.Scheduler;
 import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
-import com.win.dfas.deploy.service.AppModuleService;
-import lombok.Data;
+import com.win.dfas.deploy.service.ScheduleCenterService;
+import com.win.dfas.deploy.service.impl.ScheduleCenterServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.stereotype.Component;
 
 @Configuration
 public class ScheduleCenterConfig {
@@ -29,6 +25,13 @@ public class ScheduleCenterConfig {
     public AppManager getAppManager() {
         return new AppManager();
     }
+
+    /*
+    @Bean("schedule_center_service")
+    public ScheduleCenterService getScheduleService() {
+        return new ScheduleCenterServiceImpl();
+    }
+    */
 
     @Bean(name = "scheduler_task_executor")
     public static ThreadPoolTaskExecutor taskExecutor() {

@@ -1,9 +1,9 @@
 package com.win.dfas.deploy.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.win.dfas.deploy.po.TaskPO;
-import com.win.dfas.deploy.schedule.Scheduler;
+import com.win.dfas.deploy.service.ScheduleCenterService;
+import com.win.dfas.deploy.service.impl.ScheduleCenterServiceImpl;
 import com.win.dfas.deploy.service.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +23,25 @@ public class TaskController extends BaseController<TaskPO> {
     @Autowired
     private TaskService taskService;
 
+    @Autowired
+    private ScheduleCenterService mScheduleService;
+
+    public TaskController() {
+    }
+
     @Override
     public IService<TaskPO> getBaseService() {
         return this.taskService;
     }
 
+    @GetMapping("/deploy")
+    public void deploy(@RequestParam Long id) {
+        mScheduleService.deploy(id);
+    }
+
+    @GetMapping("/undeploy")
+    public void undeploy(@RequestParam Long id) {
+        mScheduleService.undeploy(id);
+    }
 }
 
