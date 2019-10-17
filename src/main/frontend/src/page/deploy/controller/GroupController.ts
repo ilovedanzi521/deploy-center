@@ -43,6 +43,16 @@ export default class GroupController extends BaseController {
         this.queryGroupTreeList(this.groupQueryVO);
     }
 
+    public rowClassName({ row, rowIndex }){
+        if (!row.ipAddress) {
+            return 'row-orange';
+        }
+    }
+    public cellClassName({ row, rowIndex, column, columnIndex }){
+        if(row.ipAddress && columnIndex === 0){
+            return 'col-checkbox-none';
+        }
+    }
     /** 查询设备组树形列表*/
     public queryGroupTreeList(groupQueryVO: GroupQueryVO) {
         this.groupLoading = true;
@@ -98,16 +108,36 @@ export default class GroupController extends BaseController {
         this.isGroupDialog = true;
     }
     public delGroupBatch(){
-
-    }
-    // 删除单行组
-    public handleDelete(row: GroupTreeVO) {
-        console.log(row);
-        if (row.ipAddress && !row.children){
-            this.delDeviceOne(row.id);
-        }else {
-            this.delGroupOne(row.id);
+        console.log("***********delGroupBatch************");
+        console.log(this.selected);
+        let delGroupIds=[];
+        let groupNames = "";
+        this.selected.forEach((row: any) => {
+            console.log(row);
+            if(!row.ipAddress){
+                delGroupIds.push(row.id);
+                groupNames+=row.name+";";
+            }
+        });
+       
+        if(delGroupIds.length>0){
+            const h = this.$createElement;
+            let msg =  h('p', null, [h('span', null, '确认删除设置组：'),h('i', { style: 'color: red' }, groupNames)]);
+            this.win_message_box_warning(msg,"提示")
+                .then(() => {
+                    this.deployService.removeGroupBatch(delGroupIds)
+                        .then((winResponseData: WinResponseData) =>{
+                            if (WinRspType.SUCC === winResponseData.winRspType) {
+                                this.queryGroupTreeList(this.groupQueryVO);
+                                this.successMessage(winResponseData.msg);
+                            } else {
+                                this.errorMessage(winResponseData.msg);
+                            }
+                        });
+                        
+                });
         }
+
     }
     // 子组件回调函数
     private toGroupDialogForm(msg: WinRspType) {
@@ -156,18 +186,14 @@ export default class GroupController extends BaseController {
 
     // 选中行事件
     private handleSelectChange({ selection }) {
-        console.log("***********handleSelectChange************");
-        console.log(selection);
-        this.selected = selection;
+        this.selected=selection;
     }
 
     /**
      * 全选操作
      */
     private handleSelectAll({ selection, checked }) {
-        console.log("***********handleSelectAll************");
-        console.log(selection);
-        this.selected = selection;
+        this.selected=selection;
     }
     // 状态格式化
     private formatDeviceStatus(status:number){

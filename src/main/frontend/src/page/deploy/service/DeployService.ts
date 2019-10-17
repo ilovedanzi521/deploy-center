@@ -3,6 +3,9 @@ import AxiosFun from "../../../api/AxiosFun";
 import {DeviceRepVO, DeviceReqVO, GroupQueryVO, GroupReqVO} from "../vo/GroupVO";
 
 export default class DeployService {
+    removeGroupBatch(delGroupIds: any[]) {
+        return AxiosFun.post("http://localhost:8888/deploy/group/safeRemoveBatch",delGroupIds);
+    }
     userList() {
         return AxiosFun.get("http://localhost:8888/deploy/sys/user/list", null);
     }

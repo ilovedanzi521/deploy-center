@@ -9,6 +9,8 @@ import com.win.dfas.deploy.vo.request.DeviceParamsVO;
 import com.win.dfas.deploy.vo.request.GroupVO;
 import com.win.dfas.deploy.vo.response.PageVO;
 
+import java.util.List;
+
 /**
  * @包名 com.win.dfas.deploy.service
  * @类名 GroupService
@@ -58,4 +60,11 @@ public interface GroupService extends IService<GroupPO> {
      * @return
      */
     Boolean safeRemove(Long id);
+
+    /**
+     * 安全批量删除组（包括其关联信息）
+     * @param ids
+     * @return
+     */
+    Boolean safeRemoveBatch(List<Long> ids);
 }

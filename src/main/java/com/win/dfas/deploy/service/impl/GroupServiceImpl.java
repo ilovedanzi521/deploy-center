@@ -1,6 +1,8 @@
 package com.win.dfas.deploy.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -167,5 +169,13 @@ public class GroupServiceImpl extends ServiceImpl<GroupDao, GroupPO> implements 
         this.groupDeviceRefService.removeByMap(params);
 
         return this.removeById(id);
+    }
+
+    @Override
+    public Boolean safeRemoveBatch(List<Long> ids) {
+        QueryWrapper wrapper = new QueryWrapper();
+        wrapper.in("group_id",ids);
+        this.groupDeviceRefService.remove(wrapper);
+        return this.removeByIds(ids);
     }
 }

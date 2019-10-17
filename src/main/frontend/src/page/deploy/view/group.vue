@@ -13,16 +13,15 @@
         </div>
         <div style="margin-top:9px;">
             <!--树形表格-->
-            <win-table style="width: 100%;margin-bottom: 20px;" border resizable element-loading-text="拼命加载中..." :show-selection="false" :show-index="false"
-                       @cell-dblclick="view" @select-all="handleSelectAll" @select-change="handleSelectChange"
+            <win-table border resizable 
+                        class="groupTable" :row-class-name="rowClassName" :cell-class-name="cellClassName"
+                        :show-selection="false" :show-index="false"
+                       @cell-dblclick="view" 
+                       @select-all="handleSelectAll" @select-change="handleSelectChange"
                        :data="groupTreeList"
                        :tree-config="{children: 'children', expandAll: true}"
                        >
-                <win-table-column type="selection" width="60" >
-                    <template v-slot="{ row }" >
-                        <!-- <win-checkbox v-if="row.ipAddress==null ? true : false"></win-checkbox> -->
-                    </template>
-                </win-table-column>
+                <win-table-column type="selection" width="60" ></win-table-column>
                 <win-table-column type="index" width="60" title="序号"></win-table-column>
                 <win-table-column field="name" title="组（设备)名称" min-width="130" tree-node></win-table-column>
                 <win-table-column field="ipAddress" title="ip地址" min-width="100"></win-table-column>
@@ -36,12 +35,12 @@
                         <el-tag v-if="row.ipAddress==null ? false : true" :type="deviceStatusType(row.status)" >{{formatDeviceStatus(row.status)}}</el-tag>
                     </template>
                 </win-table-column>
-                <vxe-table-column title="操作" min-width="100">
+                <win-table-column title="操作" min-width="100">
                     <template v-slot="{ row }">
                         <el-button v-if="row.ipAddress==null ? true : false" size="mini" @click="groupOperation(row,'UPDATE')">编辑</el-button>
                         <el-button v-if="row.ipAddress==null ? true : false" size="mini" type="danger" @click="delGroupOne(row)">删除</el-button>
                     </template>
-                </vxe-table-column>
+                </win-table-column>
                 <template v-slot:empty>
                     <span style="color: red;">没有更多数据了！</span>
                 </template>
@@ -73,6 +72,17 @@
             position: absolute;
             width: 100%;
             right: 10px;
+        }
+    }
+    .groupTable /deep/ {
+        width: 100%;
+        margin-bottom: 20px;
+        .vxe-body--row.row--level-0.row-orange {
+            background-color: #4a5373;
+            color: #fff;
+        }
+        .vxe-body--column.col-checkbox-none .vxe-checkbox{
+            display: none;
         }
     }
 </style>

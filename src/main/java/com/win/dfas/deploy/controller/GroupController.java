@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+
 /**
  * @包名 com.win.dfas.deploy.controller
  * @类名 GroupController
@@ -73,6 +75,18 @@ public class GroupController extends BaseController<GroupPO> {
     public WinResponseData safeRemove(@PathVariable Long id){
 
         Boolean success = this.groupService.safeRemove(id);
+        if (success){
+            return WinResponseData.handleSuccess("删除组成功！");
+        }else {
+            return WinResponseData.handleError("删除组失败！");
+        }
+    }
+
+    @SysLog("批量删除设备组")
+    @PostMapping("/safeRemoveBatch")
+    public WinResponseData safeRemove(@RequestBody Long[] ids){
+
+        Boolean success = this.groupService.safeRemoveBatch(Arrays.asList(ids));
         if (success){
             return WinResponseData.handleSuccess("删除组成功！");
         }else {
