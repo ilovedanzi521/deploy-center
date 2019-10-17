@@ -43,5 +43,6 @@ public class TaskController extends BaseController<TaskPO> {
     public void undeploy(@RequestParam Long id) {
         mScheduleService.undeploy(id);
     }
+
 }
 

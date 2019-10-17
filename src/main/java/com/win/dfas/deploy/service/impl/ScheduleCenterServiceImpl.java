@@ -146,8 +146,8 @@ public class ScheduleCenterServiceImpl implements ScheduleCenterService {
      *      <0  -  异常
      */
     @Override
-    public int moduleStatus(DevicePO dev, String moduleName) {
-        ScheduleContext context = Scheduler.get().getRemoteContext(dev);
+    public int moduleStatus(String ipAddr, String moduleName) {
+        ScheduleContext context = Scheduler.get().getRemoteContext(ipAddr);
         if(context != null) {
             return context.moduleStatus(moduleName);
         }
@@ -156,27 +156,30 @@ public class ScheduleCenterServiceImpl implements ScheduleCenterService {
 
     /**
      * 启动模块
-     * @param dev
+     * @param ipAddr
      * @param moduleName
      */
     @Override
-    public void moduleStart(DevicePO dev, String moduleName) {
-        ScheduleContext context = Scheduler.get().getRemoteContext(dev);
+    public boolean moduleStart(String ipAddr, String moduleName) {
+        ScheduleContext context = Scheduler.get().getRemoteContext(ipAddr);
         if(context != null) {
-            context.moduleStart(moduleName);
+            return context.moduleStart(moduleName);
         }
+
+        return false;
     }
 
     /**
      * 停止模块
-     * @param dev
+     * @param ipAddr
      * @param moduleName
      */
     @Override
-    public void moduleStop(DevicePO dev, String moduleName) {
-        ScheduleContext context = Scheduler.get().getRemoteContext(dev);
+    public boolean moduleStop(String ipAddr, String moduleName) {
+        ScheduleContext context = Scheduler.get().getRemoteContext(ipAddr);
         if(context != null) {
-            context.moduleStop(moduleName);
+            return context.moduleStop(moduleName);
         }
+        return false;
     }
 }
