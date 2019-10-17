@@ -94,6 +94,8 @@ export default class GroupDialogController extends BaseController{
         this.transfChildMsg(this.toChildMsg.data);
         if (this.toChildMsg.type === OperationTypeEnum.ADD) {
             this.dialogSumbitText = BaseConst.CONFIRM;
+        }else if(this.toChildMsg.type === OperationTypeEnum.UPDATE){
+            this.dialogSumbitText = BaseConst.CONFIRM;
         }
         this.dialogVisibleSon = true;
     }
@@ -126,14 +128,20 @@ export default class GroupDialogController extends BaseController{
 
     /*初始化设备穿梭框已选数据*/
     private transfChildMsg(treeVO: GroupTreeVO) {
+        console.log("*************transfChildMsg***********");
+        console.log(treeVO);
         let me = this;
-        me.groupReqVO.id = treeVO.id;
-        me.groupReqVO.name = treeVO.name;
-        me.groupReqVO.desc = treeVO.desc;
-        me.groupReqVO.deviceIds=[];
-        treeVO.children.forEach(function (item) {
-            me.groupReqVO.deviceIds.push(item.id);
-        });
+        if(treeVO){
+            me.groupReqVO.id = treeVO.id;
+            me.groupReqVO.name = treeVO.name;
+            me.groupReqVO.desc = treeVO.desc;
+            me.groupReqVO.deviceIds=[];
+            treeVO.children.forEach(function (item) {
+                me.groupReqVO.deviceIds.push(item.id);
+            });
+        }else{
+            me.groupReqVO = new GroupReqVO();
+        }
     }
 
     /*初始化设备穿梭框可选数据*/

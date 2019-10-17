@@ -8,7 +8,6 @@ insert into dc_group (id,name,desc) values (2, 'java-ms','java microservice help
 
 insert into DC_GROUP_DEVICE_REF (group_id,device_id) values (1,1);
 insert into DC_GROUP_DEVICE_REF (group_id,device_id) values (1,2);
-insert into DC_GROUP_DEVICE_REF (group_id,device_id) values (2,3);
 insert into DC_GROUP_DEVICE_REF (group_id,device_id) values (2,4);
 
 insert into dc_app_module (id,name,path,pack_dir,pack_ver,pack_file,help,desc,allow_delete) values (1, 'Java-SDK','java_sdk.sh', 'packages','jdk1.8.0_221', 'jdk-8u221-linux-x64.tar.gz','help','desc',0);

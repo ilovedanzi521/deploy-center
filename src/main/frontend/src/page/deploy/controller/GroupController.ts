@@ -79,7 +79,7 @@ export default class GroupController extends BaseController {
             this.groupDialogMsg = {
                 dialogTitle: GroupConst.ADD_GROUP,
                 type: OperationTypeEnum.ADD,
-                data: new GroupTreeVO()
+                data: null
             };
         }if (type === OperationTypeEnum.UPDATE) {
             this.groupDialogMsg = {
@@ -100,9 +100,7 @@ export default class GroupController extends BaseController {
     public delGroupBatch(){
 
     }
-    public handleEdit(row) {
-        console.log(row);
-    }
+    // 删除单行组
     public handleDelete(row: GroupTreeVO) {
         console.log(row);
         if (row.ipAddress && !row.children){
@@ -120,10 +118,10 @@ export default class GroupController extends BaseController {
         }
     }
 
-    private delGroupOne(id: number) {
-        this.win_message_box_warning("确认删除选中组","提示")
+    private delGroupOne(row: GroupTreeVO) {
+        this.win_message_box_warning("确认删除选中组-"+row.name,"提示")
             .then(() => {
-                this.deployService.removeGroupById(id)
+                this.deployService.removeGroupById(row.id)
                     .then((winResponseData: WinResponseData) =>{
                         if (WinRspType.SUCC === winResponseData.winRspType) {
                             this.queryGroupTreeList(this.groupQueryVO);
@@ -158,6 +156,8 @@ export default class GroupController extends BaseController {
 
     // 选中行事件
     private handleSelectChange({ selection }) {
+        console.log("***********handleSelectChange************");
+        console.log(selection);
         this.selected = selection;
     }
 
@@ -165,6 +165,8 @@ export default class GroupController extends BaseController {
      * 全选操作
      */
     private handleSelectAll({ selection, checked }) {
+        console.log("***********handleSelectAll************");
+        console.log(selection);
         this.selected = selection;
     }
     // 状态格式化

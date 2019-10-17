@@ -3,11 +3,13 @@ package com.win.dfas.deploy.controller;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.win.dfas.deploy.po.TaskPO;
 import com.win.dfas.deploy.service.ScheduleCenterService;
-import com.win.dfas.deploy.service.impl.ScheduleCenterServiceImpl;
 import com.win.dfas.deploy.service.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @包名 com.win.dfas.deploy.controller
@@ -42,6 +44,11 @@ public class TaskController extends BaseController<TaskPO> {
     @GetMapping("/undeploy")
     public void undeploy(@RequestParam Long id) {
         mScheduleService.undeploy(id);
+    }
+
+    @GetMapping("/scan")
+    public void sacn(@RequestParam Long id) {
+        mScheduleService.upgraded();
     }
 }
 
