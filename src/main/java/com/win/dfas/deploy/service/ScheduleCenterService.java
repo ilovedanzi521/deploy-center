@@ -55,4 +55,10 @@ public interface ScheduleCenterService {
      */
     public void upgraded();
 
+    public int moduleStatus(DevicePO dev, String moduleName);
+
+    public void moduleStart(DevicePO dev, String moduleName);
+
+    public void moduleStop(DevicePO dev, String moduleName);
+
 }

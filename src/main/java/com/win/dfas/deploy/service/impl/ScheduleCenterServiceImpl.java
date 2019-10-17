@@ -26,7 +26,7 @@ import java.util.List;
 @Slf4j
 @Service
 public class ScheduleCenterServiceImpl implements ScheduleCenterService {
-    private final static String TAG = "ScheduleCenterService";
+    private final static String TAG = "ScheduleCenterServiceImpl";
 
     @Autowired
     private TaskService taskService;
@@ -136,5 +136,47 @@ public class ScheduleCenterServiceImpl implements ScheduleCenterService {
     @Override
     public void upgraded() {
        Scheduler.get().getAppManager().scan();
+    }
+
+    /**
+     * 查询远程机器的服务状态
+     * @return
+     *      0   -  服务未运行
+     *      PID -  服务已运行(PID>0)
+     *      <0  -  异常
+     */
+    @Override
+    public int moduleStatus(DevicePO dev, String moduleName) {
+        ScheduleContext context = Scheduler.get().getRemoteContext(dev);
+        if(context != null) {
+            return context.moduleStatus(moduleName);
+        }
+       return -1;
+    }
+
+    /**
+     * 启动模块
+     * @param dev
+     * @param moduleName
+     */
+    @Override
+    public void moduleStart(DevicePO dev, String moduleName) {
+        ScheduleContext context = Scheduler.get().getRemoteContext(dev);
+        if(context != null) {
+            context.moduleStart(moduleName);
+        }
+    }
+
+    /**
+     * 停止模块
+     * @param dev
+     * @param moduleName
+     */
+    @Override
+    public void moduleStop(DevicePO dev, String moduleName) {
+        ScheduleContext context = Scheduler.get().getRemoteContext(dev);
+        if(context != null) {
+            context.moduleStop(moduleName);
+        }
     }
 }

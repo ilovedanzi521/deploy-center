@@ -15,6 +15,7 @@ import java.util.Iterator;
 @Transactional(rollbackFor = Exception.class)
 public class DeviceModuleServiceImpl extends ServiceImpl<DeviceModuleDao, DeviceModuleRefPO> implements DeviceModuleService {
 
+    @Override
     public boolean updateBatch(Collection<DeviceModuleRefPO> list) {
         if(list == null || list.size()==0) {
             return false;
@@ -30,6 +31,7 @@ public class DeviceModuleServiceImpl extends ServiceImpl<DeviceModuleDao, Device
         return true;
     }
 
+    @Override
     public boolean removeBatch(Collection<DeviceModuleRefPO> list) {
         if(list == null || list.size()==0) {
             return false;

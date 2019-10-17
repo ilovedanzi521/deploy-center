@@ -2,7 +2,6 @@ package com.win.dfas.deploy.schedule.context;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IORuntimeException;
-import cn.hutool.core.util.RuntimeUtil;
 import cn.hutool.core.util.StrUtil;
 import com.win.dfas.deploy.po.AppModulePO;
 import com.win.dfas.deploy.po.DevicePO;
@@ -10,12 +9,9 @@ import com.win.dfas.deploy.po.StrategyPO;
 import com.win.dfas.deploy.schedule.AppManager;
 import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
 import com.win.dfas.deploy.schedule.utils.ShellUtils;
-import jdk.nashorn.tools.Shell;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -210,7 +206,7 @@ public class ScheduleContext {
     /**
      * 启动远程服务
      */
-    public void moduleStart(String moduleName) throws IORuntimeException{
+    public boolean moduleStart(String moduleName) throws IORuntimeException{
         String remoteShellPath = getModuleShellPath(moduleName);
         String command = remoteShellPath;
 
@@ -230,16 +226,26 @@ public class ScheduleContext {
                 "--PACK_FILE="+module.getPackFile()};
         log.info("moduleStart command: " + command + " params: ", params.toString());
 
-        ShellUtils.envExecShell(params);
+        List<String> resultList = ShellUtils.envExecShell(params);
+        boolean isSucc = ShellUtils.isSuccess(resultList);
+        return isSucc;
     }
 
+
     /**
-     * 停止远程服务
+     * 停止服务
+     * @param moduleName
+     * @return true - 停止成功
+     *         false - 停止失败
+     * @throws IORuntimeException
      */
-    public void moduleStop(String moduleName) throws IORuntimeException{
+    public boolean moduleStop(String moduleName) throws IORuntimeException{
         String remoteShellPath = getModuleShellPath(moduleName);
         String command = remoteShellPath;
         String caller = "stop";
+
+        // 如果remote host没有初始化，则调用远程命令之前必须初始化
+        initRemoteDevice();
 
         AppModulePO module = mAppManager.getModuleByName(moduleName);
         String[] params = {
@@ -254,17 +260,16 @@ public class ScheduleContext {
         };
         log.info("moduleStop command: " + command + " params: ", params.toString());
 
-        // 如果remote host没有初始化，则调用远程命令之前必须初始化
-        initRemoteDevice();
-
-        ShellUtils.envExecShell(params);
+        List<String> resultList = ShellUtils.envExecShell(params);
+        boolean isSucc = ShellUtils.isSuccess(resultList);
+        return isSucc;
     }
 
     /**
      * 返回策略执行的日志保存路径
      * @return
      */
-    public String getLogPath() {
+    public String getLogDir() {
         String logDir = mEnvConfig.getLogsDir()+File.separator+mHost.getName();
         return logDir;
     }
@@ -275,7 +280,7 @@ public class ScheduleContext {
      * @return
      */
     public String getLogFile(String strategyName) {
-        String logFile = getLogPath()+File.separator+strategyName+".log";
+        String logFile = getLogDir()+File.separator+strategyName+".log";
         return logFile;
     }
 

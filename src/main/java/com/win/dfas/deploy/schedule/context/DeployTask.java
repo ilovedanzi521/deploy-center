@@ -1,25 +1,15 @@
 package com.win.dfas.deploy.schedule.context;
 
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.util.StrUtil;
-import com.alibaba.druid.proxy.jdbc.WrapperProxy;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.win.dfas.deploy.dao.DeviceModuleDao;
+
 import com.win.dfas.deploy.po.*;
 import com.win.dfas.deploy.schedule.Scheduler;
-import com.win.dfas.deploy.schedule.utils.ShellUtils;
 import com.win.dfas.deploy.service.DeviceModuleService;
-import com.win.dfas.deploy.service.impl.DeviceModuleServiceImpl;
-import com.win.dfas.deploy.service.impl.TaskServiceImpl;
+import com.win.dfas.deploy.service.TaskService;
 import com.win.dfas.deploy.util.SpringContextUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import java.sql.Wrapper;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
@@ -50,8 +40,10 @@ public class DeployTask implements Runnable{
     private long mTaskId;
     private TaskPO mTaskPO;
 
-    private TaskServiceImpl mTaskImpl;
-    private DeviceModuleServiceImpl mDeviceModuleService;
+    @Autowired
+    private TaskService mTaskService;
+    @Autowired
+    private DeviceModuleService mDeviceModuleService;
 
     @Autowired
     private ThreadPoolTaskExecutor mTaskExecutor;
@@ -60,14 +52,14 @@ public class DeployTask implements Runnable{
         mCmd = cmd;
         mTaskId = task.getId();
         mTaskPO = task;
-        mTaskImpl = SpringContextUtils.getBean(TaskServiceImpl.class);
-        mDeviceModuleService = SpringContextUtils.getBean(DeviceModuleServiceImpl.class);
+        mTaskService = SpringContextUtils.getBean(TaskService.class);
+        mDeviceModuleService = SpringContextUtils.getBean(DeviceModuleService.class);
         mTaskExecutor = SpringContextUtils.getBean("scheduler_task_executor", ThreadPoolTaskExecutor.class);
     }
 
     private void saveStatus(int status) {
         mTaskPO.setStatus(status);
-        mTaskImpl.updateById(mTaskPO);
+        mTaskService.updateById(mTaskPO);
     }
 
    @Override
@@ -76,7 +68,7 @@ public class DeployTask implements Runnable{
         log.info(TAG+" Start id="+mTaskId);
 
         // 1. 从taskId中查询出策略
-       final StrategyPO strategy = mTaskImpl.selectStrategyByTask(mTaskId);
+       final StrategyPO strategy = mTaskService.selectStrategyByTask(mTaskId);
         if(strategy == null) {
            status= mCmd==CMD_DEPLOY ? DEPLOY_ERROR : UNDEPLOY_ERROR;
            saveStatus(status);
@@ -85,7 +77,7 @@ public class DeployTask implements Runnable{
         log.info(TAG+" find strategy="+strategy.toString() + " deployStatus="+status);
 
         // 2. 从taskId中查询出设备列表
-        List<DevicePO> devList = mTaskImpl.selectDeviceByTask(mTaskId);
+        List<DevicePO> devList = mTaskService.selectDeviceByTask(mTaskId);
         if(devList == null || devList.size() == 0) {
             status= mCmd==CMD_DEPLOY ? DEPLOY_ERROR : UNDEPLOY_ERROR;
             saveStatus(status);

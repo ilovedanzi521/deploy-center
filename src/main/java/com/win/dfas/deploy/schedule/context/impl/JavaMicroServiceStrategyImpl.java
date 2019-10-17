@@ -149,7 +149,7 @@ public class JavaMicroServiceStrategyImpl implements StrategyInterface {
         }
 
         // 创建该模块保存的日志目录, 日志目录在本地创建
-        String logDir = mContext.getLogPath();
+        String logDir = mContext.getLogDir();
         String logFilename = mContext.getLogFile(strategy.getName());
         String[] mkParams = {"mkdir", "-p", logDir};
         log.info(TAG+" exec "+Arrays.toString(mkParams));
