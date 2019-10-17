@@ -2,11 +2,13 @@ package com.win.dfas.deploy.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.win.dfas.common.vo.WinResponseData;
 import com.win.dfas.deploy.dao.AppModuleDao;
 import com.win.dfas.deploy.po.AppModulePO;
 import com.win.dfas.deploy.schedule.Scheduler;
 import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
 import com.win.dfas.deploy.service.AppModuleService;
+import com.win.dfas.deploy.service.ScheduleCenterService;
 import com.win.dfas.deploy.service.impl.AppModuleServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
@@ -33,6 +35,9 @@ public class AppModuleController extends BaseController<AppModulePO> {
     @Autowired(required = true)
     private DeployEnvBean mEnvConfig;
 
+    @Autowired(required = true)
+    private ScheduleCenterService mScheduleService;
+
     @Override
     public IService<AppModulePO> getBaseService() {
         return this.appModuleService;
@@ -42,5 +47,23 @@ public class AppModuleController extends BaseController<AppModulePO> {
     @ResponseBody
     public List<AppModulePO> list() {
        return appModuleService.list();
+    }
+
+    @GetMapping("/moduleStart")
+    public WinResponseData moduleStart(@RequestParam String ipAddr, String moduleName) {
+       boolean isStart = mScheduleService.moduleStart(ipAddr, moduleName);
+       return WinResponseData.handleSuccess(isStart);
+    }
+
+    @GetMapping("/moduleStatus")
+    public WinResponseData moduleStatus(@RequestParam String ipAddr, String moduleName) {
+        int status = mScheduleService.moduleStatus(ipAddr, moduleName);
+        return WinResponseData.handleSuccess(String.valueOf(status));
+    }
+
+    @GetMapping("/moduleStop")
+    public WinResponseData moduleStop(@RequestParam String ipAddr, String moduleName) {
+        boolean isStop = mScheduleService.moduleStop(ipAddr, moduleName);
+        return WinResponseData.handleSuccess(String.valueOf(isStop));
     }
 }

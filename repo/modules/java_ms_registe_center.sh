@@ -71,12 +71,14 @@ Start(){
     pid=$_PID
     if [ $pid -gt 0 ]; then
       echo "Service already running, PID: $pid"
+      echo "OK"
       return 1
     fi
      
     total=`expr $total - $take`
     if [ $total -le 0 ];then
       echo "Service has not Running, PID: $pid"
+      echo "Failed"
       return 0
     else
       sleep $take
@@ -124,6 +126,7 @@ Stop(){
     pid=$_PID
     if [ $pid -le 0 ];then
       echo "Service already killed"
+      echo "OK"
       return 1
     fi
      

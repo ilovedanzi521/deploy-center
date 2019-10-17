@@ -89,6 +89,9 @@ $ftpPath -in $CC_FTP_SERVER $CC_FTP_PORT << EOF
 	get $remotefile $localfile
 EOF
 	ls -l $localfile
+	if test -r $localfile
+	  echo "OK"
+	fi
 }
 
 case $1 in

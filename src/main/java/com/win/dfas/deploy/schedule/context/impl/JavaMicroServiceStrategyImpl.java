@@ -8,6 +8,7 @@ import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.po.StrategyPO;
 import com.win.dfas.deploy.schedule.AppManager;
 import com.win.dfas.deploy.schedule.context.ScheduleContext;
+import com.win.dfas.deploy.schedule.context.StrategyFactory;
 import com.win.dfas.deploy.schedule.context.StrategyInterface;
 import com.win.dfas.deploy.schedule.utils.ShellUtils;
 import com.win.dfas.deploy.util.SpringContextUtils;
@@ -66,6 +67,10 @@ public class JavaMicroServiceStrategyImpl implements StrategyInterface {
         this.mJdkModule = javaModule;
     }
 
+    public AppModulePO getJavaModule() {
+        return this.mJdkModule;
+    }
+
     @Override
     public boolean deploy() {
         String caller = "deploy";
@@ -83,8 +88,9 @@ public class JavaMicroServiceStrategyImpl implements StrategyInterface {
         int moduleTotal = moduleList.size();
         for(int i=0; i<moduleTotal; i++) {
             AppModulePO module = moduleList.get(i);
-            if(isUseJdk() && module != null && module.getName()!= null && StrUtil.containsIgnoreCase(module.getName(),"Java-SDK")){
-                setJavaModule(module);
+            if(isUseJdk() && getJavaModule() == null) {
+                AppModulePO jdkModule = StrategyFactory.getJavaSdkModule(StrategyFactory.JDK_MODULE_NAME);
+                setJavaModule(jdkModule);
             }
             // NOTE: 暂仅支持一个javasdk和一个java 微服务的安装
             else if(isJavaMicroService()) {
