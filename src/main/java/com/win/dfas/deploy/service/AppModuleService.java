@@ -1,11 +1,14 @@
 package com.win.dfas.deploy.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.win.dfas.common.vo.BaseReqVO;
+import com.win.dfas.deploy.bo.AppModuleBO;
 import com.win.dfas.deploy.po.AppModulePO;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import javax.sql.DataSource;
+import com.win.dfas.deploy.vo.response.AppModuleTreeVO;
+import com.win.dfas.deploy.vo.response.PageVO;
 
 /**
  * @包名 com.win.dfas.deploy.service
@@ -21,4 +24,6 @@ public interface AppModuleService extends IService<AppModulePO> {
     public boolean stop(String ipAddr, String moduleName);
 
     public int status(String ipAddr, String moduleName);
+
+    PageVO<AppModuleTreeVO> getAppModuleTreePageInfo(BaseReqVO reqVO);
 }

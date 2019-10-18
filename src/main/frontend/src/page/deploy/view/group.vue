@@ -14,7 +14,7 @@
         <div style="margin-top:9px;">
             <!--树形表格-->
             <win-table border resizable 
-                        class="groupTable" :row-class-name="rowClassName" :cell-class-name="cellClassName"
+                        class="groupTable"  :cell-class-name="cellClassName"
                         :show-selection="false" :show-index="false"
                        @cell-dblclick="view" 
                        @select-all="handleSelectAll" @select-change="handleSelectChange"

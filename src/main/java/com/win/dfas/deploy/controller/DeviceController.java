@@ -49,7 +49,7 @@ public class DeviceController extends BaseController<DevicePO> {
     @PostMapping("/connectTest")
     public WinResponseData connectTest(@Validated @RequestBody DevicePO device){
         DevicePO dev = deviceService.connectTest(device);
-        updateById(dev);
+//        updateById(dev);
         return WinResponseData.handleSuccess(dev);
     }
 

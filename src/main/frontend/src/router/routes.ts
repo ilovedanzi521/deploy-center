@@ -4,7 +4,7 @@ import Home from "@/page/home/view/index.vue";
 import Directional from "@/page/fram/view/Directional.vue";
 import DeployIndex from "@/page/deploy/view/index.vue";
 import DeployGroup from "@/page/deploy/view/group.vue";
-import DeployUser from "@/page/deploy/view/userList.vue";
+import DeployAppModule from "@/page/deploy/view/appModule.vue"
 
 
 const routers = [
@@ -34,19 +34,19 @@ const routerChildren = [
         component: Home
     },
     {
-        path: "/deployIndex",
+        path: "/deploy/index",
         name: "deployIndex",
         component: DeployIndex,
     },
     {
-        path: "/deployGroup",
+        path: "/deploy/group",
         name: "deployGroup",
         component: DeployGroup,
     },
     {
-        path: "/deployUser",
-        name: "deployUser",
-        component: DeployUser,
+        path: "/deploy/appmodule",
+        name: "deployAppModule",
+        component: DeployAppModule,
     },
 ];
 

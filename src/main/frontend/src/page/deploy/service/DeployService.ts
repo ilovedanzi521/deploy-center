@@ -1,8 +1,12 @@
 import {WinResponseData} from "../../common/vo/BaseVO";
 import AxiosFun from "../../../api/AxiosFun";
 import {DeviceRepVO, DeviceReqVO, GroupQueryVO, GroupReqVO} from "../vo/GroupVO";
+import { QueryReqVO } from "../vo/AppModuleVO";
 
 export default class DeployService {
+    appModulePageList(vo: QueryReqVO) {
+        return AxiosFun.post("http://localhost:8888/deploy/app/module/pageList", vo);
+    }
     removeGroupBatch(delGroupIds: any[]) {
         return AxiosFun.post("http://localhost:8888/deploy/group/safeRemoveBatch",delGroupIds);
     }

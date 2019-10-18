@@ -41,7 +41,10 @@
 		<!--<logger name="com.win.dfas.deploy" level="DEBUG">-->
 			<!--<appender-ref ref="LOGCONSOLE" />-->
 		<!--</logger>-->
-		<root level="INFO">
+        <!--数据层sql打印-->
+        <logger name="com.win.dfas.deploy.dao" level="DEBUG">
+        </logger>
+        <root level="INFO">
             <appender-ref ref="LOGCONSOLE" />
         </root>
 	</springProfile>
