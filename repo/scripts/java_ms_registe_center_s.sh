@@ -76,13 +76,23 @@ EOF
 Deploy() {
   echo "[Deploy start...]"
 
-  echo "[Deploy uninstall java-sdk]"
-  $JDKModulePath uninstall --JDK_VER=$JDK_VER --JDK_DIR=$JDK_DIR --JDK_FILE=$JDK_FILE
-  echo "[Deploy uninstall java-sdk done]"
+  # 安装不卸载JDK
+  jdkExist=`$JDKModulePath check --JDK_VER=$JDK_VER --JDK_DIR=$JDK_DIR --JDK_FILE=$JDK_FILE`
+  if [ $jdkExist -eq 1 ]
+  then
+	echo "[Deploy check JDK($CC_DEPLOY_DIR/java/$JDK_VER/bin/java) has exist.]"
+  else
+	echo "[Deploy check JDK($CC_DEPLOY_DIR/java/$JDK_VER/bin/java) has not exist.]"
 
-  echo "[Deploy install java-sdk]"
-  $JDKModulePath install --JDK_VER=$JDK_VER --JDK_DIR=$JDK_DIR --JDK_FILE=$JDK_FILE
-  echo "[Deploy install java-sdk done]"
+	echo "[Deploy uninstall java-sdk]"
+	$JDKModulePath uninstall --JDK_VER=$JDK_VER --JDK_DIR=$JDK_DIR --JDK_FILE=$JDK_FILE
+  	echo "[Deploy uninstall java-sdk done]"
+
+  	echo "[Deploy install java-sdk]"
+  	$JDKModulePath install --JDK_VER=$JDK_VER --JDK_DIR=$JDK_DIR --JDK_FILE=$JDK_FILE
+  	echo "[Deploy install java-sdk done]"
+  fi
+
 
   echo "[Deploy uninstall java-micro-service]"
   $JavaServiceModulePath uninstall --PACK_DIR=$PACK_DIR --PACK_VER=$PACK_VER --PACK_FILE=$PACK_FILE
@@ -102,7 +112,8 @@ Deploy() {
 Undeploy() {
   echo "Undeploy"
 
-  $JavaServiceModulePath uninstall --PACK_DIR=$PACK_DIR --PACK_VER=$PACK_VER --PACK_FILE=$PACK_FILE 
+  # 反安装不卸载JDK
+  #$JavaServiceModulePath uninstall --PACK_DIR=$PACK_DIR --PACK_VER=$PACK_VER --PACK_FILE=$PACK_FILE 
 
   $JDKModulePath uninstall --JDK_DIR=$JDK_DIR --JDK_VER=$JDK_VER --JDK_FILE=$JDK_FILE
 

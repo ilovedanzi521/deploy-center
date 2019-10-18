@@ -90,6 +90,7 @@ $ftpPath -in $CC_FTP_SERVER $CC_FTP_PORT << EOF
 EOF
 	ls -l $localfile
 	if test -r $localfile
+        then
 	  echo "OK"
 	fi
 }

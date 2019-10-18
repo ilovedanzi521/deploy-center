@@ -55,10 +55,33 @@ public interface ScheduleCenterService {
      */
     public void upgraded();
 
+    /**
+     * 检查模块当前状态
+     * @param ipAddr
+     * @param moduleName
+     * @return
+     *      pid - 服务已启动
+     *      <=0 - 服务未启动
+     */
     public int moduleStatus(String ipAddr, String moduleName);
 
+    /**
+     * 启动当前模块
+     * @param ipAddr
+     * @param moduleName
+     * @return
+     *      true  - 已启动 pid>0
+     *      false - 未启动
+     */
     public boolean moduleStart(String ipAddr, String moduleName);
-
+    /**
+     * 停止当前模块
+     * @param ipAddr
+     * @param moduleName
+     * @return
+     *      true  - 已停止
+     *      false - 未停止
+     */
     public boolean moduleStop(String ipAddr, String moduleName);
 
 }
