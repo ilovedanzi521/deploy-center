@@ -18,7 +18,7 @@
                         :show-selection="false" :show-index="false"
                        @cell-dblclick="view" 
                        @select-all="handleSelectAll" @select-change="handleSelectChange"
-                       :data="groupTreeList"
+                       :data="groupTreeList" :loading="groupLoading"
                        :tree-config="{children: 'children', expandAll: true}"
                        >
                 <win-table-column type="selection" width="60" ></win-table-column>

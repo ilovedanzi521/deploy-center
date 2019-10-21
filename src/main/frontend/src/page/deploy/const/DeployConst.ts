@@ -17,3 +17,7 @@ export const DeviceStatusConst = {
     FAILURE: '连接失败',
     NORMAL: '连接正常'
 }
+
+export const AppModuleConst = {
+    UPLOAD_TITLE: "上传应用模块"
+}

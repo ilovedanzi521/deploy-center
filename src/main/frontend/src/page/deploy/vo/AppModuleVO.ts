@@ -4,7 +4,9 @@ import { BaseReqVO, BaseRepVO } from "../../common/vo/BaseVO";
 export class QueryReqVO extends BaseReqVO{
 
 }
-
+export class UploadVO {
+    
+}
 
 /*********************response VO****************/
 //响应设备组树形VO

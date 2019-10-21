@@ -7,15 +7,15 @@ import DeployService from "../service/DeployService";
 import PageVO from "../../common/vo/PageVO";
 import {OperationTypeEnum} from "../../common/enum/OperationTypeEnum";
 import {GroupTreeVO, DeviceReqVO} from "../vo/GroupVO";
-import {GroupConst, DeviceStatusConst, BaseTypeConst} from "../const/DeployConst";
-import GroupDialog from "../view/groupDialog.vue";
+import {GroupConst, DeviceStatusConst, BaseTypeConst, AppModuleConst} from "../const/DeployConst";
 import {BaseConst} from "../../common/const/BaseConst";
 import dateUtils from "../../common/util/DateUtils";
-import { DeviceStatus } from "../const/DeviceStatusEnum";
-import { QueryReqVO, AppModuleTreeVO } from "../vo/AppModuleVO";
+import { DeviceStatus, DeployTypeEnum } from "../const/DeployEnum";
+import { QueryReqVO, AppModuleTreeVO, UploadVO } from "../vo/AppModuleVO";
+import UploadDialog from "../view/uploadDialog.vue";
 
 
-@Component({ components: {GroupDialog} })
+@Component({ components: {UploadDialog} })
 export default class AppModuleController extends BaseController {
     /** 部署服务*/
     private deployService: DeployService = new DeployService();
@@ -26,16 +26,16 @@ export default class AppModuleController extends BaseController {
     /** 树形组列表数据*/
     private pageDataList: AppModuleTreeVO[]=[];
     /** 是否显示设备组弹框*/
-    private isGroupDialog: boolean = false;
+    private isUploadDialog: boolean = false;
     /*组表格加载中*/
     private tableLoading: boolean = false;
     /*选中项*/
     private selected: any = [];
-    /** 设备组弹框信息*/
-    private groupDialogMsg: {
+    /** 上传弹框信息*/
+    private toUploadDialogMsg: {
         dialogTitle: string;
-        type: OperationTypeEnum;
-        data: GroupTreeVO;
+        type: DeployTypeEnum;
+        data: UploadVO;
     };
 
     private deviceReqVO: DeviceReqVO = new DeviceReqVO();
@@ -104,30 +104,15 @@ export default class AppModuleController extends BaseController {
     }
 
     /** 新增/修改设备组*/
-    public groupOperation(row: GroupTreeVO, type: OperationTypeEnum){
-        console.log("groupOperation"+OperationTypeEnum);
-        console.log(row);
-        if (type === OperationTypeEnum.ADD) {
-            this.groupDialogMsg = {
-                dialogTitle: GroupConst.ADD_GROUP,
-                type: OperationTypeEnum.ADD,
-                data: null
-            };
-        }if (type === OperationTypeEnum.UPDATE) {
-            this.groupDialogMsg = {
-                dialogTitle: GroupConst.EDIT_GROUP,
-                type: OperationTypeEnum.UPDATE,
-                data: this.copy(row)
-            };
+    public uploadAppModule(){
+        console.log("uploadAppModule"+OperationTypeEnum);
+        this.toUploadDialogMsg={
+            dialogTitle: AppModuleConst.UPLOAD_TITLE,
+            type : DeployTypeEnum.UPLOAD,
+            data : null
         }
-        if (type === OperationTypeEnum.VIEW) {
-            this.groupDialogMsg = {
-                dialogTitle: BaseConst.VIEW + row.name,
-                type: OperationTypeEnum.VIEW,
-                data: row
-            };
-        }
-        this.isGroupDialog = true;
+        // this.toUploadDialogMsg.dialogTitle= AppModuleConst.UPLOAD_TITLE;
+        this.isUploadDialog = true;
     }
     public delGroupBatch(){
         console.log("***********delGroupBatch************");
@@ -162,11 +147,10 @@ export default class AppModuleController extends BaseController {
 
     }
     // 子组件回调函数
-    private toGroupDialogForm(msg: WinRspType) {
-        this.isGroupDialog = false;
+    private bindUploadSend(msg: WinRspType) {
+        this.isUploadDialog = false;
         if (msg === WinRspType.SUCC) {
-            this.queryReqVO.reqPageNum = 1;
-            this.queryPageList(this.queryReqVO);
+            
         }
     }
 
@@ -201,10 +185,6 @@ export default class AppModuleController extends BaseController {
             });
     }
 
-    // 双击查看
-    private view({ cellValue, row, rowIndex, column, columnIndex }) {
-        this.groupOperation(row, OperationTypeEnum.VIEW);
-    }
 
     // 选中行事件
     private handleSelectChange({ selection }) {

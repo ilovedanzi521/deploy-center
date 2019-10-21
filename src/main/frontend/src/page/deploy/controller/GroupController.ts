@@ -11,7 +11,7 @@ import {GroupConst, DeviceStatusConst, BaseTypeConst} from "../const/DeployConst
 import GroupDialog from "../view/groupDialog.vue";
 import {BaseConst} from "../../common/const/BaseConst";
 import dateUtils from "../../common/util/DateUtils";
-import { DeviceStatus } from "../const/DeviceStatusEnum";
+import { DeviceStatus } from "../const/DeployEnum";
 
 
 @Component({ components: {GroupDialog} })

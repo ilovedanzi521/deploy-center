@@ -3,3 +3,7 @@ export enum DeviceStatus {
     failure = -1,
     normal = 1
 }
+
+export enum DeployTypeEnum{
+    UPLOAD = "UPLOAD",
+}

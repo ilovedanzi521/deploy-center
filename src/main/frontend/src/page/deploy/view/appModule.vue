@@ -5,7 +5,7 @@
             <ul class="btn-edit fr">
                 <li>
                     <el-button-group>
-                        <win-button type="info" icon="el-icon-plus" round @click="groupOperation('','ADD')">上传应用</win-button>
+                        <win-button type="info" icon="el-icon-plus" round @click="uploadAppModule">上传应用</win-button>
                         <win-button v-popover:popover1 type="info" icon="el-icon-delete" round :disabled="selected.length == 0" @click="delGroupBatch">删除应用</win-button>
                     </el-button-group>
                 </li>
@@ -34,8 +34,7 @@
                 </el-table-column>
                 <el-table-column label="操作" min-width="100">
                     <template v-slot="{ row }">
-                        <el-button v-if="row.ipAddress==null ? false : true" size="mini" @click="groupOperation(row,'UPDATE')">编辑</el-button>
-                        <el-button v-if="row.ipAddress==null ? false : true" size="mini" type="danger" @click="delGroupOne(row)">删除</el-button>
+                        <el-button v-if="row.ipAddress==null ? true : false" size="mini" type="danger" @click="delGroupOne(row)">删除</el-button>
                     </template>
                 </el-table-column>
                 <template v-slot:empty>
@@ -46,8 +45,8 @@
             <div class="page-contanier">
                 <win-pagination name="groupPage" v-bind:childMsg="pageVO" @callFather="groupPageQuery"></win-pagination>
             </div>
-            <!-- 设备组弹框begin：新增/删除 -->
-            <GroupDialog v-if="isGroupDialog" :toChildMsg="groupDialogMsg" @bindSend="toGroupDialogForm" ></GroupDialog>
+            <!--上传应用弹框 -->
+            <UploadDialog v-if="isUploadDialog" :toChildMsg="toUploadDialogMsg" @bindSend="bindUploadSend" ></UploadDialog>
         </div>
     </div>
 </template>
