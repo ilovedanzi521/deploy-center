@@ -84,7 +84,7 @@ export default class AppModuleController extends BaseController {
                     console.log(this.pageDataList);
                     this.pageVO = winResponseData.data;
                 } else {
-                    this.errorMessage(winResponseData.msg);
+                    this.win_message_error(winResponseData.msg);
                 }
             })
             .finally(() =>{
@@ -130,15 +130,15 @@ export default class AppModuleController extends BaseController {
         if(delGroupIds.length>0){
             const h = this.$createElement;
             let msg =  h('p', null, [h('span', null, '确认删除设置组：'),h('i', { style: 'color: red' }, groupNames)]);
-            this.win_message_box_warning(msg,"提示")
+            this.win_message_box_success(msg,"提示")
                 .then(() => {
                     this.deployService.removeGroupBatch(delGroupIds)
                         .then((winResponseData: WinResponseData) =>{
                             if (WinRspType.SUCC === winResponseData.winRspType) {
                                 this.queryPageList(this.queryReqVO);
-                                this.successMessage(winResponseData.msg);
+                                this.win_message_success(winResponseData.msg);
                             } else {
-                                this.errorMessage(winResponseData.msg);
+                                this.win_message_error(winResponseData.msg);
                             }
                         });
                         
@@ -161,9 +161,9 @@ export default class AppModuleController extends BaseController {
                     .then((winResponseData: WinResponseData) =>{
                         if (WinRspType.SUCC === winResponseData.winRspType) {
                             this.queryPageList(this.queryReqVO);
-                            this.successMessage(winResponseData.msg);
+                            this.win_message_success(winResponseData.msg);
                         } else {
-                            this.errorMessage(winResponseData.msg);
+                            this.win_message_error(winResponseData.msg);
                         }
                     });
             });
@@ -177,9 +177,9 @@ export default class AppModuleController extends BaseController {
                     .then((winResponseData: WinResponseData) =>{
                         if (WinRspType.SUCC === winResponseData.winRspType) {
                             this.queryPageList(this.queryReqVO);
-                            this.successMessage(winResponseData.msg);
+                            this.win_message_success(winResponseData.msg);
                         } else {
-                            this.errorMessage(winResponseData.msg);
+                            this.win_message_error(winResponseData.msg);
                         }
                     });
             });

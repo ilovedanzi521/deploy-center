@@ -7,24 +7,19 @@ import "xe-utils";
 import App from "./App.vue";
 import router from "./router/index";
 import store from "./store/index";
-import "./assets/style/theme.scss";
-import "./assets/style/reset.scss";
-import "./assets/style/font.scss";
-import directives from "../src/mixin/directives";
-import "./layout/require.context";
+import { PluginsPage } from "win-biz";
 import "win-plus/dist/static/index.css";
-import filters from "../src/mixin/filters";
 
 Vue.use(VueDND);
 Vue.use(ElementUI);
-Vue.use(directives);
+Vue.use(PluginsPage);
 
 Vue.config.productionTip = false;
-let d = process.env.NODE_ENV;
+Vue.config.productionTip = false;
+let $env = process.env.NODE_ENV;
+Vue.prototype.$env = $env;
 
-Object.keys(filters).forEach(key => {
-    Vue.filter(key, filters[key]);
-});
+
 //全局锁屏判断
 router.beforeEach((to, from, next) => {
     if (localStorage.getItem("lockName")) {

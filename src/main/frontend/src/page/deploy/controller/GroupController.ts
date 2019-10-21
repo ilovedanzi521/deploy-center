@@ -62,7 +62,7 @@ export default class GroupController extends BaseController {
                     this.groupTreeList = winResponseData.data.list;
                     this.pageVO = winResponseData.data;
                 } else {
-                    this.errorMessage(winResponseData.msg);
+                    this.win_message_error(winResponseData.msg);
                 }
             })
             .finally(() =>{
@@ -129,9 +129,9 @@ export default class GroupController extends BaseController {
                         .then((winResponseData: WinResponseData) =>{
                             if (WinRspType.SUCC === winResponseData.winRspType) {
                                 this.queryGroupTreeList(this.groupQueryVO);
-                                this.successMessage(winResponseData.msg);
+                                this.win_message_success(winResponseData.msg);
                             } else {
-                                this.errorMessage(winResponseData.msg);
+                                this.win_message_error(winResponseData.msg);
                             }
                         });
                         
@@ -155,9 +155,9 @@ export default class GroupController extends BaseController {
                     .then((winResponseData: WinResponseData) =>{
                         if (WinRspType.SUCC === winResponseData.winRspType) {
                             this.queryGroupTreeList(this.groupQueryVO);
-                            this.successMessage(winResponseData.msg);
+                            this.win_message_success(winResponseData.msg);
                         } else {
-                            this.errorMessage(winResponseData.msg);
+                            this.win_message_error(winResponseData.msg);
                         }
                     });
             });
@@ -171,9 +171,9 @@ export default class GroupController extends BaseController {
                     .then((winResponseData: WinResponseData) =>{
                         if (WinRspType.SUCC === winResponseData.winRspType) {
                             this.queryGroupTreeList(this.groupQueryVO);
-                            this.successMessage(winResponseData.msg);
+                            this.win_message_success(winResponseData.msg);
                         } else {
-                            this.errorMessage(winResponseData.msg);
+                            this.win_message_error(winResponseData.msg);
                         }
                     });
             });

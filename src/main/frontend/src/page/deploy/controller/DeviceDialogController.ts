@@ -103,7 +103,7 @@ export default class DeviceDialogController extends BaseController{
                             this.send(WinRspType.SUCC);
                             this.win_message_success(winResponseData.msg);
                         } else {
-                            this.errorMessage(winResponseData.msg);
+                            this.win_message_error(winResponseData.msg);
                         }
                     })
             } else {
@@ -127,7 +127,7 @@ export default class DeviceDialogController extends BaseController{
                                 this.deviceStatusText= "未连接";
                             }
                         } else {
-                            this.errorMessage(winResponseData.msg);
+                            this.win_message_error(winResponseData.msg);
                         }
                     })
             } else {

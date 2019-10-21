@@ -162,7 +162,7 @@ export default class GroupDialogController extends BaseController{
                         })
                     }
                 } else {
-                    this.errorMessage(winResponseData.msg);
+                    this.win_message_error(winResponseData.msg);
                 }
             })
     }

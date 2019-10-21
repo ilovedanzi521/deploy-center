@@ -1,4 +1,4 @@
-import layout from "@/layout/Layout.vue";
+import {Layout} from "win-biz";
 import Login from "@/page/login/view/index.vue";
 import Home from "@/page/home/view/index.vue";
 import Directional from "@/page/fram/view/Directional.vue";
@@ -11,7 +11,7 @@ const routers = [
     {
         path: "/",
         name: "layout",
-        component: layout,
+        component: Layout,
         children: [
             {
                 path: "/directional",

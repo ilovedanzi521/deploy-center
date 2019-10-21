@@ -1,5 +1,5 @@
 import {WinResponseData} from "../../common/vo/BaseVO";
-import AxiosFun from "../../../api/AxiosFun";
+import AxiosFun from "win-biz";
 import {DeviceRepVO, DeviceReqVO, GroupQueryVO, GroupReqVO} from "../vo/GroupVO";
 import { QueryReqVO } from "../vo/AppModuleVO";
 
