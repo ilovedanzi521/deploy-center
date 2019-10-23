@@ -9,6 +9,9 @@ import com.win.dfas.deploy.bo.AppModuleBO;
 import com.win.dfas.deploy.po.AppModulePO;
 import com.win.dfas.deploy.vo.response.AppModuleTreeVO;
 import com.win.dfas.deploy.vo.response.PageVO;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
 
 /**
  * @包名 com.win.dfas.deploy.service
@@ -25,5 +28,17 @@ public interface AppModuleService extends IService<AppModulePO> {
 
     public int status(String ipAddr, String moduleName);
 
+    /**
+     * 获取分页列表
+     * @param reqVO
+     * @return
+     */
     PageVO<AppModuleTreeVO> getAppModuleTreePageInfo(BaseReqVO reqVO);
+
+    /**
+     * 上传文件
+     * @param file
+     * @return
+     */
+    void uploadFile(MultipartFile file);
 }

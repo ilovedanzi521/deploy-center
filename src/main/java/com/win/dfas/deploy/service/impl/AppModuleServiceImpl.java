@@ -1,32 +1,33 @@
 package com.win.dfas.deploy.service.impl;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.extra.ftp.Ftp;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.win.dfas.common.vo.BaseReqVO;
-import com.win.dfas.common.vo.WinResponseData;
-import com.win.dfas.deploy.bo.AppModuleBO;
-import com.win.dfas.deploy.bo.DeviceGroupBO;
 import com.win.dfas.deploy.common.exception.BaseException;
 import com.win.dfas.deploy.dao.AppModuleDao;
 import com.win.dfas.deploy.po.AppModulePO;
-import com.win.dfas.deploy.schedule.context.ScheduleContext;
+import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
 import com.win.dfas.deploy.service.AppModuleService;
 import com.win.dfas.deploy.service.ScheduleCenterService;
-import com.win.dfas.deploy.vo.request.DeviceParamsVO;
+import com.win.dfas.deploy.util.DeployUtils;
+import com.win.dfas.deploy.util.SpringContextUtils;
 import com.win.dfas.deploy.vo.response.AppModuleTreeVO;
 import com.win.dfas.deploy.vo.response.PageVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -43,6 +44,9 @@ public class AppModuleServiceImpl extends ServiceImpl<AppModuleDao, AppModulePO>
 
     @Autowired
     private ScheduleCenterService mScheduleService;
+
+    @Autowired
+    private Environment env;
 
     @Override
     public boolean start(String ipAddr, String moduleName) {
@@ -68,6 +72,45 @@ public class AppModuleServiceImpl extends ServiceImpl<AppModuleDao, AppModulePO>
         IPage<AppModulePO> pageList = this.baseMapper.selectPage(page,queryWrapper);
 
         return new PageVO(page,toTreeList(pageList.getRecords()));
+    }
+
+    @Override
+    public void uploadFile(MultipartFile file) {
+        DeployEnvBean deployEnv = SpringContextUtils.getBean("deploy_env_bean", DeployEnvBean.class);
+        File zipTempFile = null;
+        try {
+            DeployUtils.parseDeployZipFile(file,deployEnv);
+            zipTempFile = DeployUtils.saveZipToTempFile(file,deployEnv);
+        } catch (IOException e) {
+            FileUtil.del(zipTempFile);
+            throw new BaseException("上传异常:"+e.getMessage());
+        }
+        Boolean upgraded = this.mScheduleService.upgradAppModule(zipTempFile.getAbsolutePath(),deployEnv.getHomeDir());
+        if (!upgraded){
+            FileUtil.del(zipTempFile);
+            throw new BaseException("压缩包初始化异常");
+        }
+    }
+
+    /**
+     * 上传文件到ftp仓库
+     * @param file
+     * @return
+     */
+    public Boolean uploadToRemoteFtpRepo(File file){
+        DeployEnvBean deployEnv = SpringContextUtils.getBean("deploy_env_bean", DeployEnvBean.class);
+        Ftp ftp = new Ftp(deployEnv.getFtpHost(),deployEnv.getFtpPort(),deployEnv.getFtpUser(),deployEnv.getFtpPswd());
+        String ftpRepoTempPath = deployEnv.getFtpTempDir();
+        String ftpRepoTempFile = ftpRepoTempPath+File.separator+file.getName();
+        Boolean isUpload = ftp.upload(ftpRepoTempPath,file);
+        if (!isUpload){
+            throw new BaseException("上传Ftp失败");
+        }
+        Boolean isUpgraded = this.mScheduleService.upgradAppModule(ftpRepoTempFile,deployEnv.getHomeDir());
+        if (!isUpgraded){
+            throw new BaseException("解压异常");
+        }
+        return (isUpload && isUpgraded);
     }
 
     private List<AppModuleTreeVO> toTreeList(List<AppModulePO> records) {

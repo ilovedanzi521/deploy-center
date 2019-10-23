@@ -7,3 +7,4 @@ export enum DeviceStatus {
 export enum DeployTypeEnum{
     UPLOAD = "UPLOAD",
 }
+

@@ -88,7 +88,6 @@ public class ScheduleContext {
     public List<String> devConnect() {
         // 如果remote host没有初始化，则调用远程命令之前必须初始化
         initRemoteDevice();
-
         String command = mEnvConfig.getHomeDir()+File.separator+sCommShell;
         String[] params = {
                 "ssh",

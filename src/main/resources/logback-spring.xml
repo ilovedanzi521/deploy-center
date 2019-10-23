@@ -42,8 +42,8 @@
 			<!--<appender-ref ref="LOGCONSOLE" />-->
 		<!--</logger>-->
         <!--数据层sql打印-->
-        <logger name="com.win.dfas.deploy.dao" level="DEBUG">
-        </logger>
+        <logger name="com.win.dfas.deploy.dao" level="DEBUG"/>
+        <logger name="cn.hutool.extra.ftp" level="DEBUG"/>
         <root level="INFO">
             <appender-ref ref="LOGCONSOLE" />
         </root>

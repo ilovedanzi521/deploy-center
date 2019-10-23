@@ -1,3 +1,5 @@
+
+export const DeployBaseUrl:string = "http://localhost:8888/deploy";
 export const BaseTypeConst={
     primary:"primary",
     info:"info",
@@ -21,3 +23,9 @@ export const DeviceStatusConst = {
 export const AppModuleConst = {
     UPLOAD_TITLE: "上传应用模块"
 }
+
+export const MimeTypeConst = {
+    ZIP: "application/zip",
+    XZIP: "application/x-zip-compressed"
+}
+

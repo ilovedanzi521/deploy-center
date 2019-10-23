@@ -29,7 +29,6 @@ public class GlobalExceptionHandler {
      * @param e
      * @return
      */
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public WinResponseData exceptionHandle(Exception e){
         log.error("未知系统异常："+e.getMessage(),e);

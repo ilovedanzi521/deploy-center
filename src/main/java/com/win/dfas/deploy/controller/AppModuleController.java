@@ -1,30 +1,20 @@
 package com.win.dfas.deploy.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.win.dfas.common.vo.BaseReqVO;
 import com.win.dfas.common.vo.WinResponseData;
-import com.win.dfas.deploy.bo.AppModuleBO;
-import com.win.dfas.deploy.dao.AppModuleDao;
-import com.win.dfas.deploy.dto.GroupTree;
 import com.win.dfas.deploy.po.AppModulePO;
-import com.win.dfas.deploy.schedule.Scheduler;
 import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
 import com.win.dfas.deploy.service.AppModuleService;
 import com.win.dfas.deploy.service.ScheduleCenterService;
-import com.win.dfas.deploy.service.impl.AppModuleServiceImpl;
-import com.win.dfas.deploy.vo.request.DeviceParamsVO;
 import com.win.dfas.deploy.vo.response.AppModuleTreeVO;
 import com.win.dfas.deploy.vo.response.PageVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.sound.midi.SysexMessage;
-import javax.sql.DataSource;
 import java.util.List;
-import java.util.Random;
+
 
 /**
  * @包名 com.win.dfas.deploy.controller
@@ -40,9 +30,6 @@ public class AppModuleController extends BaseController<AppModulePO> {
     private AppModuleService appModuleService;
 
     @Autowired(required = true)
-    private DeployEnvBean mEnvConfig;
-
-    @Autowired(required = true)
     private ScheduleCenterService mScheduleService;
 
     @Override
@@ -50,10 +37,22 @@ public class AppModuleController extends BaseController<AppModulePO> {
         return this.appModuleService;
     }
 
+    /**
+     * 分页列表
+     * @param reqVO
+     * @return
+     */
     @PostMapping("/pageList")
     public WinResponseData pageList(@RequestBody BaseReqVO reqVO){
         PageVO<AppModuleTreeVO> pageVO = this.appModuleService.getAppModuleTreePageInfo(reqVO);
         return WinResponseData.handleSuccess(pageVO);
+    }
+
+    @PostMapping("/upload")
+    public WinResponseData upload(@RequestParam("file") MultipartFile file){
+
+        this.appModuleService.uploadFile(file);
+        return WinResponseData.handleSuccess("上传成功");
     }
 
     @GetMapping("/list")

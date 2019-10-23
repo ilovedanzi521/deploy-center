@@ -4,20 +4,16 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.po.TaskPO;
-import com.win.dfas.deploy.schedule.AppManager;
 import com.win.dfas.deploy.schedule.Scheduler;
 import com.win.dfas.deploy.schedule.context.ScheduleContext;
 import com.win.dfas.deploy.schedule.utils.ShellUtils;
-import com.win.dfas.deploy.service.DeviceService;
 import com.win.dfas.deploy.service.ScheduleCenterService;
 import com.win.dfas.deploy.service.TaskService;
-import com.win.dfas.deploy.util.SpringContextUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -134,7 +130,7 @@ public class ScheduleCenterServiceImpl implements ScheduleCenterService {
      * 当升级安装包后，需要调用该函数重新扫描应用和策略表，否则要重启
      */
     @Override
-    public void upgraded() {
+    public void appSourceScan() {
        Scheduler.get().getAppManager().scan();
     }
 
@@ -181,5 +177,21 @@ public class ScheduleCenterServiceImpl implements ScheduleCenterService {
             return context.moduleStop(moduleName);
         }
         return false;
+    }
+
+    /**
+     * 升级应用模块
+     * @param zipFile
+     * @param repoDir
+     * @return
+     */
+    @Override
+    public Boolean upgradAppModule(String zipFile, String repoDir) {
+        Boolean isSuccess = ShellUtils.unZip(zipFile,repoDir);
+        if (isSuccess){
+            //当升级安装包后，需要调用该函数重新扫描应用和策略表，否则要重启
+            this.appSourceScan();
+        }
+        return isSuccess;
     }
 }

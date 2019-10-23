@@ -25,13 +25,15 @@ public class DeployEnvBean {
 
     private String ftpHost;
 
-    private String ftpPort;
+    private Integer ftpPort;
 
     private String ftpUser;
 
     private String ftpPswd;
 
     private String ftpRepoDir;
+
+    private String ftpTempDir;
 
     private String releaseDescFile;
 }

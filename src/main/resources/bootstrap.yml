@@ -7,7 +7,11 @@ spring:
     active: dev
   application:
     name: dfas-deploy-center #服务名
-## h2数据库配置
+  servlet:
+    multipart:
+      max-request-size: 1GB
+      max-file-size: 1GB
+  ## h2数据库配置
   datasource:
     driverClassName: org.h2.Driver
     url: jdbc:h2:file:./data/db/dfas-deploy-center
@@ -72,5 +76,5 @@ deploy-center:
   ftpUser: ftp
   ftpPswd: ftp
   ftpRepoDir: /pub/repo
+  ftpTempDir: /temp
   releaseDescFile: release_version.txt
-

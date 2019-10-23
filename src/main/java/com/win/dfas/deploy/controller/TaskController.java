@@ -48,7 +48,7 @@ public class TaskController extends BaseController<TaskPO> {
 
     @GetMapping("/scan")
     public void sacn(@RequestParam Long id) {
-        mScheduleService.upgraded();
+        mScheduleService.appSourceScan();
     }
 }
 

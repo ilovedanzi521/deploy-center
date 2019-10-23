@@ -5,11 +5,16 @@ import cn.hutool.core.util.RuntimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
 public class ShellUtils {
 
+    /**
+     * 通用命令执行脚本
+     */
+    private final static String sCommShell = "/root/repo/shell.sh";
     /**
      * 执行shell命令，返回执行完后的日志信息
      * @param commands
@@ -72,5 +77,14 @@ public class ShellUtils {
         for(int i=0; i<total; i++) {
             log.info(logList.get(i));
         }
+    }
+
+    public static Boolean unZip(String zipFile, String targetDir) {
+        String[] params = {sCommShell,"unzip", "-o", zipFile, "-d", targetDir};
+        log.info("command ==>: "+ Arrays.toString(params));
+        List<String> resultList = ShellUtils.envExecShell(params);
+        log.info(" <==: "+ Arrays.toString(resultList.toArray()));
+
+        return isSuccess(resultList);
     }
 }

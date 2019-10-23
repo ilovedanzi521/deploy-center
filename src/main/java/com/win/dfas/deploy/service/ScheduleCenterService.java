@@ -1,6 +1,7 @@
 package com.win.dfas.deploy.service;
 
 import com.win.dfas.deploy.po.DevicePO;
+import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
 
 import java.util.List;
 
@@ -53,7 +54,7 @@ public interface ScheduleCenterService {
     /**
      * 当升级安装包后，需要调用该函数重新扫描应用和策略表，否则要重启
      */
-    public void upgraded();
+    public void appSourceScan();
 
     /**
      * 检查模块当前状态
@@ -82,6 +83,14 @@ public interface ScheduleCenterService {
      *      true  - 已停止
      *      false - 未停止
      */
-    public boolean moduleStop(String ipAddr, String moduleName);
+    boolean moduleStop(String ipAddr, String moduleName);
 
+    /**
+     * 解压文件到仓库
+     *
+     * @param zipFile
+     * @param repoDir
+     * @return
+     */
+    Boolean upgradAppModule(String zipFile, String repoDir);
 }
