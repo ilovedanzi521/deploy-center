@@ -6,8 +6,8 @@ import BaseController from "../../common/controller/BaseController";
 import DeployService from "../service/DeployService";
 import PageVO from "../../common/vo/PageVO";
 import {OperationTypeEnum} from "../../common/enum/OperationTypeEnum";
-import {GroupDetailVO, GroupQueryVO, GroupTreeVO, DeviceReqVO} from "../vo/GroupVO";
-import {GroupConst, DeviceStatusConst, BaseTypeConst} from "../const/DeployConst";
+import {GroupQueryVO, GroupTreeVO, DeviceReqVO} from "../vo/GroupVO";
+import {GroupConst, DeviceStatusConst, BaseTypeConst, DialogTitleConst} from "../const/DeployConst";
 import GroupDialog from "../view/groupDialog.vue";
 import {BaseConst} from "../../common/const/BaseConst";
 import dateUtils from "../../common/util/DateUtils";
@@ -87,20 +87,20 @@ export default class GroupController extends BaseController {
         console.log(row);
         if (type === OperationTypeEnum.ADD) {
             this.groupDialogMsg = {
-                dialogTitle: GroupConst.ADD_GROUP,
+                dialogTitle: DialogTitleConst.GROUP_ADD,
                 type: OperationTypeEnum.ADD,
                 data: null
             };
         }if (type === OperationTypeEnum.UPDATE) {
             this.groupDialogMsg = {
-                dialogTitle: GroupConst.EDIT_GROUP,
+                dialogTitle: DialogTitleConst.GROUP_EDIT+"-"+row.name,
                 type: OperationTypeEnum.UPDATE,
                 data: this.copy(row)
             };
         }
         if (type === OperationTypeEnum.VIEW) {
             this.groupDialogMsg = {
-                dialogTitle: BaseConst.VIEW + row.name,
+                dialogTitle: BaseConst.VIEW +"-" + row.name,
                 type: OperationTypeEnum.VIEW,
                 data: row
             };

@@ -8,7 +8,7 @@ import {BaseConst} from "../../common/const/BaseConst";
 import {DeviceValidCanst, GroupValidConst} from "../const/ValidateConst";
 import DeployService from "../service/DeployService";
 import {WinResponseData} from "../../common/vo/BaseVO";
-import {GroupConst} from "../const/DeployConst";
+import {GroupConst, DialogTitleConst} from "../const/DeployConst";
 import DeviceDialog from "../view/deviceDialog.vue";
 
 @Component({ components: {DeviceDialog} })
@@ -185,7 +185,7 @@ export default class GroupDialogController extends BaseController{
         console.log(row);
         if (type === OperationTypeEnum.ADD) {
             this.deviceDialogMsg = {
-                dialogTitle: GroupConst.ADD_GROUP,
+                dialogTitle: DialogTitleConst.GROUP_ADD,
                 type: OperationTypeEnum.ADD,
                 data: new DeviceRepVO()
             };

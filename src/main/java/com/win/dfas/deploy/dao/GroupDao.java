@@ -1,12 +1,10 @@
 package com.win.dfas.deploy.dao;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.win.dfas.deploy.bo.DeviceGroupBO;
+import com.win.dfas.deploy.dto.DeviceGroupDTO;
 import com.win.dfas.deploy.po.GroupPO;
 import org.apache.ibatis.annotations.Param;
 
@@ -24,8 +22,8 @@ public interface GroupDao extends BaseMapper<GroupPO> {
      * @param id
      * @return
      */
-    DeviceGroupBO getOne(Long id);
+    DeviceGroupDTO getOne(Long id);
     //IPage 分页器， Wrapper 条件构造器
-    IPage<DeviceGroupBO> getPageList(IPage<DeviceGroupBO> page, @Param(Constants.WRAPPER) Wrapper query) throws Exception;
+    IPage<DeviceGroupDTO> getPageList(IPage<DeviceGroupDTO> page, @Param(Constants.WRAPPER) Wrapper query) throws Exception;
 
 }

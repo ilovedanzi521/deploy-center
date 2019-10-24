@@ -2,7 +2,36 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.win.dfas.deploy.dao.TaskDao">
     <!--说明：单表的所有操作不用写代码（如果只有简单的单表操作，mapper.xml文件也不需要），mybatis-plus已经自动处理-->
+    <!--设备组结果集-->
+    <resultMap id="taskDtoResult" type="com.win.dfas.deploy.dto.TaskDTO">
+        <!--此处除了id，其他属性只要同名都可以自动映射上。另外，mybatis将数据库含下划线的列名自动匹配成驼峰式的javabean属性-->
+        <id property="id" column="id" />
+        <result property="strategyId" column="strategy_id"/>
+        <result property="groupId" column="group_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="strategyId" column="strategy_id"/>
+        <association property="strategy" javaType="com.win.dfas.deploy.po.StrategyPO">
+            <id property="id" column="s_id"/>
+            <result property="name" column="s_name"/>
+            <result property="path" column="s_path"/>
+        </association>
+        <association property="group" javaType="com.win.dfas.deploy.po.GroupPO">
+            <id property="id" column="g_id"/>
+            <result property="name" column="g_name"/>
+            <result property="desc" column="g_desc"/>
+        </association>
+    </resultMap>
 
+    <!--分页列表查询-->
+    <select id="getPageList" resultMap="taskDtoResult">
+      SELECT t.id,t.strategy_id,t.group_id,t.status,t.create_time,
+      s.id as s_id,s.name as s_name,s.path as s_path,s.allow_delete,
+      g.id as g_id,g.name as g_name,g.desc as g_desc
+      FROM dc_task as t
+      left join dc_strategy as s on s.id=t.strategy_id
+      left join dc_group as g on g.id=t.group_id
+      ${ew.customSqlSegment}
+    </select>
     <!-- 根据任务ID查询对应要执行的策略 -->
     <select id="selectStrategyByTask" parameterType="long" resultType="com.win.dfas.deploy.po.StrategyPO">
         select dc_strategy.id as id, dc_strategy.name, dc_strategy.path

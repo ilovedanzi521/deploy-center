@@ -6,6 +6,7 @@ import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.po.StrategyPO;
 import com.win.dfas.deploy.po.TaskPO;
 import com.win.dfas.deploy.vo.response.PageVO;
+import com.win.dfas.deploy.dto.TaskDTO;
 
 import java.util.List;
 
@@ -35,5 +36,5 @@ public interface TaskService extends IService<TaskPO> {
      * @param reqVO
      * @return
      */
-    PageVO<TaskPO> getPageInfo(BaseReqVO reqVO);
+    PageVO<TaskDTO> getPageInfo(BaseReqVO reqVO);
 }

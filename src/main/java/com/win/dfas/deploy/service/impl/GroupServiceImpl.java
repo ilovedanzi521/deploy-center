@@ -1,14 +1,10 @@
 package com.win.dfas.deploy.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.win.dfas.common.entity.BaseEntity;
-import com.win.dfas.common.util.ObjectUtils;
-import com.win.dfas.deploy.bo.DeviceGroupBO;
+import com.win.dfas.deploy.dto.DeviceGroupDTO;
 import com.win.dfas.deploy.common.exception.BaseException;
 import com.win.dfas.deploy.dao.GroupDao;
 import com.win.dfas.deploy.dto.GroupTree;
@@ -50,17 +46,17 @@ public class GroupServiceImpl extends ServiceImpl<GroupDao, GroupPO> implements 
 
     @Override
     public PageVO<GroupTree> getGroupTreePageInfo(DeviceParamsVO deviceParamsVO) {
-        Page<DeviceGroupBO> groupPage = (Page<DeviceGroupBO>) this.getPageList(deviceParamsVO);
+        Page<DeviceGroupDTO> groupPage = (Page<DeviceGroupDTO>) this.getPageList(deviceParamsVO);
         //转成树形表格
         return new PageVO(groupPage,toGroupTree(groupPage.getRecords()));
     }
 
-    private List<GroupTree> toGroupTree(List<DeviceGroupBO> records) {
+    private List<GroupTree> toGroupTree(List<DeviceGroupDTO> records) {
         List<GroupTree> treeList = new ArrayList<>(records.size());
-        for (DeviceGroupBO deviceGroupBO: records){
+        for (DeviceGroupDTO deviceGroupDTO : records){
             GroupTree groupTree = new GroupTree();
-            BeanUtils.copyProperties(deviceGroupBO,groupTree);
-            List<DevicePO> devices = deviceGroupBO.getDevices();
+            BeanUtils.copyProperties(deviceGroupDTO,groupTree);
+            List<DevicePO> devices = deviceGroupDTO.getDevices();
             if (!CollectionUtils.isEmpty(devices)){
                 List<GroupTree> children = new ArrayList<>(devices.size());
                 for (DevicePO devicePO: devices) {
@@ -137,17 +133,17 @@ public class GroupServiceImpl extends ServiceImpl<GroupDao, GroupPO> implements 
     }
 
     @Override
-    public DeviceGroupBO getInfo(Long id) {
+    public DeviceGroupDTO getInfo(Long id) {
         return baseMapper.getOne(id);
     }
 
     @Override
-    public IPage<DeviceGroupBO> getPageList(DeviceParamsVO deviceParamsVO) {
-        Page<DeviceGroupBO> page = new Page<>(deviceParamsVO.getReqPageNum(),deviceParamsVO.getReqPageSize());
+    public IPage<DeviceGroupDTO> getPageList(DeviceParamsVO deviceParamsVO) {
+        Page<DeviceGroupDTO> page = new Page<>(deviceParamsVO.getReqPageNum(),deviceParamsVO.getReqPageSize());
         //条件构造器对象
-        QueryWrapper<DeviceGroupBO> queryWrapper = new QueryWrapper<DeviceGroupBO>();
+        QueryWrapper<DeviceGroupDTO> queryWrapper = new QueryWrapper<DeviceGroupDTO>();
         queryWrapper.orderByDesc("create_time");
-        IPage<DeviceGroupBO> pageList;
+        IPage<DeviceGroupDTO> pageList;
         try {
              pageList = this.baseMapper.getPageList(page,queryWrapper);
         } catch (Exception e) {

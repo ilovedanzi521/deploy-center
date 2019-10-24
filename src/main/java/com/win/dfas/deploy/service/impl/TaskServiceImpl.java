@@ -11,6 +11,7 @@ import com.win.dfas.deploy.po.StrategyPO;
 import com.win.dfas.deploy.po.TaskPO;
 import com.win.dfas.deploy.service.TaskService;
 import com.win.dfas.deploy.vo.response.PageVO;
+import com.win.dfas.deploy.dto.TaskDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,14 +49,19 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskPO> implements Tas
         return list;
     }
 
+    /**
+     * 分页列表
+     * @param reqVO
+     * @return
+     */
     @Override
-    public PageVO<TaskPO> getPageInfo(BaseReqVO reqVO) {
-        Page<TaskPO> page = new Page<>(reqVO.getReqPageNum(),reqVO.getReqPageSize());
+    public PageVO<TaskDTO> getPageInfo(BaseReqVO reqVO) {
+        Page<TaskDTO> page = new Page<>(reqVO.getReqPageNum(),reqVO.getReqPageSize());
         //条件构造器对象
         QueryWrapper<TaskPO> queryWrapper = new QueryWrapper<TaskPO>();
         queryWrapper.orderByDesc("create_time");
-        IPage<TaskPO> pageList = this.baseMapper.selectPage(page,queryWrapper);
+        IPage<TaskDTO> pageList = this.baseMapper.getPageList(page,queryWrapper);
 
-        return new PageVO(page);
+        return new PageVO(page,pageList.getRecords());
     }
 }

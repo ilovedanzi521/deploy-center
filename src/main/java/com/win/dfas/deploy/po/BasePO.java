@@ -1,5 +1,7 @@
 package com.win.dfas.deploy.po;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.win.dfas.common.util.LongJsonDeserializer;
@@ -27,6 +29,7 @@ public class BasePO implements Serializable {
     @JsonSerialize(using = LongJsonSerializer.class)
     @JsonDeserialize(using = LongJsonDeserializer.class)
     @NotNull(message = "主键ID不能为空",groups = UpdateGroup.class)
+    @TableId(type = IdType.AUTO)
     private Long id;
     /**
      * 创建时间

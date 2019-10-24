@@ -1,7 +1,6 @@
 
 import {Component, Emit, Prop} from "vue-property-decorator";
 import BaseController from "../../common/controller/BaseController";
-import { OperationTypeEnum } from "../../common/enum/OperationTypeEnum";
 import { UploadVO } from "../vo/AppModuleVO";
 import { WinRspType } from "../../common/enum/BaseEnum";
 import { DeployTypeEnum } from "../const/DeployEnum";

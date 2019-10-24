@@ -4,7 +4,7 @@
 <!--说明：单表的所有操作不用写代码（如果只有简单的单表操作，mapper.xml文件也不需要），mybatis-plus已经自动处理-->
 
     <!--设备组结果集-->
-    <resultMap id="deviceGroupResult" type="com.win.dfas.deploy.bo.DeviceGroupBO">
+    <resultMap id="deviceGroupResult" type="com.win.dfas.deploy.dto.DeviceGroupDTO">
         <!--此处除了id，其他属性只要同名都可以自动映射上。另外，mybatis将数据库含下划线的列名自动匹配成驼峰式的javabean属性-->
         <id property="id" column="id" />
         <collection property="devices" javaType="ArrayList" column="id" ofType="com.win.dfas.deploy.po.DevicePO" select="selectDevicesByGroupId"/>

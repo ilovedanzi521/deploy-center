@@ -64,17 +64,3 @@ mybatis-plus:
   configuration:
     jdbc-type-for-null: 'null'
 
-deploy-center:
-  homeDir: /root/repo
-  deployDir: /root/deploy
-  modulesDir: /root/repo/modules
-  scriptsDir: /root/repo/scripts
-  packagesDir: /root/repo/packages
-  logsDir: /root/repo/logs
-  ftpHost: 192.168.0.72
-  ftpPort: 21
-  ftpUser: ftp
-  ftpPswd: ftp
-  ftpRepoDir: /pub/repo
-  ftpTempDir: /temp
-  releaseDescFile: release_version.txt

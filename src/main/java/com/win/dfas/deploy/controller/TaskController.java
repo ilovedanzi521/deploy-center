@@ -7,6 +7,7 @@ import com.win.dfas.deploy.po.TaskPO;
 import com.win.dfas.deploy.service.ScheduleCenterService;
 import com.win.dfas.deploy.service.TaskService;
 import com.win.dfas.deploy.vo.response.PageVO;
+import com.win.dfas.deploy.dto.TaskDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +41,7 @@ public class TaskController extends BaseController<TaskPO> {
      */
     @PostMapping("/pageList")
     public WinResponseData pageList(@RequestBody BaseReqVO reqVO){
-        PageVO<TaskPO> pageVO = this.taskService.getPageInfo(reqVO);
+        PageVO<TaskDTO> pageVO = this.taskService.getPageInfo(reqVO);
         return WinResponseData.handleSuccess(pageVO);
     }
     @GetMapping("/deploy")

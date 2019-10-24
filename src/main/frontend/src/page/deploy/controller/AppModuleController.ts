@@ -7,7 +7,7 @@ import DeployService from "../service/DeployService";
 import PageVO from "../../common/vo/PageVO";
 import {OperationTypeEnum} from "../../common/enum/OperationTypeEnum";
 import {GroupTreeVO, DeviceReqVO} from "../vo/GroupVO";
-import {GroupConst, DeviceStatusConst, BaseTypeConst, AppModuleConst} from "../const/DeployConst";
+import {GroupConst, DeviceStatusConst, BaseTypeConst, DialogTitleConst} from "../const/DeployConst";
 import {BaseConst} from "../../common/const/BaseConst";
 import dateUtils from "../../common/util/DateUtils";
 import { DeviceStatus, DeployTypeEnum } from "../const/DeployEnum";
@@ -107,7 +107,7 @@ export default class AppModuleController extends BaseController {
     public uploadAppModule(){
         console.log("uploadAppModule"+OperationTypeEnum);
         this.toUploadDialogMsg={
-            dialogTitle: AppModuleConst.UPLOAD_TITLE,
+            dialogTitle: DialogTitleConst.APP_UPLOAD,
             type : DeployTypeEnum.UPLOAD,
             data : null
         }

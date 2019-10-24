@@ -1,17 +1,11 @@
 package com.win.dfas.deploy.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.win.dfas.common.vo.BaseReqVO;
-import com.win.dfas.deploy.bo.AppModuleBO;
 import com.win.dfas.deploy.po.AppModulePO;
 import com.win.dfas.deploy.vo.response.AppModuleTreeVO;
 import com.win.dfas.deploy.vo.response.PageVO;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
 
 /**
  * @包名 com.win.dfas.deploy.service

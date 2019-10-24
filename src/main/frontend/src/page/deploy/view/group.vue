@@ -37,8 +37,8 @@
                 </win-table-column>
                 <win-table-column title="操作" min-width="100">
                     <template v-slot="{ row }">
-                        <el-button v-if="row.ipAddress==null ? true : false" size="mini" @click="groupOperation(row,'UPDATE')">编辑</el-button>
-                        <el-button v-if="row.ipAddress==null ? true : false" size="mini" type="danger" @click="delGroupOne(row)">删除</el-button>
+                        <el-button v-if="row.ipAddress==null ? true : false" size="mini" type="text" icon="el-icon-edit" @click="groupOperation(row,'UPDATE')">编辑</el-button>
+                        <el-button v-if="row.ipAddress==null ? true : false" size="mini" type="text" icon="el-icon-delete" @click="delGroupOne(row)">删除</el-button>
                     </template>
                 </win-table-column>
                 <template v-slot:empty>

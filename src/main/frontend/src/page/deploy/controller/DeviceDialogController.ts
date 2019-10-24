@@ -1,10 +1,9 @@
 import BaseController from "../../common/controller/BaseController";
 import {Component, Emit, Prop} from "vue-property-decorator";
 import DeployService from "../service/DeployService";
-import {DeviceRepVO, DeviceReqVO, GroupTreeVO} from "../vo/GroupVO";
+import {DeviceRepVO, DeviceReqVO} from "../vo/GroupVO";
 import {DeviceValidCanst} from "../const/ValidateConst";
 import {OperationTypeEnum} from "../../common/enum/OperationTypeEnum";
-import {GroupConst} from "../const/DeployConst";
 import {WinResponseData} from "../../common/vo/BaseVO";
 import {WinRspType} from "../../common/enum/BaseEnum";
 import {BaseConst} from "../../common/const/BaseConst";

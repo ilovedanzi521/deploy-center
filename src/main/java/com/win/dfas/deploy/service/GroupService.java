@@ -2,7 +2,7 @@ package com.win.dfas.deploy.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.win.dfas.deploy.bo.DeviceGroupBO;
+import com.win.dfas.deploy.dto.DeviceGroupDTO;
 import com.win.dfas.deploy.dto.GroupTree;
 import com.win.dfas.deploy.po.GroupPO;
 import com.win.dfas.deploy.vo.request.DeviceParamsVO;
@@ -45,14 +45,14 @@ public interface GroupService extends IService<GroupPO> {
      * @param id
      * @return
      */
-    DeviceGroupBO getInfo(Long id);
+    DeviceGroupDTO getInfo(Long id);
 
     /**
      * 获取设备组分页信息
      * @param deviceParamsVO
      * @return
      */
-    IPage<DeviceGroupBO> getPageList(DeviceParamsVO deviceParamsVO);
+    IPage<DeviceGroupDTO> getPageList(DeviceParamsVO deviceParamsVO);
 
     /**
      * 安全删除设备组（包括其关联信息）
