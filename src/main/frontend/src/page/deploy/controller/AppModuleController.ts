@@ -226,9 +226,9 @@ export default class AppModuleController extends BaseController {
         console.log("formatGroupTable************8");
         console.log(row);
         console.log(cellValue);
-        // if (column.property === "createTime") {
-        //     return dateUtils.dateFtt("yyyy-MM-dd hh:mm:ss", new Date(cellValue));
-        // }
+        if (column.property === "createTime") {
+            return dateUtils.dateFtt("yyyy-MM-dd hh:mm:ss", new Date(cellValue));
+        }
     }
 }
 

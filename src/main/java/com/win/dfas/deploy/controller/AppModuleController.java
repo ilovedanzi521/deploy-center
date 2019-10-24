@@ -3,6 +3,7 @@ package com.win.dfas.deploy.controller;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.win.dfas.common.vo.BaseReqVO;
 import com.win.dfas.common.vo.WinResponseData;
+import com.win.dfas.deploy.common.annotation.SysLog;
 import com.win.dfas.deploy.po.AppModulePO;
 import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
 import com.win.dfas.deploy.service.AppModuleService;
@@ -48,9 +49,9 @@ public class AppModuleController extends BaseController<AppModulePO> {
         return WinResponseData.handleSuccess(pageVO);
     }
 
+    @SysLog("上传应用模块")
     @PostMapping("/upload")
     public WinResponseData upload(@RequestParam("file") MultipartFile file){
-
         this.appModuleService.uploadFile(file);
         return WinResponseData.handleSuccess("上传成功");
     }

@@ -5,8 +5,11 @@ import { QueryReqVO } from "../vo/AppModuleVO";
 import { DeployBaseUrl } from "../const/DeployConst";
 
 export default class DeployService {
-
     public static uploadUrl: string = DeployBaseUrl +"/app/module/upload";
+
+    taskPageList(vo: import("../vo/DeployVO").QueryReqVO) {
+        return AxiosFun.post(DeployBaseUrl +"/task/pageList", vo);
+    }
 
     appModulePageList(vo: QueryReqVO) {
         return AxiosFun.post(DeployBaseUrl +"/app/module/pageList", vo);

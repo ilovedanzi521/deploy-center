@@ -58,6 +58,8 @@ spring:
       path: /db
       #网页访问开关，默认false
       enabled: true
+  main:
+    allow-bean-definition-overriding: true
 mybatis-plus:
   # 扫描 mapper.xml
   mapper-locations: classpath:/mapper/**/*Mapper.xml

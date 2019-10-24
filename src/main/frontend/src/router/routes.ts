@@ -4,8 +4,8 @@ import Home from "@/page/home/view/index.vue";
 import Directional from "@/page/fram/view/Directional.vue";
 import DeployIndex from "@/page/deploy/view/index.vue";
 import DeployGroup from "@/page/deploy/view/group.vue";
-import DeployAppModule from "@/page/deploy/view/appModule.vue"
-
+import DeployAppModule from "@/page/deploy/view/appModule.vue";
+import DeployTask from "@/page/deploy/view/task.vue";
 
 const routers = [
     {
@@ -47,6 +47,11 @@ const routerChildren = [
         path: "/deploy/appmodule",
         name: "deployAppModule",
         component: DeployAppModule,
+    },
+    {
+        path: "/deploy/task",
+        name: "deployTask",
+        component: DeployTask,
     },
 ];
 

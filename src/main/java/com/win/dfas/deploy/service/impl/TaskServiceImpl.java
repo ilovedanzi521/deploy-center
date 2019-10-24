@@ -1,11 +1,16 @@
 package com.win.dfas.deploy.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.win.dfas.common.vo.BaseReqVO;
 import com.win.dfas.deploy.dao.TaskDao;
 import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.po.StrategyPO;
 import com.win.dfas.deploy.po.TaskPO;
 import com.win.dfas.deploy.service.TaskService;
+import com.win.dfas.deploy.vo.response.PageVO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,5 +46,16 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskPO> implements Tas
     public List<DevicePO> selectDeviceByTask(long taskId) {
         List<DevicePO> list = (List)this.sqlSessionBatch().selectList("com.win.dfas.deploy.dao.TaskDao.selectDeviceByTask", taskId);
         return list;
+    }
+
+    @Override
+    public PageVO<TaskPO> getPageInfo(BaseReqVO reqVO) {
+        Page<TaskPO> page = new Page<>(reqVO.getReqPageNum(),reqVO.getReqPageSize());
+        //条件构造器对象
+        QueryWrapper<TaskPO> queryWrapper = new QueryWrapper<TaskPO>();
+        queryWrapper.orderByDesc("create_time");
+        IPage<TaskPO> pageList = this.baseMapper.selectPage(page,queryWrapper);
+
+        return new PageVO(page);
     }
 }

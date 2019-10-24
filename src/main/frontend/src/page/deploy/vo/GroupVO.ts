@@ -30,7 +30,13 @@ export class GroupTreeVO extends BaseRepVO{
 }
 
 export class GroupDetailVO extends BaseRepVO {
-
+    name: string;
+    ipAddress: string;
+    osType: string;
+    userName: string;
+    port: number;
+    status: number;
+    desc: string;
 }
 
 export class DeviceRepVO extends BaseRepVO{

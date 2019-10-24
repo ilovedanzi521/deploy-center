@@ -1,13 +1,13 @@
 <template>
     <div>
-        <!-- 设备组弹框end：新增/删除 -->
+        <!-- 工具栏按钮 -->
         <div class="col-md-12" style="margin-top:5px;">
             <ul class="btn-edit fr">
                 <li>
-                    <el-button-group>
+                    <win-button-group>
                         <win-button type="info" icon="el-icon-plus" round @click="uploadAppModule">上传应用</win-button>
-                        <win-button v-popover:popover1 type="info" icon="el-icon-delete" round :disabled="selected.length == 0" @click="delGroupBatch">删除应用</win-button>
-                    </el-button-group>
+                        <win-button type="info" icon="el-icon-delete" round :disabled="selected.length == 0" @click="delGroupBatch">删除应用</win-button>
+                    </win-button-group>
                 </li>
             </ul>
         </div>

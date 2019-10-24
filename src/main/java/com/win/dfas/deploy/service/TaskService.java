@@ -1,9 +1,11 @@
 package com.win.dfas.deploy.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.win.dfas.common.vo.BaseReqVO;
 import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.po.StrategyPO;
 import com.win.dfas.deploy.po.TaskPO;
+import com.win.dfas.deploy.vo.response.PageVO;
 
 import java.util.List;
 
@@ -28,4 +30,10 @@ public interface TaskService extends IService<TaskPO> {
      */
     public List<DevicePO> selectDeviceByTask(long taskId);
 
+    /**
+     * 分页列表查询
+     * @param reqVO
+     * @return
+     */
+    PageVO<TaskPO> getPageInfo(BaseReqVO reqVO);
 }
