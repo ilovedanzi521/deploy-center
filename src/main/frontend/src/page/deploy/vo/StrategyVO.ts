@@ -1,4 +1,5 @@
 import { BaseRepVO } from "win-biz";
-export default class StrategyRepVO extends BaseRepVO {
+
+export class StrategyRepVO extends BaseRepVO {
     name:String;
 }

@@ -56,11 +56,11 @@ public class AppModuleController extends BaseController<AppModulePO> {
         return WinResponseData.handleSuccess("上传成功");
     }
 
-    @GetMapping("/list")
+    /*@GetMapping("/list")
     @ResponseBody
     public List<AppModulePO> list() {
        return appModuleService.list();
-    }
+    }*/
 
     @GetMapping("/moduleStart")
     public WinResponseData moduleStart(@RequestParam String ipAddr, String moduleName) {

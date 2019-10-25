@@ -1,12 +1,17 @@
-import { BaseRepVO } from "win-biz";
+import { BaseRepVO, BaseReqVO } from "win-biz";
 import { GroupDetailVO } from "./GroupVO";
-import StrategyRepVO from "./StrategyVO";
+import { StrategyRepVO } from "./StrategyVO";
 
 /**********************request VO***********************/
-
+export class TaskReqVO{
+    id: number;
+    strategyId: number=null;
+    groupId: number=null;
+    status: number = 0;
+}
 
 /*********************response VO****************/
-export default class TaskTableVO extends BaseRepVO{
+export class TaskTableVO extends BaseRepVO{
     strategyId: number;
     groupId: number;
     status: number;

@@ -82,4 +82,9 @@ public abstract class BaseController<T extends BasePO> {
         return WinResponseData.handleSuccess(this.getBaseService().getById(id));
     }
 
+    @GetMapping("/list")
+    public WinResponseData list(){
+        List<T> list = this.getBaseService().list(null);
+        return WinResponseData.handleSuccess(list);
+    }
 }

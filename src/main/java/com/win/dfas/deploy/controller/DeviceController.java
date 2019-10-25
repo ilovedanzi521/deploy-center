@@ -39,12 +39,12 @@ public class DeviceController extends BaseController<DevicePO> {
     public IService<DevicePO> getBaseService() {
         return this.deviceService;
     }
-
+/*
     @GetMapping("/list")
     public WinResponseData list(){
         List<DevicePO> list = deviceService.list(null);
         return WinResponseData.handleSuccess(list);
-    }
+    }*/
 
     @PostMapping("/connectTest")
     public WinResponseData connectTest(@Validated @RequestBody DevicePO device){

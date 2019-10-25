@@ -3,8 +3,18 @@ import AxiosFun from "win-biz";
 import {DeviceRepVO, DeviceReqVO, GroupQueryVO, GroupReqVO} from "../vo/GroupVO";
 import { QueryReqVO } from "../vo/AppModuleVO";
 import { DeployBaseUrl } from "../const/DeployConst";
+import { TaskReqVO } from "../vo/TaskVO";
 
 export default class DeployService {
+    insertTask(vo: TaskReqVO): Promise<WinResponseData> {
+        return AxiosFun.post(DeployBaseUrl +"/task/save", vo);
+    }
+    strategyList(): Promise<WinResponseData> {
+        return AxiosFun.get(DeployBaseUrl +"/strategy/list", null);
+    }
+    groupList(): Promise<WinResponseData> {
+        return AxiosFun.get(DeployBaseUrl +"/group/list", null);
+    }
     public static uploadUrl: string = DeployBaseUrl +"/app/module/upload";
 
     taskPageList(vo: import("../vo/DeployVO").QueryReqVO) {

@@ -6,6 +6,8 @@ import com.win.dfas.deploy.common.exception.UserInvalidException;
 import com.win.dfas.deploy.common.exception.ValidateException;
 import lombok.extern.log4j.Log4j;
 import lombok.extern.slf4j.Slf4j;
+import org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -56,5 +58,10 @@ public class GlobalExceptionHandler {
         return WinResponseData.handleError("验证异常："+e.getMessage());
     }
 
+
+    @ExceptionHandler(DuplicateKeyException.class)
+    public WinResponseData duplicateKeyExceptionHandler(DuplicateKeyException e){
+        return WinResponseData.handleError("数据已经存在："+e.getMessage());
+    }
 
 }
