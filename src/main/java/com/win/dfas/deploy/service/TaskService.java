@@ -43,14 +43,14 @@ public interface TaskService extends IService<TaskPO> {
      * @param id
      * @return
      */
-    TaskPO deploy(Long id);
+    void deploy(Long id);
 
     /**
      * 卸载
      * @param id
      * @return
      */
-    TaskPO unDeploy(Long id);
+    void unDeploy(Long id);
 
     /**
      * 扫描升级文件

@@ -20,41 +20,31 @@ import java.util.List;
 
 /**
  * 调度中心服务提供者
+ * @author heshansen
  */
 @Slf4j
 @Service
 public class ScheduleCenterServiceImpl implements ScheduleCenterService {
-    private final static String TAG = "ScheduleCenterServiceImpl";
 
     @Autowired
     private TaskService taskService;
 
     /**
      * 启动部署
-     * @param id - TaskID
+     * @param taskId
      */
     @Override
-    public void deploy(long id) {
-        TaskPO task = taskService.getById(id);
-        if(task != null) {
-            Scheduler.get().depoly(task.getId());
-        }else {
-            throw new BaseException("任务不存在："+id);
-        }
+    public void deploy(long taskId) {
+        Scheduler.get().depoly(taskId);
     }
 
     /**
      * 卸载部署
-     * @param id - TaskID
+     * @param taskId
      */
     @Override
-    public void undeploy(long id) {
-        TaskPO task = taskService.getById(id);
-        if(task != null) {
-            Scheduler.get().undepoly(task.getId());
-        }else {
-            throw new BaseException("任务不存在："+id);
-        }
+    public void undeploy(long taskId) {
+        Scheduler.get().undepoly(taskId);
     }
 
     /**

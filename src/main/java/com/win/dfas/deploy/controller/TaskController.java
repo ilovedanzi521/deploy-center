@@ -44,14 +44,14 @@ public class TaskController extends BaseController<TaskPO> {
     }
     @GetMapping("/deploy")
     public WinResponseData deploy(@RequestParam Long id) {
-        TaskPO taskPO=taskService.deploy(id);
-        return WinResponseData.handleSuccess("开始异步部署...");
+        this.taskService.deploy(id);
+        return WinResponseData.handleSuccess("启动异步部署...");
     }
 
     @GetMapping("/undeploy")
     public WinResponseData undeploy(@RequestParam Long id) {
-        TaskPO taskPO=taskService.unDeploy(id);
-        return WinResponseData.handleSuccess("开始异步卸载...");
+        this.taskService.unDeploy(id);
+        return WinResponseData.handleSuccess("启动异步卸载...");
     }
 
     @GetMapping("/scan")

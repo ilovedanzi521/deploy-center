@@ -103,8 +103,8 @@ export default class TaskController extends BaseController{
         console.log("*************deploy");
         console.log(row);
         // const h = this.$createElement;
-        if(row.status === 0){
-            this.win_message_box_info('确认部署任务['+row.strategy.name+']?')
+        if(this.isDeployTask(row)){
+            this.win_message_box_warning('确认部署任务['+row.id+']?')
                 .then(() => {
                     this.deployService.taskDeploy(row.id)
                         .then((winResponseData: WinResponseData) =>{
@@ -115,15 +115,22 @@ export default class TaskController extends BaseController{
                                 this.win_message_error(winResponseData.msg);
                             }
                         });
-                        
+                    
                 });
         }else{
-            this.win_message_box_warning("请选择未部署任务进行部署！");
+            this.win_message_box_error("当前状态任务无法部署！");
         }
+    }
+    // 是否可部署
+    isDeployTask(row: any) {
+        if(row.status==1 || row.status==3||row.status ==4||row.status ==5){
+            return false;
+        }
+        return true;
     }
     // 卸载按钮
     unDeploy(row: TaskTableVO){
-        if(row.status === 2){
+        if(this.isUnDeployTask(row)){
             this.win_message_box_info('确认卸载任务['+row.id+']?')
                 .then(() => {
                     this.deployService.taskDeploy(row.id)
@@ -138,8 +145,14 @@ export default class TaskController extends BaseController{
                         
                 });
         }else{
-            this.win_message_box_warning("请选择已经部署的任务进行卸载！");
+            this.win_message_box_error("当前状态任务无法卸载！");
         }
+    }
+    isUnDeployTask(row: any) {
+        if(row.status==0 ||row.status==1 ||row.status==2 || row.status ==4){
+            return false;
+        }
+        return true;
     }
     // 查看日志按钮
     viewLog(row: TaskTableVO){

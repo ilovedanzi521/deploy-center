@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.win.dfas.common.vo.BaseReqVO;
+import com.win.dfas.deploy.common.enumerate.DeployEnum;
+import com.win.dfas.deploy.common.exception.BaseException;
 import com.win.dfas.deploy.dao.TaskDao;
 import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.po.StrategyPO;
@@ -76,15 +78,39 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskPO> implements Tas
     }
 
     @Override
-    public TaskPO deploy(Long id) {
+    public void deploy(Long id) {
+        TaskPO task = this.getById(id);
+        if(task == null) {
+            throw new BaseException("部署异常：任务["+id+"]已经不存在！");
+        }else if (DeployEnum.TaskStatus.DEPLOY_UNDERWAY.getValue().equals(task.getStatus())){
+            throw new BaseException("部署异常：任务正在部署中！");
+        }else if (DeployEnum.TaskStatus.DEPLOY_SUCCESS.getValue().equals(task.getStatus())){
+            throw new BaseException("部署异常：任务已经部署成功！");
+        }else if (DeployEnum.TaskStatus.UNINSTALL_UNDERWAY.getValue().equals(task.getStatus())){
+            throw new BaseException("部署异常：任务正在卸载中！");
+        }else if (DeployEnum.TaskStatus.UNINSTALL_FAILURE.getValue().equals(task.getStatus())){
+            throw new BaseException("部署异常：任务已经部署！");
+        }
         this.mScheduleService.deploy(id);
-        return this.getById(id);
     }
 
     @Override
-    public TaskPO unDeploy(Long id) {
+    public void unDeploy(Long id) {
+        TaskPO task = this.getById(id);
+        if(task == null) {
+            throw new BaseException("部署异常：任务["+id+"]已经不存在！");
+        }else if (DeployEnum.TaskStatus.DEPLOY_NONE.getValue().equals(task.getStatus())){
+            throw new BaseException("部署异常：任务未部署！");
+        }else if (DeployEnum.TaskStatus.DEPLOY_NONE.getValue().equals(task.getStatus())){
+            throw new BaseException("部署异常：任务部署失败！");
+        }else if (DeployEnum.TaskStatus.DEPLOY_UNDERWAY.getValue().equals(task.getStatus())){
+            throw new BaseException("部署异常：任务正在部署中！");
+        }else if (DeployEnum.TaskStatus.UNINSTALL_UNDERWAY.getValue().equals(task.getStatus())){
+            throw new BaseException("部署异常：任务正在卸载中！");
+        }else if (DeployEnum.TaskStatus.UNINSTALL_SUCCESS.getValue().equals(task.getStatus())){
+            throw new BaseException("部署异常：任务已经卸载成功！");
+        }
         this.mScheduleService.undeploy(id);
-        return this.getById(id);
     }
 
     @Override
