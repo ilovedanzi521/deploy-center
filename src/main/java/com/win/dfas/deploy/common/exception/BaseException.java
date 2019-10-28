@@ -12,11 +12,7 @@
 package com.win.dfas.deploy.common.exception;
 
 /**
- * 包名称：com.win.dfas.auth.common.exception
- * 类名称：BaseException
- * 类描述：认证基本异常类
- * 创建人：@author zhoujinyin
- * 创建时间：2019/5/31/18:46
+ * 基础异常类
  */
 public class BaseException extends RuntimeException {
     private int status = 200;

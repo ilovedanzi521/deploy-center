@@ -5,6 +5,8 @@ import cn.hutool.core.util.RuntimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,12 +23,7 @@ public class ShellUtils {
      * @return
      */
     public static List<String> envExecShell(String... commands) {
-        try {
-            return RuntimeUtil.execForLines(commands);
-        } catch (Exception e) {
-            log.error("envExecShell "+commands.toString()+" error.", e);
-        }
-        return null;
+        return RuntimeUtil.execForLines(commands);
     }
 
     /**
@@ -79,7 +76,11 @@ public class ShellUtils {
         }
     }
 
-    public static Boolean unZip(String zipFile, String targetDir) {
+    public static Boolean unZip(String zipFile, String targetDir) throws IOException {
+        File cmdFile = new File(sCommShell);
+        if(!cmdFile.exists()){
+            throw new IOException("未找到指定命令脚本："+sCommShell);
+        }
         String[] params = {sCommShell,"unzip", "-o", zipFile, "-d", targetDir};
         log.info("command ==>: "+ Arrays.toString(params));
         List<String> resultList = ShellUtils.envExecShell(params);

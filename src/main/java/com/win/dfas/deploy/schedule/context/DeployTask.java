@@ -68,23 +68,22 @@ public class DeployTask implements Runnable{
         log.info(TAG+" Start id="+mTaskId);
 
         // 1. 从taskId中查询出策略
-       final StrategyPO strategy = mTaskService.selectStrategyByTask(mTaskId);
+       final StrategyPO strategy = mTaskService.getStrategyByTask(mTaskPO);
         if(strategy == null) {
            status= mCmd==CMD_DEPLOY ? DEPLOY_ERROR : UNDEPLOY_ERROR;
            saveStatus(status);
            return;
         }
-        log.info(TAG+" find strategy="+strategy.toString() + " deployStatus="+status);
+        log.info(TAG+" find strategy="+strategy.getName() + " deployStatus="+status);
 
         // 2. 从taskId中查询出设备列表
-        List<DevicePO> devList = mTaskService.selectDeviceByTask(mTaskId);
+        List<DevicePO> devList = mTaskService.getDevicesByTask(mTaskPO);
         if(devList == null || devList.size() == 0) {
             status= mCmd==CMD_DEPLOY ? DEPLOY_ERROR : UNDEPLOY_ERROR;
             saveStatus(status);
             return;
         }
         log.info(TAG+ " find devices total="+devList.size()+" deployStatus="+status);
-        log.info(TAG+ " devices: "+ devList.toString());
 
         // 获取device对应的ScheduleContext对象
         List<ScheduleContext> remoteContextList = new ArrayList<ScheduleContext>();
@@ -132,7 +131,7 @@ public class DeployTask implements Runnable{
      * 该任务是具体执行远程单台机器的部署任务
      */
     private class RemoteDeployTask implements Runnable {
-        private final static String TAG = "RemoteDeployTask";
+        private String TASK_NAME = "RemoteDeployTask";
         private ScheduleContext remoteContext;
         private StrategyPO strategy;
         private CountDownLatch taskCount;
@@ -147,13 +146,17 @@ public class DeployTask implements Runnable{
         public void run() {
             try {
                 DevicePO device = remoteContext.getDevice();
+                TASK_NAME += "["+ device.toSimpleString()+"]==> ";
+                log.info(TASK_NAME + "deploy start...");
                 String logFilename = remoteContext.getLogFile(strategy.getName());
-                log.info(TAG+ "[" + device.getName() + "," + device.getIpAddress() + "] deploy start.");
 
                 // 1. 初始化远程节点的环境
-                log.info(TAG+" initRemoteDevice ["+remoteContext.getDevice().toSimpleString()+"] start ...");
+                log.info(TASK_NAME +" start init.sh; ");
                 boolean isInit = remoteContext.initRemoteDevice();
-                log.info(TAG+" initRemoteDevice "+isInit);
+                log.info(TASK_NAME +" ent init is "+isInit);
+                if (!isInit){
+                    saveStatus(DEPLOY_ERROR);
+                }
 
                 // 2. 创建一个策略实现类，类型为java微服务,
                 //    通过list_modules获取策略需要的模块,并设置到strategyImpl中
@@ -167,7 +170,7 @@ public class DeployTask implements Runnable{
                 // 4. 执行完成后，添加和更新服务到设备对应的表中
                 if (result) {
                     int moduleTotal = moduleObjList.size();
-                    log.info(TAG+ "saveOrUpdate deviceModule size: " + moduleTotal);
+                    log.info(TASK_NAME + "saveOrUpdate deviceModule size: " + moduleTotal);
 
                     List<DeviceModuleRefPO> devModList = new ArrayList<>();
                     for (int i = 0; i < moduleTotal; i++) {
@@ -176,7 +179,7 @@ public class DeployTask implements Runnable{
                         refObj.setDeviceId(device.getId());
                         refObj.setModuleId(module.getId());
                         devModList.add(refObj);
-                        log.info(TAG+ "update deviceModuleRefPO " + i + ": " + refObj.toString());
+                        log.info(TASK_NAME + "update deviceModuleRefPO " + i + ": " + refObj.toString());
                     }
                     if(devModList.size() >0 ) {
                         mDeviceModuleService.updateBatch(devModList);
@@ -184,10 +187,10 @@ public class DeployTask implements Runnable{
 
                     saveStatus(DEPLOY_DONE);
                 }
-                log.info(TAG+ "[" + device.toSimpleString() + "] deploy end. result=" + result);
+                log.info(TASK_NAME + "[" + device.toSimpleString() + "] deploy end. result=" + result);
             } catch (Exception e) {
                 saveStatus(DEPLOY_ERROR);
-                log.info(TAG+ "deploy exception. ", e);
+                log.info(TASK_NAME + "deploy exception. ", e);
             } finally {
                 taskCount.countDown();
             }

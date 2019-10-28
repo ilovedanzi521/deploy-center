@@ -9,9 +9,13 @@ import com.win.dfas.deploy.dao.TaskDao;
 import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.po.StrategyPO;
 import com.win.dfas.deploy.po.TaskPO;
+import com.win.dfas.deploy.service.GroupService;
+import com.win.dfas.deploy.service.ScheduleCenterService;
+import com.win.dfas.deploy.service.StrategyService;
 import com.win.dfas.deploy.service.TaskService;
 import com.win.dfas.deploy.vo.response.PageVO;
 import com.win.dfas.deploy.dto.TaskDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +32,12 @@ import java.util.List;
 @Transactional(rollbackFor = Exception.class)
 public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskPO> implements TaskService {
 
+    @Autowired
+    private ScheduleCenterService mScheduleService;
+    @Autowired
+    private StrategyService strategyService;
+    @Autowired
+    private GroupService groupService;
     /**
      * 从任务ID获取对应的策略
      * @param taskId - task id
@@ -63,5 +73,32 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskPO> implements Tas
         IPage<TaskDTO> pageList = this.baseMapper.getPageList(page,queryWrapper);
 
         return new PageVO(page,pageList.getRecords());
+    }
+
+    @Override
+    public TaskPO deploy(Long id) {
+        this.mScheduleService.deploy(id);
+        return this.getById(id);
+    }
+
+    @Override
+    public TaskPO unDeploy(Long id) {
+        this.mScheduleService.undeploy(id);
+        return this.getById(id);
+    }
+
+    @Override
+    public void appSourceScan() {
+        this.mScheduleService.appSourceScan();
+    }
+
+    @Override
+    public StrategyPO getStrategyByTask(TaskPO taskPO) {
+        return this.strategyService.getById(taskPO.getStrategyId());
+    }
+
+    @Override
+    public List<DevicePO> getDevicesByTask(TaskPO taskPO) {
+        return this.groupService.getDevicesByGroupId(taskPO.getGroupId());
     }
 }

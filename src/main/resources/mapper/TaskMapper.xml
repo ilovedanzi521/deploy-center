@@ -8,6 +8,7 @@
         <id property="id" column="id" />
         <result property="strategyId" column="strategy_id"/>
         <result property="groupId" column="group_id"/>
+        <result property="status" column="status"/>
         <result property="createTime" column="create_time"/>
         <result property="strategyId" column="strategy_id"/>
         <association property="strategy" javaType="com.win.dfas.deploy.po.StrategyPO">

@@ -26,8 +26,6 @@ public class TaskController extends BaseController<TaskPO> {
     @Autowired
     private TaskService taskService;
 
-    @Autowired
-    private ScheduleCenterService mScheduleService;
 
     @Override
     public IService<TaskPO> getBaseService() {
@@ -45,18 +43,21 @@ public class TaskController extends BaseController<TaskPO> {
         return WinResponseData.handleSuccess(pageVO);
     }
     @GetMapping("/deploy")
-    public void deploy(@RequestParam Long id) {
-        mScheduleService.deploy(id);
+    public WinResponseData deploy(@RequestParam Long id) {
+        TaskPO taskPO=taskService.deploy(id);
+        return WinResponseData.handleSuccess("开始异步部署...");
     }
 
     @GetMapping("/undeploy")
-    public void undeploy(@RequestParam Long id) {
-        mScheduleService.undeploy(id);
+    public WinResponseData undeploy(@RequestParam Long id) {
+        TaskPO taskPO=taskService.unDeploy(id);
+        return WinResponseData.handleSuccess("开始异步卸载...");
     }
 
     @GetMapping("/scan")
-    public void sacn(@RequestParam Long id) {
-        mScheduleService.appSourceScan();
+    public WinResponseData sacn() {
+        taskService.appSourceScan();
+        return WinResponseData.handleSuccess("扫描结束");
     }
 }
 

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.win.dfas.deploy.dto.DeviceGroupDTO;
 import com.win.dfas.deploy.dto.GroupTree;
+import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.po.GroupPO;
 import com.win.dfas.deploy.vo.request.DeviceParamsVO;
 import com.win.dfas.deploy.vo.request.GroupVO;
@@ -67,4 +68,11 @@ public interface GroupService extends IService<GroupPO> {
      * @return
      */
     Boolean safeRemoveBatch(List<Long> ids);
+
+    /**
+     * 通过组id查询设备列表
+     * @param groupId
+     * @return
+     */
+    List<DevicePO> getDevicesByGroupId(Long groupId);
 }

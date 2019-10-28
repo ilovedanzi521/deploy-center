@@ -55,24 +55,7 @@
             <appender-ref ref="asyncFileAppender" />
         </logger>
         <root level="INFO">
-            <appender-ref ref="asyncFileAppender" />
-        </root>
-    </springProfile>
-
-    <springProfile name="sit">
-        <logger name="com.win" level="DEBUG">
-            <appender-ref ref="asyncFileAppender" />
-        </logger>
-        <root level="INFO">
-            <appender-ref ref="asyncFileAppender" />
-        </root>
-    </springProfile>
-
-    <springProfile name="uat">
-        <logger name="com.win" level="DEBUG">
-            <appender-ref ref="asyncFileAppender" />
-        </logger>
-        <root level="INFO">
+            <appender-ref ref="LOGCONSOLE"/>
             <appender-ref ref="asyncFileAppender" />
         </root>
     </springProfile>

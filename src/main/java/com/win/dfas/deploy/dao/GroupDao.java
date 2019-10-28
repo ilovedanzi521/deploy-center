@@ -5,8 +5,11 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.win.dfas.deploy.dto.DeviceGroupDTO;
+import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.po.GroupPO;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * @包名 com.win.dfas.deploy.dao
@@ -26,4 +29,10 @@ public interface GroupDao extends BaseMapper<GroupPO> {
     //IPage 分页器， Wrapper 条件构造器
     IPage<DeviceGroupDTO> getPageList(IPage<DeviceGroupDTO> page, @Param(Constants.WRAPPER) Wrapper query) throws Exception;
 
+    /**
+     * 获取组设备列表
+     * @param id 组id
+     * @return
+     */
+    List<DevicePO> selectDevicesByGroupId(Long id);
 }

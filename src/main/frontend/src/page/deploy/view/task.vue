@@ -27,12 +27,13 @@
                     </template>
                 </win-table-column>
                 <win-table-column title="创建时间" field="createTime" :formatter="formatCellValue"></win-table-column>
-                <win-table-column title="状态" field="status" :formatter="formatCellValue"></win-table-column>
+                <win-table-column title="状态" field="status" :formatter="formatCellValue">
+                </win-table-column>
                 <win-table-column title="操作" >
                     <template v-slot="{ row }">
-                        <win-button size="mini" type="text" icon="el-icon-orange">部署</win-button>
-                        <win-button size="mini" type="text" icon="el-icon-delete">卸载</win-button>
-                        <win-button size="mini" type="text" icon="el-icon-view">查看日志</win-button>
+                        <win-button size="mini" type="text" icon="el-icon-orange" @click="deploy(row)">部署</win-button>
+                        <win-button size="mini" type="text" icon="el-icon-delete" @click="unDeploy(row)">卸载</win-button>
+                        <win-button size="mini" type="text" icon="el-icon-view" @click="viewLog(row)">查看日志</win-button>
                     </template>
                 </win-table-column>
             </win-table>

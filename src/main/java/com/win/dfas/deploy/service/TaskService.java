@@ -37,4 +37,37 @@ public interface TaskService extends IService<TaskPO> {
      * @return
      */
     PageVO<TaskDTO> getPageInfo(BaseReqVO reqVO);
+
+    /**
+     * 部署
+     * @param id
+     * @return
+     */
+    TaskPO deploy(Long id);
+
+    /**
+     * 卸载
+     * @param id
+     * @return
+     */
+    TaskPO unDeploy(Long id);
+
+    /**
+     * 扫描升级文件
+     */
+    void appSourceScan();
+
+    /**
+     * 获取任务对应策略
+     * @param taskPO
+     * @return
+     */
+    StrategyPO getStrategyByTask(TaskPO taskPO);
+
+    /**
+     * 获取任务对应设备
+     * @param taskPO
+     * @return
+     */
+    List<DevicePO> getDevicesByTask(TaskPO taskPO);
 }

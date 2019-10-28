@@ -85,7 +85,12 @@ public class AppModuleServiceImpl extends ServiceImpl<AppModuleDao, AppModulePO>
             FileUtil.del(zipTempFile);
             throw new BaseException("上传异常:"+e.getMessage());
         }
-        Boolean upgraded = this.mScheduleService.upgradAppModule(zipTempFile.getAbsolutePath(),deployEnv.getHomeDir());
+        Boolean upgraded = false;
+        try {
+            upgraded = this.mScheduleService.upgradAppModule(zipTempFile.getAbsolutePath(),deployEnv.getHomeDir());
+        } catch (IOException e) {
+            throw new BaseException(e.getMessage());
+        }
         if (!upgraded){
             FileUtil.del(zipTempFile);
             throw new BaseException("压缩包初始化异常");
@@ -106,7 +111,12 @@ public class AppModuleServiceImpl extends ServiceImpl<AppModuleDao, AppModulePO>
         if (!isUpload){
             throw new BaseException("上传Ftp失败");
         }
-        Boolean isUpgraded = this.mScheduleService.upgradAppModule(ftpRepoTempFile,deployEnv.getHomeDir());
+        Boolean isUpgraded = false;
+        try {
+            isUpgraded = this.mScheduleService.upgradAppModule(ftpRepoTempFile,deployEnv.getHomeDir());
+        } catch (IOException e) {
+            throw new BaseException(e.getMessage());
+        }
         if (!isUpgraded){
             throw new BaseException("解压异常");
         }

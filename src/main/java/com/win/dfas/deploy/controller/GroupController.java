@@ -98,4 +98,9 @@ public class GroupController extends BaseController<GroupPO> {
     public WinResponseData getInfo(@PathVariable Long id){
         return WinResponseData.handleSuccess(this.groupService.getInfo(id));
     }
+
+    @GetMapping("/devices/{id}")
+    public WinResponseData getDevices(@PathVariable Long id){
+        return WinResponseData.handleSuccess(this.groupService.getDevicesByGroupId(id));
+    }
 }

@@ -63,4 +63,3 @@ mybatis-plus:
   mapper-locations: classpath:/mapper/**/*Mapper.xml
   configuration:
     jdbc-type-for-null: 'null'
-

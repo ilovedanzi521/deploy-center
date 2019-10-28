@@ -2,6 +2,7 @@ package com.win.dfas.deploy.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.win.dfas.deploy.common.exception.BaseException;
 import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.po.TaskPO;
 import com.win.dfas.deploy.schedule.Scheduler;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,11 +35,11 @@ public class ScheduleCenterServiceImpl implements ScheduleCenterService {
      */
     @Override
     public void deploy(long id) {
-        QueryWrapper<TaskPO> wp = new QueryWrapper<TaskPO>();
-        wp.eq("id",id);
-        TaskPO task = taskService.getOne(wp);
+        TaskPO task = taskService.getById(id);
         if(task != null) {
             Scheduler.get().depoly(task.getId());
+        }else {
+            throw new BaseException("任务不存在："+id);
         }
     }
 
@@ -47,11 +49,11 @@ public class ScheduleCenterServiceImpl implements ScheduleCenterService {
      */
     @Override
     public void undeploy(long id) {
-        QueryWrapper<TaskPO> wp = new QueryWrapper<TaskPO>();
-        wp.eq("id",id);
-        TaskPO task = taskService.getOne(wp);
+        TaskPO task = taskService.getById(id);
         if(task != null) {
             Scheduler.get().undepoly(task.getId());
+        }else {
+            throw new BaseException("任务不存在："+id);
         }
     }
 
@@ -186,7 +188,7 @@ public class ScheduleCenterServiceImpl implements ScheduleCenterService {
      * @return
      */
     @Override
-    public Boolean upgradAppModule(String zipFile, String repoDir) {
+    public Boolean upgradAppModule(String zipFile, String repoDir) throws IOException {
         Boolean isSuccess = ShellUtils.unZip(zipFile,repoDir);
         if (isSuccess){
             //当升级安装包后，需要调用该函数重新扫描应用和策略表，否则要重启

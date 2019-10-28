@@ -3,6 +3,7 @@ package com.win.dfas.deploy.schedule.context;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.util.StrUtil;
+import com.win.dfas.deploy.common.exception.BaseException;
 import com.win.dfas.deploy.po.AppModulePO;
 import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.po.StrategyPO;
@@ -66,15 +67,21 @@ public class ScheduleContext {
     public boolean initRemoteDevice()  {
         if (mIsInit.get() == false) {
             String command = mEnvConfig.getHomeDir() + File.separator + sInitShell;
-            // 要加上ssh头部
-            String[] params = {
-                    command, mHost.getIpAddress(), String.valueOf(mHost.getPort())};
-            List<String> resultList = ShellUtils.envExecShell(params);
-            mIsInit.set(ShellUtils.isSuccess(resultList));
+            File initFile = new File(command);
+            if (initFile.exists()){
+                // 要加上ssh头部
+                String[] params = {
+                        command, mHost.getIpAddress(), String.valueOf(mHost.getPort())};
+                List<String> resultList = ShellUtils.envExecShell(params);
+                mIsInit.set(ShellUtils.isSuccess(resultList));
 
-            if(resultList == null) {
-                log.info("initRemoteDevice ===> ");
-                ShellUtils.listLog(log, resultList);
+                if(resultList == null) {
+                    log.info("initRemoteDevice ===> ");
+                    ShellUtils.listLog(log, resultList);
+                }
+            }else {
+                log.warn(command + "脚本不存在！");
+                return false;
             }
         }
         return mIsInit.get();

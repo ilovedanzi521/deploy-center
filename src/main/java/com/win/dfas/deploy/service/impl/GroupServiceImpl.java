@@ -174,4 +174,10 @@ public class GroupServiceImpl extends ServiceImpl<GroupDao, GroupPO> implements 
         this.groupDeviceRefService.remove(wrapper);
         return this.removeByIds(ids);
     }
+
+    @Override
+    public List<DevicePO> getDevicesByGroupId(Long groupId) {
+
+        return this.baseMapper.selectDevicesByGroupId(groupId);
+    }
 }

@@ -35,6 +35,8 @@
                 <el-table-column label="操作" min-width="100">
                     <template v-slot="{ row }">
                         <el-button v-if="row.ipAddress==null ? true : false" size="mini" type="text" icon="el-icon-delete" @click="delGroupOne(row)">删除</el-button>
+                        <el-button v-if="row.ipAddress==null ? false : true" size="mini" type="text" icon="el-icon-switch-button" @click="delGroupOne(row)">启动</el-button>
+                        <el-button v-if="row.ipAddress==null ? false : true" size="mini" type="text" icon="el-icon-delete" @click="delGroupOne(row)">停止</el-button>
                     </template>
                 </el-table-column>
                 <template v-slot:empty>

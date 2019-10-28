@@ -60,7 +60,7 @@ export default class TaskDialogController extends BaseController{
         ]
     };
 
-    private mounted(){
+    mounted(){
         console.log("进入弹框");
         console.log(this.toChildMsg);
         this.dialogTitle = this.toChildMsg.dialogTitle;
@@ -105,23 +105,15 @@ export default class TaskDialogController extends BaseController{
     }
 
     /*关闭组对话框*/
-    private closeDialog(){
+    closeDialog(){
         this.send(WinRspType.CANCEL);
     }
 
-    private submitDialog(formName: string){
+    submitDialog(formName: string){
         console.log("********submitDialog**********");
         this.$refs[formName].validate((valid: boolean) => {
             if (valid) {
                 console.log(this.taskReqVO);
-                // if(!this.taskReqVO.strategyId){
-                //     this.win_message_box_error("部署策略不能为空！");
-                //     return false;
-                // }
-                // if(!this.taskReqVO.groupId){
-                //     this.win_message_box_error("设备组不能为空！");
-                //     return false;
-                // }
                 this.deployService.insertTask(this.taskReqVO)
                     .then((winResponseData: WinResponseData) =>{
                         if (WinRspType.SUCC === winResponseData.winRspType) {

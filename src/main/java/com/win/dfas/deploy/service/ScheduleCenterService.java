@@ -3,6 +3,7 @@ package com.win.dfas.deploy.service;
 import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface ScheduleCenterService {
@@ -92,5 +93,5 @@ public interface ScheduleCenterService {
      * @param repoDir
      * @return
      */
-    Boolean upgradAppModule(String zipFile, String repoDir);
+    Boolean upgradAppModule(String zipFile, String repoDir) throws IOException;
 }

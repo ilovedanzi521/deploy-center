@@ -1,11 +1,10 @@
 <template>
     <win-fdialog width="30%"  :title="dialogTitle" class="taskDialog" :before-close="closeDialog" :visible.sync="dialogVisibleSon" :close-on-click-modal="false" :close-on-press-escape="false">
-        <win-form class="taskform" :inline="true" :rules="formRules" :model="taskReqVO" ref="taskForm" label-width="80px">
+        <win-form class="taskform" :inline="true" :rules="formRules" :model="taskReqVO" ref="taskForm" label-position="left" label-width="80px">
             <div class="hr">
                 
                 <win-col :span="12">
-                    <win-form-item prop="strategyId" lable="部署策略" >
-                        <span><i class="el-icon-star-on" style="color:red"/>部署策略：</span>
+                    <win-form-item label="部署策略:" prop="strategyId">
                         <win-select v-model="taskReqVO.strategyId" placeholder="请选择">
                                 <win-option
                                 v-for="item in strategyData"
@@ -17,8 +16,7 @@
                     </win-form-item>
                 </win-col>
                 <win-col :span="12">
-                    <win-form-item prop="groupId" lable="设备组" >
-                        <span><i class="el-icon-star-on" style="color:red"/>设备组：</span>
+                    <win-form-item label="设备组:" prop="groupId">
                             <win-select v-model="taskReqVO.groupId" placeholder="请选择">
                                 <win-option
                                 v-for="item in groupData"
