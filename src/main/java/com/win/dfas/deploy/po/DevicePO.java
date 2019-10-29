@@ -3,6 +3,7 @@ package com.win.dfas.deploy.po;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.win.dfas.deploy.common.validator.group.AddGroup;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -14,6 +15,7 @@ import javax.validation.constraints.NotNull;
  * @创建人 heshansen
  * @创建时间 2019/09/26 11:50
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @TableName("dc_device")
 public class DevicePO extends BasePO{

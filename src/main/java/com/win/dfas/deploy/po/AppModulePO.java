@@ -1,7 +1,11 @@
 package com.win.dfas.deploy.po;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import java.io.File;
 
 /**
  * @包名 com.win.dfas.deploy.po
@@ -10,6 +14,7 @@ import lombok.Data;
  * @创建人 heshansen
  * @创建时间 2019/09/26 13:38
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @TableName("dc_app_module")
 public class AppModulePO extends BasePO{
@@ -49,4 +54,10 @@ public class AppModulePO extends BasePO{
      */
     private int allowDelete;
 
+    public String toFilePathString() {
+        if (StrUtil.isNotBlank(this.path) && !this.path.endsWith(File.separator)){
+            return this.path+File.separator+this.name;
+        }
+        return this.path+this.name;
+    }
 }

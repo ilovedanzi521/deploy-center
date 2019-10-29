@@ -2,6 +2,7 @@ package com.win.dfas.deploy.po;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @包名 com.win.dfas.deploy.po
@@ -10,6 +11,7 @@ import lombok.Data;
  * @创建人 heshansen
  * @创建时间 2019/09/23 16:57
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @TableName("sys_log")
 public class SysLogPO extends BasePO {

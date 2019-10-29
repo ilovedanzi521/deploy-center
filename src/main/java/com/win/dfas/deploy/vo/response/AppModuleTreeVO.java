@@ -2,6 +2,7 @@ package com.win.dfas.deploy.vo.response;
 
 import com.win.dfas.deploy.po.AppModulePO;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.List;
  * @创建人 heshansen
  * @创建时间 2019/10/18 13:17
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class AppModuleTreeVO extends AppModulePO {
     private static final long serialVersionUID = 536618326714404400L;

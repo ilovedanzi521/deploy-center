@@ -101,10 +101,10 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskPO> implements Tas
             throw new BaseException("部署异常：任务["+id+"]已经不存在！");
         }else if (DeployEnum.TaskStatus.DEPLOY_NONE.getValue().equals(task.getStatus())){
             throw new BaseException("部署异常：任务未部署！");
-        }else if (DeployEnum.TaskStatus.DEPLOY_NONE.getValue().equals(task.getStatus())){
-            throw new BaseException("部署异常：任务部署失败！");
         }else if (DeployEnum.TaskStatus.DEPLOY_UNDERWAY.getValue().equals(task.getStatus())){
             throw new BaseException("部署异常：任务正在部署中！");
+        }else if (DeployEnum.TaskStatus.DEPLOY_FAILURE.getValue().equals(task.getStatus())){
+            throw new BaseException("部署异常：任务部署失败！");
         }else if (DeployEnum.TaskStatus.UNINSTALL_UNDERWAY.getValue().equals(task.getStatus())){
             throw new BaseException("部署异常：任务正在卸载中！");
         }else if (DeployEnum.TaskStatus.UNINSTALL_SUCCESS.getValue().equals(task.getStatus())){

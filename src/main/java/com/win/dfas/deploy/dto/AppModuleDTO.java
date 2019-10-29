@@ -3,6 +3,7 @@ package com.win.dfas.deploy.dto;
 import com.win.dfas.deploy.po.AppModulePO;
 import com.win.dfas.deploy.po.DevicePO;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
  * @创建时间 2019/10/18 13:27
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class AppModuleDTO extends AppModulePO {
     private static final long serialVersionUID = -5932600356013745543L;
     private List<DevicePO> devices;

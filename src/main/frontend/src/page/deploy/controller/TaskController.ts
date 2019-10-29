@@ -109,8 +109,8 @@ export default class TaskController extends BaseController{
                     this.deployService.taskDeploy(row.id)
                         .then((winResponseData: WinResponseData) =>{
                             if (WinRspType.SUCC === winResponseData.winRspType) {
-                                
                                 this.win_message_success(winResponseData.msg);
+                                this.queryPageList(this.queryReqVO);
                             } else {
                                 this.win_message_error(winResponseData.msg);
                             }
@@ -123,7 +123,7 @@ export default class TaskController extends BaseController{
     }
     // 是否可部署
     isDeployTask(row: any) {
-        if(row.status==1 || row.status==3||row.status ==4||row.status ==5){
+        if(row.status===1 ||row.status===2 ||row.status ===4||row.status ===6){
             return false;
         }
         return true;
@@ -133,11 +133,11 @@ export default class TaskController extends BaseController{
         if(this.isUnDeployTask(row)){
             this.win_message_box_info('确认卸载任务['+row.id+']?')
                 .then(() => {
-                    this.deployService.taskDeploy(row.id)
+                    this.deployService.taskUnDeploy(row.id)
                         .then((winResponseData: WinResponseData) =>{
                             if (WinRspType.SUCC === winResponseData.winRspType) {
-                                
                                 this.win_message_success(winResponseData.msg);
+                                this.queryPageList(this.queryReqVO);
                             } else {
                                 this.win_message_error(winResponseData.msg);
                             }
@@ -149,14 +149,19 @@ export default class TaskController extends BaseController{
         }
     }
     isUnDeployTask(row: any) {
-        if(row.status==0 ||row.status==1 ||row.status==2 || row.status ==4){
+        if(row.status===0 ||row.status===1 ||row.status===3 || row.status ===4|| row.status ===5){
             return false;
         }
         return true;
     }
     // 查看日志按钮
     viewLog(row: TaskTableVO){
-
+        this.toDialogMsg={
+            dialogTitle: DialogTitleConst.TASK_DETAIL,
+            type: OperationTypeEnum.VIEW,
+            data: row,
+        };
+        this.showDialog = true;
     }
 
     percentage(row: TaskTableVO){

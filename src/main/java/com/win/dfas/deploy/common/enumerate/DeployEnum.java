@@ -15,11 +15,11 @@ public class DeployEnum {
     public enum TaskStatus{
         DEPLOY_NONE("未部署", 0),
         DEPLOY_UNDERWAY("部署中", 1),
-        DEPLOY_FAILURE("部署失败", 2),
-        DEPLOY_SUCCESS("部署成功", 3),
-        UNINSTALL_UNDERWAY("卸载中", 1),
-        UNINSTALL_FAILURE("卸载失败", 2),
-        UNINSTALL_SUCCESS("卸载成功", 3)
+        DEPLOY_SUCCESS("部署成功", 2),
+        DEPLOY_FAILURE("部署失败", 3),
+        UNINSTALL_UNDERWAY("卸载中", 4),
+        UNINSTALL_SUCCESS("卸载成功", 5),
+        UNINSTALL_FAILURE("卸载失败", 6)
         ;
 
         private String name;

@@ -1,5 +1,6 @@
 package com.win.dfas.deploy.controller;
 
+import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.win.dfas.common.vo.BaseReqVO;
 import com.win.dfas.common.vo.WinResponseData;
@@ -11,6 +12,8 @@ import com.win.dfas.deploy.dto.TaskDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @包名 com.win.dfas.deploy.controller
@@ -58,6 +61,13 @@ public class TaskController extends BaseController<TaskPO> {
     public WinResponseData sacn() {
         taskService.appSourceScan();
         return WinResponseData.handleSuccess("扫描结束");
+    }
+
+    @GetMapping("/logInfo")
+    public WinResponseData logInfo(String filePath){
+        log.info("filePath="+filePath);
+        List<String> lines = FileUtil.readUtf8Lines(filePath);
+        return WinResponseData.handleSuccess(lines);
     }
 }
 

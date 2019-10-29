@@ -1,8 +1,11 @@
 package com.win.dfas.deploy.schedule.context;
 
 
+import cn.hutool.core.util.StrUtil;
+import com.win.dfas.deploy.common.enumerate.DeployEnum;
 import com.win.dfas.deploy.po.*;
 import com.win.dfas.deploy.schedule.Scheduler;
+import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
 import com.win.dfas.deploy.service.DeviceModuleService;
 import com.win.dfas.deploy.service.TaskService;
 import com.win.dfas.deploy.util.SpringContextUtils;
@@ -10,7 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import java.util.*;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -18,27 +25,24 @@ import java.util.concurrent.CountDownLatch;
  */
 @Slf4j
 public class DeployTask implements Runnable{
-    private final static String TAG = "DeployTask";
+    private SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static String TAG = "DeployTask-";
+    private static String LOG_SUFFIX=".log";
     /**
-     * 部署和卸载命令字
+     * 部署和卸载命令字 1-部署；2-卸载
      */
     public final static int CMD_DEPLOY = 1;
     public final static int CMD_UNDEPLOY = 2;
 
-    /**
-     * 部署和卸载状态
-     */
-    public final static int TASK_CREATED = 0;
-    public final static int DEPLOY_DOING  = 1;
-    public final static int DEPLOY_DONE   = 2;
-    public final static int DEPLOY_ERROR  = 3;
-    public final static int UNDEPLOY_DOING  = 4;
-    public final static int UNDEPLOY_DONE   = 5;
-    public final static int UNDEPLOY_ERROR  = 6;
+    /*消息类型： underway（进行中)、success（成功）、failure（失败）*/
+    public final static String MSG_UNDERWAY = "underway";
+    public final static String MSG_SUCCESS = "success";
+    public final static String MSG_FAILURE = "failure";
 
     private int mCmd;
     private long mTaskId;
     private TaskPO mTaskPO;
+    private String logDir;
 
     @Autowired
     private TaskService mTaskService;
@@ -47,56 +51,68 @@ public class DeployTask implements Runnable{
 
     @Autowired
     private ThreadPoolTaskExecutor mTaskExecutor;
+    private DeployEnvBean mEnvConfig;
 
     public DeployTask(int cmd, TaskPO task) {
-        mCmd = cmd;
-        mTaskId = task.getId();
-        mTaskPO = task;
-        mTaskService = SpringContextUtils.getBean(TaskService.class);
-        mDeviceModuleService = SpringContextUtils.getBean(DeviceModuleService.class);
-        mTaskExecutor = SpringContextUtils.getBean("scheduler_task_executor", ThreadPoolTaskExecutor.class);
+        this.mCmd = cmd;
+        this.mTaskId = task.getId();
+        this.mTaskPO = task;
+        this.mTaskService = SpringContextUtils.getBean(TaskService.class);
+        this.mDeviceModuleService = SpringContextUtils.getBean(DeviceModuleService.class);
+        this.mEnvConfig = SpringContextUtils.getBean("deploy_env_bean", DeployEnvBean.class);
+        this.mTaskExecutor = SpringContextUtils.getBean("scheduler_task_executor", ThreadPoolTaskExecutor.class);
+        initLogPath();
     }
 
-    private void saveStatus(int status) {
-        mTaskPO.setStatus(status);
-        mTaskService.updateById(mTaskPO);
+    private void initLogPath() {
+        String logsDir = this.mEnvConfig.getLogsDir();
+        if (!logsDir.endsWith(File.separator)){
+            logsDir+=File.separator;
+        }
+        this.logDir = logsDir+ this.mTaskId + File.separator;
     }
 
-   @Override
+
+    @Override
     public void run() {
-        int status= mCmd==CMD_DEPLOY ? DEPLOY_DOING : UNDEPLOY_DOING;
-        log.info(TAG+" Start id="+mTaskId);
+        TAG+=(mCmd==CMD_DEPLOY ? "deploy":"unDeploy")+"==> ";
+        writeTaskLog(TAG+"Start id="+mTaskId +" deployStatus="+mTaskPO.getStatus(), FileWriterTask.WRITE);
 
         // 1. 从taskId中查询出策略
-       final StrategyPO strategy = mTaskService.getStrategyByTask(mTaskPO);
+        final StrategyPO strategy = mTaskService.getStrategyByTask(mTaskPO);
         if(strategy == null) {
-           status= mCmd==CMD_DEPLOY ? DEPLOY_ERROR : UNDEPLOY_ERROR;
-           saveStatus(status);
-           return;
+            writeTaskLog(TAG+"strategy is not exist!", null);
+            saveStatus(mCmd,MSG_FAILURE);
+            return;
+        }else {
+            writeTaskLog(TAG+"strategy is "+strategy.getName(), null);
         }
-        log.info(TAG+" find strategy="+strategy.getName() + " deployStatus="+status);
-
         // 2. 从taskId中查询出设备列表
         List<DevicePO> devList = mTaskService.getDevicesByTask(mTaskPO);
         if(devList == null || devList.size() == 0) {
-            status= mCmd==CMD_DEPLOY ? DEPLOY_ERROR : UNDEPLOY_ERROR;
-            saveStatus(status);
+            writeTaskLog(TAG+"not find any devices!", null);
+            saveStatus(mCmd,MSG_FAILURE);
             return;
+        }else {
+            writeTaskLog(TAG+"Find total "+devList.size() +" devices todo.", null);
         }
-        log.info(TAG+ " find devices total="+devList.size()+" deployStatus="+status);
 
         // 获取device对应的ScheduleContext对象
         List<ScheduleContext> remoteContextList = new ArrayList<ScheduleContext>();
         int devTotal = devList.size();
+        String msg=TAG+"Began asyn remote devices: ";
         for(int i=0; i<devTotal; i++) {
             DevicePO device = devList.get(i);
             ScheduleContext remoteContext = Scheduler.get().getRemoteContext(device);
             remoteContextList.add(remoteContext);
+            msg+="["+device.toSimpleString()+"];";
         }
         if(remoteContextList.size() == 0) {
-            status= mCmd==CMD_DEPLOY ? DEPLOY_ERROR : UNDEPLOY_ERROR;
-            saveStatus(status);
+            writeTaskLog(TAG+"no valid remote devices", null);
+            saveStatus(mCmd,MSG_FAILURE);
             return;
+        }else {
+            writeTaskLog(msg, null);
         }
 
         // 3. 批量执行发布命令
@@ -116,22 +132,22 @@ public class DeployTask implements Runnable{
         // 4. 等待远程节点全部执行完成。
         try{
             taskCount.await();
-            status= mCmd==CMD_DEPLOY ? DEPLOY_DONE : UNDEPLOY_DONE;
-            log.error("DeployTask finished status="+status);
+            // 5. 设置部署状态DEPLOY_DONE or DEPLOY_ERROR
+            saveStatus(mCmd,MSG_SUCCESS);
+            writeTaskLog(TAG+"All Finished!", null);
         } catch (InterruptedException e) {
-            status= mCmd==CMD_DEPLOY ? DEPLOY_ERROR : UNDEPLOY_ERROR;
-            log.error("DeployTask"+ "taskCount await interrupted.", e);
+            writeTaskLog(TAG+"Interrupted Failure, "+e.toString()+", "+e.getMessage(), null);
+            saveStatus(mCmd,MSG_FAILURE);
+            return;
         }
 
-       // 5. 设置部署状态DEPLOY_DONE or DEPLOY_ERROR
-       saveStatus(status);
     }
 
     /**
      * 该任务是具体执行远程单台机器的部署任务
      */
     private class RemoteDeployTask implements Runnable {
-        private String TASK_NAME = "RemoteDeployTask";
+        private String LOG = "RemoteDeployTask";
         private ScheduleContext remoteContext;
         private StrategyPO strategy;
         private CountDownLatch taskCount;
@@ -146,16 +162,16 @@ public class DeployTask implements Runnable{
         public void run() {
             try {
                 DevicePO device = remoteContext.getDevice();
-                TASK_NAME += "["+ device.toSimpleString()+"]==> ";
-                log.info(TASK_NAME + "deploy start...");
-                String logFilename = remoteContext.getLogFile(strategy.getName());
-
+                LOG += "["+ device.toSimpleString()+"]==> ";
+                writeTaskLog(LOG +"start init environment... ",null);
                 // 1. 初始化远程节点的环境
-                log.info(TASK_NAME +" start init.sh; ");
                 boolean isInit = remoteContext.initRemoteDevice();
-                log.info(TASK_NAME +" ent init is "+isInit);
                 if (!isInit){
-                    saveStatus(DEPLOY_ERROR);
+                    writeTaskLog(LOG +"init error!",null);
+                    saveStatus(CMD_DEPLOY,MSG_FAILURE);
+                    return;
+                }else {
+                    writeTaskLog(LOG +"init finished!",null);
                 }
 
                 // 2. 创建一个策略实现类，类型为java微服务,
@@ -163,45 +179,44 @@ public class DeployTask implements Runnable{
                 StrategyInterface strategyImpl = StrategyFactory.createStrategyImpl(StrategyFactory.STRATEGY_TYPE_JAVA_MS, remoteContext, strategy);
                 List<AppModulePO> moduleObjList = strategyImpl.list_modules();
                 strategyImpl.setListModules(moduleObjList);
-
+                writeTaskLog(LOG +"start deploy... ",null);
                 // 3. 执行deploy命令
                 boolean result = strategyImpl.deploy();
-
                 // 4. 执行完成后，添加和更新服务到设备对应的表中
                 if (result) {
+                    writeTaskLog(LOG +"deploy success!",null);
                     int moduleTotal = moduleObjList.size();
-                    log.info(TASK_NAME + "saveOrUpdate deviceModule size: " + moduleTotal);
-
+                    writeTaskLog(LOG + "Batch update deviceRefModules, size is " + moduleObjList.size(),null);
                     List<DeviceModuleRefPO> devModList = new ArrayList<>();
-                    for (int i = 0; i < moduleTotal; i++) {
-                        AppModulePO module = moduleObjList.get(i);
+                    for (AppModulePO appModulePO: moduleObjList) {
                         DeviceModuleRefPO refObj = new DeviceModuleRefPO();
                         refObj.setDeviceId(device.getId());
-                        refObj.setModuleId(module.getId());
+                        refObj.setModuleId(appModulePO.getId());
                         devModList.add(refObj);
-                        log.info(TASK_NAME + "update deviceModuleRefPO " + i + ": " + refObj.toString());
                     }
                     if(devModList.size() >0 ) {
                         mDeviceModuleService.updateBatch(devModList);
                     }
-
-                    saveStatus(DEPLOY_DONE);
+                    writeTaskLog(LOG +"Batch update finished!",null);
+                    saveStatus(CMD_DEPLOY,MSG_SUCCESS);
+                }else {
+                    writeTaskLog(LOG +"deploy failure!",null);
                 }
-                log.info(TASK_NAME + "[" + device.toSimpleString() + "] deploy end. result=" + result);
             } catch (Exception e) {
-                saveStatus(DEPLOY_ERROR);
-                log.info(TASK_NAME + "deploy exception. ", e);
+                writeTaskLog(LOG +"deploy error!"+e.getMessage(),null);
+                saveStatus(CMD_DEPLOY,MSG_FAILURE);
             } finally {
                 taskCount.countDown();
             }
         }
-    };
+    }
+
 
     /**
      * 该任务是具体执行远程单台机器的部署任务
      */
     private class RemoteUndeployTask implements Runnable {
-        private final static String TAG = "RemoteUndeployTask ";
+        private String LOG = "RemoteUndeployTask";
         private ScheduleContext remoteContext;
         private StrategyPO strategy;
         private CountDownLatch taskCount;
@@ -216,8 +231,8 @@ public class DeployTask implements Runnable{
         public void run() {
             try {
                 DevicePO device = remoteContext.getDevice();
-                log.info(TAG+ " [" + device.getName() + "," + device.getIpAddress() + "] undeploy start.");
-
+                LOG+=" [" + device.getName() + "," + device.getIpAddress() + "]==> ";
+                writeTaskLog(LOG +"start unDeploy... ",null);
                 // 1. 创建一个策略实现类，类型为java微服务
                 StrategyInterface strategyImpl = StrategyFactory.createStrategyImpl(StrategyFactory.STRATEGY_TYPE_JAVA_MS, remoteContext, strategy);
 
@@ -230,32 +245,95 @@ public class DeployTask implements Runnable{
 
                 // 4. 执行完成后，删除服务和设备对应关系
                 if (result) {
+                    writeTaskLog(LOG +"unDeploy success. ",null);
                     int moduleTotal = moduleObjList.size();
                     List<DeviceModuleRefPO> devModList = new ArrayList<>();
-                    log.info(TAG+ " remove deviceModule size: " + moduleTotal);
-
+                    String appMsg = LOG + "Remove relative appModule size is " + moduleObjList.size()+",list=";
                     for (int i = 0; i < moduleTotal; i++) {
                         AppModulePO module = moduleObjList.get(i);
                         DeviceModuleRefPO refObj = new DeviceModuleRefPO();
                         refObj.setDeviceId(device.getId());
                         refObj.setModuleId(module.getId());
                         devModList.add(refObj);
-
-                       log.info(TAG+ " delete deviceModuleRefPO " + i + ": " + refObj.toString());
+                        appMsg+="["+ module.toFilePathString() +"];";
                     }
+                    writeTaskLog(appMsg,null);
                     if(devModList.size()> 0) {
                         mDeviceModuleService.removeBatch(devModList);
                     }
-                    saveStatus(UNDEPLOY_DONE);
+                    writeTaskLog(LOG +"unDeploy finished success!",null);
+                    saveStatus(CMD_UNDEPLOY,MSG_SUCCESS);
+                }else {
+                    writeTaskLog(LOG +"unDeploy failure!",null);
                 }
-                log.info(TAG+ " [" + device.getName() + "," + device.getIpAddress() + "] undeploy end. result=" + result);
+                log.info(LOG + " [" + device.getName() + "," + device.getIpAddress() + "] undeploy end. result=" + result);
             } catch (Exception e) {
-                saveStatus(UNDEPLOY_ERROR);
-                log.info(TAG+ " undeploy exception. ", e);
+                writeTaskLog(LOG +"unDeploy error!"+e.toString()+","+e.getMessage(),null);
+                saveStatus(CMD_UNDEPLOY,MSG_FAILURE);
             } finally {
                 taskCount.countDown();
             }
         }
-    };
+    }
+
+    /**
+     * 更新任务状态
+     * @param mCmd
+     * @param msgType
+     */
+    private void saveStatus(int mCmd,String msgType) {
+        if (MSG_UNDERWAY.equals(msgType)){
+            if (mCmd==CMD_DEPLOY){
+                mTaskPO.setStatus(DeployEnum.TaskStatus.DEPLOY_UNDERWAY.getValue());
+            }else if (mCmd==CMD_UNDEPLOY){
+                mTaskPO.setStatus(DeployEnum.TaskStatus.UNINSTALL_UNDERWAY.getValue());
+            }
+        } else if (MSG_SUCCESS.equals(msgType)) {
+            if (mCmd==CMD_DEPLOY){
+                mTaskPO.setStatus(DeployEnum.TaskStatus.DEPLOY_SUCCESS.getValue());
+            }else if (mCmd==CMD_UNDEPLOY){
+                mTaskPO.setStatus(DeployEnum.TaskStatus.UNINSTALL_SUCCESS.getValue());
+            }
+        } else if (MSG_FAILURE.equals(msgType)) {
+            if (mCmd==CMD_DEPLOY){
+                mTaskPO.setStatus(DeployEnum.TaskStatus.DEPLOY_FAILURE.getValue());
+            }else if (mCmd==CMD_UNDEPLOY){
+                mTaskPO.setStatus(DeployEnum.TaskStatus.UNINSTALL_FAILURE.getValue());
+            }
+        }
+        mTaskService.updateById(mTaskPO);
+    }
+
+    /**
+     * 异步写入日志消息
+     * @param line 日志消息
+     * @param operate WRITE-覆盖；APPEND-后面增加一行
+     */
+    private void writeTaskLog(String line, String operate) {
+        log.info(line);
+        String logFile = this.logDir+mTaskPO.getId()+ LOG_SUFFIX;
+
+        if (StrUtil.isEmpty(operate)){
+            //默认在日志文件后面累加
+            operate = FileWriterTask.APPEND;
+        }else if (FileWriterTask.WRITE.equals(operate)){
+            //如果是覆盖，更新任务日志文件路径
+            mTaskPO.setLogPath(logFile);
+        }
+        List<String> lines=new ArrayList<>(1);
+        lines.add(df.format(new Date())+" "+line);
+//        异步写入日志消息
+        FileWriterTask logTask = new FileWriterTask(logFile,lines, operate);
+        mTaskExecutor.submit(logTask);
+    }
+
+    public static void main(String[] args){
+        String logDir = "X:\\test\\13\\log.txt";
+        List<String> lines=new ArrayList<>(1);
+        lines.add(logDir);
+        FileWriterTask task = new FileWriterTask(logDir,lines,FileWriterTask.APPEND);
+        task.run();
+    }
+
 }
 

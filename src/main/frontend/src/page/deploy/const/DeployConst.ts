@@ -7,7 +7,7 @@ export const DialogTitleConst={
     DEVICE_ADD:"新增设备",
     APP_UPLOAD: "上传应用模块",
     TASK_ADD: "添加任务",
-    TASK_LOG: "查看任务日志"
+    TASK_DETAIL: "查看任务日志"
 }
 export const BaseTypeConst={
     primary:"primary",

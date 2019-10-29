@@ -2,6 +2,7 @@ package com.win.dfas.deploy.po;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @包名 com.win.dfas.deploy.po
@@ -10,8 +11,9 @@ import lombok.Data;
  * @创建人 heshansen
  * @创建时间 2019/09/26 13:18
  */
-@Data
 @TableName("dc_group")
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class GroupPO extends BasePO {
 
     private static final long serialVersionUID = -3030340942837664507L;

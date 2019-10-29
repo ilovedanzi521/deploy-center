@@ -1,7 +1,7 @@
 package com.win.dfas.deploy.schedule;
 
 import cn.hutool.core.util.StrUtil;
-import com.win.dfas.common.util.SpringContextUtil;
+import com.win.dfas.deploy.common.enumerate.DeployEnum;
 import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.po.TaskPO;
 import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
@@ -11,12 +11,11 @@ import com.win.dfas.deploy.service.DeviceService;
 import com.win.dfas.deploy.service.TaskService;
 import com.win.dfas.deploy.util.SpringContextUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -162,17 +161,8 @@ public class Scheduler {
         TaskPO taskObj = mTaskService.getById(taskId);
         log.info(TAG, "deploy taskId="+taskId+" status="+taskObj.getStatus());
 
-        switch (taskObj.getStatus()) {
-            case DeployTask.DEPLOY_DOING:
-            case DeployTask.UNDEPLOY_DOING:
-                log.info(TAG, "deploy already starting...");
-                return;
-            default:
-                break;
-        }
-
         // 2. 更新任务状态为deploy_doing
-        taskObj.setStatus(DeployTask.DEPLOY_DOING);
+        taskObj.setStatus(DeployEnum.TaskStatus.DEPLOY_UNDERWAY.getValue());
         mTaskService.updateById(taskObj);
 
         // 3. 创建新的异步任务
@@ -185,17 +175,8 @@ public class Scheduler {
         TaskPO taskObj = mTaskService.getById(taskId);
         log.info(TAG, "undeploy taskId="+taskId+" status="+taskObj.getStatus());
 
-        switch (taskObj.getStatus()) {
-            case DeployTask.DEPLOY_DOING:
-            case DeployTask.UNDEPLOY_DOING:
-                log.info(TAG, "undeploy already starting...");
-                return;
-            default:
-                break;
-        }
-
         // 2. 更新任务状态为deploy_doing
-        taskObj.setStatus(DeployTask.UNDEPLOY_DOING);
+        taskObj.setStatus(DeployEnum.TaskStatus.UNINSTALL_UNDERWAY.getValue());
         mTaskService.updateById(taskObj);
 
         // 3. 创建新的异步任务

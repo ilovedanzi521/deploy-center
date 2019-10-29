@@ -6,6 +6,7 @@ import DeployIndex from "@/page/deploy/view/index.vue";
 import DeployGroup from "@/page/deploy/view/group.vue";
 import DeployAppModule from "@/page/deploy/view/appModule.vue";
 import DeployTask from "@/page/deploy/view/task.vue";
+import StrategyManagement from "@/page/deploy/view/strategyManagement.vue";
 
 const routers = [
     {
@@ -52,6 +53,11 @@ const routerChildren = [
         path: "/deploy/task",
         name: "deployTask",
         component: DeployTask,
+    },
+    {
+        path: "/deploy/strategy",
+        name: "strategyManagement",
+        component: StrategyManagement,
     },
 ];
 

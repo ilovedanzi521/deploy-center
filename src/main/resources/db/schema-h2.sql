@@ -70,12 +70,13 @@ CREATE TABLE IF NOT EXISTS dc_task(
 	id BIGINT(20) NOT NULL auto_increment COMMENT '主键ID',
 	strategy_id BIGINT(20) NOT NULL COMMENT '策略ID',
 	group_id BIGINT(20) NOT NULL COMMENT '组ID',
-	status int(2) NOT NULL COMMENT '状态：0-未部署;1-已部署;2-部署失败;3-进行中',
+	status int(2) NOT NULL COMMENT '状态：0-未部署;1-部署中;2-部署成功；3-部署失败;4-卸载中；5-卸载成功；6-卸载失败；',
+	log_path VARCHAR(500) NULL COMMENT '日志文件路径',
 	create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
 	update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
 	PRIMARY KEY (id),
 	UNIQUE KEY (strategy_id,group_id)
-) COMMENT='策略信息表';
+) COMMENT='任务信息表';
 
 --用户信息表
 CREATE TABLE IF NOT EXISTS sys_user(

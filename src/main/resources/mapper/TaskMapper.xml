@@ -9,6 +9,7 @@
         <result property="strategyId" column="strategy_id"/>
         <result property="groupId" column="group_id"/>
         <result property="status" column="status"/>
+        <result property="logPath" column="log_path"/>
         <result property="createTime" column="create_time"/>
         <result property="strategyId" column="strategy_id"/>
         <association property="strategy" javaType="com.win.dfas.deploy.po.StrategyPO">
@@ -25,7 +26,7 @@
 
     <!--分页列表查询-->
     <select id="getPageList" resultMap="taskDtoResult">
-      SELECT t.id,t.strategy_id,t.group_id,t.status,t.create_time,
+      SELECT t.id,t.strategy_id,t.group_id,t.status,t.log_path,t.create_time,
       s.id as s_id,s.name as s_name,s.path as s_path,s.allow_delete,
       g.id as g_id,g.name as g_name,g.desc as g_desc
       FROM dc_task as t
