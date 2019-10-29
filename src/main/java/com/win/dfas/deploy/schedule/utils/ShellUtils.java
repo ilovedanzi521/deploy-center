@@ -2,11 +2,20 @@ package com.win.dfas.deploy.schedule.utils;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.RuntimeUtil;
+import cn.hutool.core.util.StrUtil;
+import com.win.dfas.deploy.common.exception.BaseException;
+import com.win.dfas.deploy.po.AppModulePO;
+import com.win.dfas.deploy.po.StrategyPO;
+import com.win.dfas.deploy.schedule.AppManager;
+import com.win.dfas.deploy.schedule.Scheduler;
+import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
+import com.win.dfas.deploy.util.SpringContextUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -87,5 +96,17 @@ public class ShellUtils {
         log.info(" <==: "+ Arrays.toString(resultList.toArray()));
 
         return isSuccess(resultList);
+    }
+
+    public static List<String> getAppModules(String strategyShell) {
+        if (FileUtil.file(strategyShell).exists()){
+            String caller ="list_modules";
+            String[] params = { strategyShell, caller };
+            List<String> resultList = ShellUtils.envExecShell(params);
+            return resultList;
+        }else {
+            log.warn(strategyShell+"策略脚本文件不存在！");
+            return null;
+        }
     }
 }

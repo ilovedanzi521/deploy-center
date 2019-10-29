@@ -33,7 +33,7 @@
                     <template v-slot="{ row }">
                         <win-button size="mini" type="text" icon="el-icon-orange" @click="deploy(row)">部署</win-button>
                         <win-button size="mini" type="text" icon="el-icon-delete" @click="unDeploy(row)">卸载</win-button>
-                        <win-button size="mini" type="text" icon="el-icon-view" @click="viewLog(row)">查看日志</win-button>
+                        <win-button size="mini" type="text" icon="el-icon-view" @click="viewLog(row)">详情日志</win-button>
                     </template>
                 </win-table-column>
             </win-table>

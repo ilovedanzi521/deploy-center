@@ -6,6 +6,9 @@ import { DeployBaseUrl } from "../const/DeployConst";
 import { TaskReqVO } from "../vo/TaskVO";
 
 export default class DeployService {
+    taskInfo(id: number) {
+        return AxiosFun.get(DeployBaseUrl +"/task/detail/"+id, null);
+    }
     taskUnDeploy(id: number): Promise<WinResponseData> {
         return AxiosFun.get(DeployBaseUrl +"/task/undeploy?id="+id, null);
     }

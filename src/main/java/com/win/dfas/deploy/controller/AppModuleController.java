@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.win.dfas.common.vo.BaseReqVO;
 import com.win.dfas.common.vo.WinResponseData;
 import com.win.dfas.deploy.common.annotation.SysLog;
+import com.win.dfas.deploy.dto.AppModuleInstanceDTO;
 import com.win.dfas.deploy.po.AppModulePO;
-import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
 import com.win.dfas.deploy.service.AppModuleService;
 import com.win.dfas.deploy.service.ScheduleCenterService;
 import com.win.dfas.deploy.vo.response.AppModuleTreeVO;
@@ -49,6 +49,11 @@ public class AppModuleController extends BaseController<AppModulePO> {
         return WinResponseData.handleSuccess(pageVO);
     }
 
+    @GetMapping("/treeList")
+    public WinResponseData treeList(){
+        List<AppModuleInstanceDTO> treeList = this.appModuleService.treeList();
+        return WinResponseData.handleSuccess(treeList);
+    }
     @SysLog("上传应用模块")
     @PostMapping("/upload")
     public WinResponseData upload(@RequestParam("file") MultipartFile file){

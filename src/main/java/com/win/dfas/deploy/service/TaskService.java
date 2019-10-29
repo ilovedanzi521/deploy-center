@@ -7,6 +7,7 @@ import com.win.dfas.deploy.po.StrategyPO;
 import com.win.dfas.deploy.po.TaskPO;
 import com.win.dfas.deploy.vo.response.PageVO;
 import com.win.dfas.deploy.dto.TaskDTO;
+import com.win.dfas.deploy.vo.response.TaskDetailVO;
 
 import java.util.List;
 
@@ -70,4 +71,7 @@ public interface TaskService extends IService<TaskPO> {
      * @return
      */
     List<DevicePO> getDevicesByTask(TaskPO taskPO);
+
+    TaskDetailVO getDetailById(Long id);
+
 }

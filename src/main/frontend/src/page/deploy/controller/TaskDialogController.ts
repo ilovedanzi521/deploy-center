@@ -1,7 +1,7 @@
 import { Component, Prop, Emit } from "vue-property-decorator";
 import BaseController from "../../common/controller/BaseController";
 import { WinRspType, OperationTypeEnum, WinResponseData } from "win-biz";
-import { TaskReqVO, TaskTableVO } from "../vo/TaskVO";
+import { TaskReqVO, TaskTableVO, TaskDetailVO } from "../vo/TaskVO";
 import { StrategyRepVO } from "../vo/StrategyVO";
 import { GroupDetailVO } from "../vo/GroupVO";
 import DeployService from "../service/DeployService";
@@ -27,10 +27,13 @@ export default class TaskDialogController extends BaseController{
     private dialogTitle: string= "";
     // 是否隐藏弹框
     private dialogVisibleSon: boolean = false;
+    private allDisabled:boolean = false;
     // 提交按钮加载
     private submitLoading: boolean = false;
     //任务新增修改VO
     private taskReqVO: TaskReqVO = new TaskReqVO();
+    private taskDetailVO: TaskDetailVO= new TaskDetailVO();
+    private logInfo: string = "";
 
     private deployService: DeployService = new DeployService();
     private strategyData: StrategyRepVO[] = [];
@@ -64,14 +67,34 @@ export default class TaskDialogController extends BaseController{
         console.log("进入弹框");
         console.log(this.toChildMsg);
         this.dialogTitle = this.toChildMsg.dialogTitle;
+        this.dialogVisibleSon = true;
         if(this.toChildMsg.type === OperationTypeEnum.ADD){
-            this.dialogVisibleSon = true;
-        }
-        if(this.dialogVisibleSon){
+            this.allDisabled = false;
             this.initStrategyData();
             this.initGroupData();
+        }else if(this.toChildMsg.type === OperationTypeEnum.VIEW){
+            this.allDisabled = true;
+            this.getInfo(this.toChildMsg.data.id);
+        }
+        if(this.dialogVisibleSon){
         }
     }
+    getInfo(id:number) {
+        console.log("***********getLogInfo");
+        let me=this;
+        if(id){
+            this.deployService.taskInfo(id)
+            .then((winResponseData: WinResponseData) =>{
+                console.log(winResponseData.data);
+                if (WinRspType.SUCC === winResponseData.winRspType) {
+                    this.taskDetailVO = winResponseData.data;
+                } else {
+                    this.win_message_error(winResponseData.msg);
+                }
+            });
+        }
+    }
+    // 初始化组下拉框数据
     initGroupData() {
         console.log("初始化可选策略");
         let me = this;
@@ -88,6 +111,7 @@ export default class TaskDialogController extends BaseController{
             });
 
     }
+    // 初始化策略下拉框数据
     initStrategyData() {
         console.log("初始化可选设备组");
         let me = this;

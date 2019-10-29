@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.win.dfas.common.vo.BaseReqVO;
 import com.win.dfas.deploy.common.exception.BaseException;
 import com.win.dfas.deploy.dao.AppModuleDao;
+import com.win.dfas.deploy.dto.AppModuleInstanceDTO;
 import com.win.dfas.deploy.po.AppModulePO;
 import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
 import com.win.dfas.deploy.service.AppModuleService;
@@ -95,6 +96,12 @@ public class AppModuleServiceImpl extends ServiceImpl<AppModuleDao, AppModulePO>
             FileUtil.del(zipTempFile);
             throw new BaseException("压缩包初始化异常");
         }
+    }
+
+    @Override
+    public List<AppModuleInstanceDTO> treeList() {
+
+        return null;
     }
 
     /**

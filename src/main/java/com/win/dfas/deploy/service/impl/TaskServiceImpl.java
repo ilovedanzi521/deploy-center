@@ -1,5 +1,8 @@
 package com.win.dfas.deploy.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -8,19 +11,30 @@ import com.win.dfas.common.vo.BaseReqVO;
 import com.win.dfas.deploy.common.enumerate.DeployEnum;
 import com.win.dfas.deploy.common.exception.BaseException;
 import com.win.dfas.deploy.dao.TaskDao;
+import com.win.dfas.deploy.po.AppModulePO;
 import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.po.StrategyPO;
 import com.win.dfas.deploy.po.TaskPO;
+import com.win.dfas.deploy.schedule.AppManager;
+import com.win.dfas.deploy.schedule.Scheduler;
+import com.win.dfas.deploy.schedule.context.ScheduleContext;
+import com.win.dfas.deploy.schedule.context.StrategyFactory;
+import com.win.dfas.deploy.schedule.context.StrategyInterface;
+import com.win.dfas.deploy.schedule.utils.ShellUtils;
 import com.win.dfas.deploy.service.GroupService;
 import com.win.dfas.deploy.service.ScheduleCenterService;
 import com.win.dfas.deploy.service.StrategyService;
 import com.win.dfas.deploy.service.TaskService;
 import com.win.dfas.deploy.vo.response.PageVO;
 import com.win.dfas.deploy.dto.TaskDTO;
+import com.win.dfas.deploy.vo.response.TaskDetailVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -30,6 +44,7 @@ import java.util.List;
  * @创建人 heshansen
  * @创建时间 2019/09/26 14:44
  */
+@Slf4j
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskPO> implements TaskService {
@@ -126,5 +141,32 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskPO> implements Tas
     @Override
     public List<DevicePO> getDevicesByTask(TaskPO taskPO) {
         return this.groupService.getDevicesByGroupId(taskPO.getGroupId());
+    }
+
+    @Override
+    public TaskDetailVO getDetailById(Long id) {
+        TaskDetailVO detailVO = new TaskDetailVO();
+        //1.查任务详情
+        QueryWrapper<TaskPO> queryWrapper = new QueryWrapper<TaskPO>();
+        queryWrapper.eq("t.id",id);
+        IPage<TaskDTO> pageList = this.baseMapper.getPageList(new Page<>(),queryWrapper);
+        if (CollectionUtil.isNotEmpty(pageList.getRecords()) && pageList.getRecords().size()==1){
+            TaskDTO taskDTO = pageList.getRecords().get(0);
+            detailVO.setId(taskDTO.getId());
+            detailVO.setStatus(taskDTO.getStatus());
+            detailVO.setLogPath(taskDTO.getLogPath());
+            detailVO.setStrategyName(taskDTO.getStrategy().getName());
+            detailVO.setGroupName(taskDTO.getGroup().getName());
+
+            // 2. 查策略绑定应用模块列表
+            detailVO.setAppModules(strategyService.getAppModules(taskDTO.getStrategy()));
+            //3.查组设备列表
+            detailVO.setDevices(groupService.getDevicesByGroupId(taskDTO.getGroupId()));
+            //4.查日志详情
+            if (StrUtil.isNotBlank(detailVO.getLogPath())){
+                detailVO.setLogInfo(FileUtil.readUtf8Lines(detailVO.getLogPath()));
+            }
+        }
+        return detailVO;
     }
 }

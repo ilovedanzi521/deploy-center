@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.win.dfas.common.vo.BaseReqVO;
 import com.win.dfas.common.vo.WinResponseData;
 import com.win.dfas.deploy.po.TaskPO;
-import com.win.dfas.deploy.service.ScheduleCenterService;
 import com.win.dfas.deploy.service.TaskService;
 import com.win.dfas.deploy.vo.response.PageVO;
 import com.win.dfas.deploy.dto.TaskDTO;
@@ -13,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.List;
 
 /**
@@ -63,9 +64,20 @@ public class TaskController extends BaseController<TaskPO> {
         return WinResponseData.handleSuccess("扫描结束");
     }
 
+    @GetMapping("/detail/{id}")
+    public WinResponseData getDetailById(@PathVariable Long id){
+
+        return WinResponseData.handleSuccess(taskService.getDetailById(id));
+    }
     @GetMapping("/logInfo")
     public WinResponseData logInfo(String filePath){
         log.info("filePath="+filePath);
+        try {
+            filePath = URLDecoder.decode(filePath,"UTF-8");
+            log.info("new filePath="+filePath);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         List<String> lines = FileUtil.readUtf8Lines(filePath);
         return WinResponseData.handleSuccess(lines);
     }
