@@ -17,6 +17,7 @@ import com.win.dfas.deploy.po.StrategyPO;
 import com.win.dfas.deploy.po.TaskPO;
 import com.win.dfas.deploy.schedule.AppManager;
 import com.win.dfas.deploy.schedule.Scheduler;
+import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
 import com.win.dfas.deploy.schedule.context.ScheduleContext;
 import com.win.dfas.deploy.schedule.context.StrategyFactory;
 import com.win.dfas.deploy.schedule.context.StrategyInterface;
@@ -35,6 +36,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -168,5 +172,22 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskPO> implements Tas
             }
         }
         return detailVO;
+    }
+
+    @Override
+    public List<String> getDeployLogInfo(String ipAddress, String strategyName) {
+        ScheduleContext context = Scheduler.get().getRemoteContext(ipAddress);
+        List<String> lines = new ArrayList<>();
+        if (context==null){
+            lines.add("调度中心不存在设备："+ipAddress);
+            return lines;
+        }
+        String filePath = context.getLogFile(strategyName);
+        log.info("readUtf8Lines from"+filePath);
+        if (!FileUtil.file(filePath).exists()){
+            lines.add(filePath+"日志文件不存在！");
+            return lines;
+        }
+        return FileUtil.readUtf8Lines(filePath);
     }
 }

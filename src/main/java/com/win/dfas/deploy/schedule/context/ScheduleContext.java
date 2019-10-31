@@ -297,7 +297,7 @@ public class ScheduleContext {
      * @return
      */
     public String getLogDir() {
-        String logDir = mEnvConfig.getLogsDir()+File.separator+mHost.getName();
+        String logDir = mEnvConfig.getLogsDir()+File.separator+mHost.getIpAddress();
         return logDir;
     }
 

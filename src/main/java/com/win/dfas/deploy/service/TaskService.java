@@ -72,6 +72,18 @@ public interface TaskService extends IService<TaskPO> {
      */
     List<DevicePO> getDevicesByTask(TaskPO taskPO);
 
+    /**
+     * 获取任务详情
+     * @param id
+     * @return
+     */
     TaskDetailVO getDetailById(Long id);
 
+    /**
+     * 获取部署日志详情
+     * @param ipAddress ip地址
+     * @param strategyName 部署策略名
+     * @return
+     */
+    List<String> getDeployLogInfo(String ipAddress, String strategyName);
 }

@@ -4,7 +4,10 @@ import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.win.dfas.common.vo.BaseReqVO;
 import com.win.dfas.common.vo.WinResponseData;
+import com.win.dfas.deploy.common.exception.BaseException;
 import com.win.dfas.deploy.po.TaskPO;
+import com.win.dfas.deploy.schedule.Scheduler;
+import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
 import com.win.dfas.deploy.service.TaskService;
 import com.win.dfas.deploy.vo.response.PageVO;
 import com.win.dfas.deploy.dto.TaskDTO;
@@ -12,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.List;
@@ -81,5 +85,20 @@ public class TaskController extends BaseController<TaskPO> {
         List<String> lines = FileUtil.readUtf8Lines(filePath);
         return WinResponseData.handleSuccess(lines);
     }
+
+    @GetMapping("/log/device")
+    public WinResponseData deviceLog(String ipAddress,String strategyName){
+        log.info("ipAddress="+ipAddress+",strategyName"+strategyName);
+        try {
+            strategyName = URLDecoder.decode(strategyName,"UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            log.error("参数解析异常：strategyName="+strategyName,e);
+            throw new BaseException("参数解析异常：strategyName="+strategyName);
+        }
+        List<String> lines = this.taskService.getDeployLogInfo(ipAddress,strategyName);
+
+        return WinResponseData.handleSuccess(lines);
+    }
+
 }
 

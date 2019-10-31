@@ -2,6 +2,7 @@ package com.win.dfas.deploy.common.handler;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
 import com.win.dfas.common.vo.WinResponseData;
+import com.win.dfas.deploy.common.exception.BaseException;
 import com.win.dfas.deploy.common.exception.UserInvalidException;
 import com.win.dfas.deploy.common.exception.ValidateException;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,11 @@ public class GlobalExceptionHandler {
 
     //************************自定义业务异常**************************
 
+    @ExceptionHandler(BaseException.class)
+    public WinResponseData baseExceptionHandle(BaseException e){
+        log.error("后台异常："+e.getMessage(),e);
+        return WinResponseData.handleError("后台异常："+e.getMessage());
+    }
     /**
      * 用户验证异常
      * @param request

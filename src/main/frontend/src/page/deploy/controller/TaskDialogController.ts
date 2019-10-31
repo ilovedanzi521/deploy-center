@@ -41,6 +41,11 @@ export default class TaskDialogController extends BaseController{
     private groupData: GroupDetailVO[]=[];
     private selectedGroup: number[]=[];
 
+    // 机器日志弹框
+    private remoteDialogTitle:string="日志详情";
+    private remoteDialogVisibleSon: boolean= false;
+    private deviceLogInfo: string[]=[];
+
     /*定义校验函数*/
     public $refs: {
         validate: HTMLFormElement;
@@ -155,5 +160,26 @@ export default class TaskDialogController extends BaseController{
                 return false;
             }
         });
+    }
+
+    viewLog(ipAddress:string){
+        if(ipAddress && this.taskDetailVO.strategyName){
+            this.remoteDialogTitle +="["+ipAddress+"]";
+            this.remoteDialogVisibleSon = true;
+            // this.deviceLogInfo=['asdfasfsa','asdfasf ','sfasfa'];
+            let params={
+                "ipAddress":ipAddress,
+                "strategyName":this.taskDetailVO.strategyName
+            }
+            this.deployService.viewDeviceLog(params)
+            .then((winResponseData: WinResponseData) =>{
+                console.log(winResponseData.data);
+                if (WinRspType.SUCC === winResponseData.winRspType) {
+                    this.deviceLogInfo=winResponseData.data;
+                } else {
+                    this.win_message_error(winResponseData.msg);
+                }
+            });
+        }
     }
 }

@@ -6,6 +6,9 @@ import { DeployBaseUrl } from "../const/DeployConst";
 import { TaskReqVO } from "../vo/TaskVO";
 
 export default class DeployService {
+    viewDeviceLog(params) {
+        return AxiosFun.get(DeployBaseUrl +"/task/log/device", params);
+    }
     appModuleInstantList(id: any) {
         return AxiosFun.get(DeployBaseUrl +"/app/module/instanceList/"+id, null);
     }

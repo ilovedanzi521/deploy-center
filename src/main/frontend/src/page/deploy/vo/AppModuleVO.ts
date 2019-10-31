@@ -21,7 +21,7 @@ export class AppModuleTreeVO extends BaseRepVO{
     help: string;
     allowDelete: number;
     hasChildren: boolean;
-    devices: DeviceRepVO[]=[];
+    devices: any[]=[];
 }
 export class AppModuleVO extends BaseRepVO{
     name: string;

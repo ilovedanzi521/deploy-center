@@ -198,16 +198,18 @@ export default class AppModuleController extends BaseController {
         let expandClass:string = event.target.className;
         if(expandClass.indexOf("expand--active")<0){
             console.log("展开行："+rowIndex);
-            // if(row.id==1){
-            //     row.devices=[{"id":"1","createTime":"2019-10-30T13:20:15.934+0000","updateTime":"2019-10-30T13:20:15.934+0000","name":"dev73","alias":"dev73","ipAddress":"192.168.0.73","userName":"root","port":22,"osType":"Centos7","status":1,"desc":null}];
-            // }else{
-            //     row.devices=[{"id":"1","createTime":"2019-10-30T13:20:15.934+0000","updateTime":"2019-10-30T13:20:15.934+0000","name":"test1111","alias":"test1111","ipAddress":"0.0.0.0","userName":"root","port":22,"osType":"Centos7","status":0,"desc":null}];
-            // }
             this.deployService.appModuleInstantList(row.id)
             .then((winResponseData: WinResponseData) =>{
                 if (WinRspType.SUCC === winResponseData.winRspType) {
                     console.log(winResponseData.data);
-                    row.devices=winResponseData.data;
+                    this.pageDataList[rowIndex].devices=winResponseData.data;
+                    //  if(row.id==1){
+                    //     this.pageDataList[rowIndex].devices=[{"id":1,"createTime":"2019-10-30T13:20:15.934+0000","updateTime":"2019-10-30T13:20:15.934+0000","name":"dev73","alias":"dev73","ipAddress":"192.168.0.73","userName":"root","port":22,"osType":"Centos7","status":1,"desc":null}];
+                    // }else{
+                    //     this.pageDataList[rowIndex].devices=[{"id":"1","createTime":"2019-10-30T13:20:15.934+0000","updateTime":"2019-10-30T13:20:15.934+0000","name":"test1111","alias":"test1111","ipAddress":"0.0.0.0","userName":"root","port":22,"osType":"Centos7","status":0,"desc":null}];
+                    // }
+                    // 必须刷新表格数据，否则展开表格devices数据无法更新。
+                    this.$refs["xTable"].refreshData();
                 } else {
                     this.win_message_error(row.name+"机器服务查询异常："+winResponseData.msg);
                 }

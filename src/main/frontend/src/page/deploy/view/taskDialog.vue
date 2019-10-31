@@ -31,7 +31,7 @@
             <win-form v-if="toChildMsg.type==='VIEW'" class="taskDetailForm" :inline="true" :model="taskDetailVO"  ref="taskDetailForm" label-position="right" label-width="60px">
                 <div class="hr" v-if="toChildMsg.type==='VIEW'">
                     <win-col :span="8">
-                        <win-form-item label="任务ID:" style="width:100%">
+                        <win-form-item label="任务ID:">
                             <win-input v-model="taskDetailVO.id" readonly />
                         </win-form-item>
                     </win-col>
@@ -66,9 +66,11 @@
                                     <div slot="header" class="clearfix">
                                             <span>设备列表</span>
                                     </div>
-                                    <div v-for="item in taskDetailVO.devices" :key="item.id" class="text item">
-                                        {{item.ipAddress}}
-                                    </div>
+                                    <ul>
+                                        <li v-for="item in taskDetailVO.devices" :key="item.id" class="text item">
+                                            <win-button  @click="viewLog(item.ipAddress)">{{item.ipAddress}}</win-button>
+                                        </li>
+                                    </ul>
                                     </el-card>
                             </win-col>
                             <win-col :span="21">
@@ -84,14 +86,16 @@
                         </win-col>
                         
                         <win-col :span="16">
-                            <el-card class="box-card max-height">
-                                    <div slot="header" class="clearfix">
+                            <el-card class="box-card" >
+                                <div slot="header" class="clearfix">
                                         <span>日志详情({{taskDetailVO.logPath}})</span>
-                                    </div>
+                                </div>
+                                <!-- 注意需要给 el-scrollbar 设置高度，判断是否滚动是看它的height判断的 -->
+                                <el-scrollbar style="height: 100%;"> <!-- 滚动条 -->
                                     <div v-for="item in taskDetailVO.logInfo" :key="item" class="logtext">
                                             {{item}}
-                                    </div>
-                                    <!-- <win-input v-model="taskDetailVO.logInfo" type="textarea" rows="13" readonly/> -->
+                                     </div>
+                                </el-scrollbar><!-- /滚动条 -->
                             </el-card>
                         </win-col>
                     </win-col>
@@ -101,6 +105,14 @@
                 <win-button @click="closeDialog">取消</win-button>
                 <win-button v-if="toChildMsg.type==='ADD'" type="primary" :loading="submitLoading" @click="submitDialog('taskForm')">确认</win-button>
             </div>
+            <win-fdialog append-to-body  width="45%"  :title="remoteDialogTitle" :visible.sync="remoteDialogVisibleSon" :close-on-click-modal="false" :close-on-press-escape="false">
+                 <!-- 注意需要给 el-scrollbar 设置高度，判断是否滚动是看它的height判断的 -->
+                <el-scrollbar style="height: 100%;"> <!-- 滚动条 -->
+                    <div v-for="item in deviceLogInfo" :key="item" class="logtext">
+                         {{item}}
+                    </div>
+                </el-scrollbar><!-- /滚动条 -->
+            </win-fdialog>
     </win-fdialog>
 
 </template> 
@@ -121,14 +133,10 @@
     margin-bottom: 18px;
     height: auto;
 }
-.box-card.max-height{
-    height: 380px;
-}
 .text {
     font-size: 14px;
 }
 .logtext {
     font-size: 8px;
-    overflow-y:auto;
 }
 </style>
