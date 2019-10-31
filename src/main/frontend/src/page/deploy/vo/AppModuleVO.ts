@@ -1,4 +1,5 @@
 import { BaseReqVO, BaseRepVO } from "../../common/vo/BaseVO";
+import { DeviceRepVO } from "./GroupVO";
 /**********************request VO***********************/
 //查询VO
 export class QueryReqVO extends BaseReqVO{
@@ -20,4 +21,15 @@ export class AppModuleTreeVO extends BaseRepVO{
     help: string;
     allowDelete: number;
     hasChildren: boolean;
+    devices: DeviceRepVO[]=[];
+}
+export class AppModuleVO extends BaseRepVO{
+    name: string;
+    path: string;
+    packDir: string;
+    packVer: string;
+    packFile: string;
+    desc: string;
+    help: string;
+    allowDelete: number;
 }

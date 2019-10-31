@@ -12,37 +12,48 @@
             </ul>
         </div>
         <div style="margin-top:9px;">
-            <el-table border resizable class="tree-table-class"  row-key="id"
-                        :row-class-name="tableRowClassName"
-                       :data="pageDataList" :loading="tableLoading"
-                       :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
-                       lazy :load="lazyLoad"
-                       >
-                <el-table-column type="selection" width="60" ></el-table-column>
-                <el-table-column prop="name" label="应用模块名(机器)" min-width="130"></el-table-column>
-                <el-table-column prop="ipAddress" label="机器地址" min-width="100"></el-table-column>
-                <el-table-column prop="path" label="脚本路径" min-width="100"></el-table-column>
-                <el-table-column prop="packDir" label="包目录" min-width="130"></el-table-column>
-                <el-table-column prop="packVer" label="包版本" min-width="80"></el-table-column>
-                <el-table-column prop="packFile" label="包文件名" min-width="80"></el-table-column>
-                <el-table-column prop="desc" label="描述信息" min-width="60"></el-table-column>
-                <el-table-column prop="createTime" label="创建时间" min-width="100" :formatter="formatGroupTable"></el-table-column>
-                <el-table-column prop="status" label="服务状态" min-width="80">
-                    <template v-slot="{ row }" >
-                        <el-tag v-if="row.ipAddress==null ? false : true" :type="deviceStatusType(row.status)" >{{formatDeviceStatus(row.status)}}</el-tag>
+            <vxe-table ref="xTable" border stripe show-overflow class="app-module-table"
+                     :show-selection="false" :show-index="false" 
+                     :loading="tableLoading" :expand-config="{expandRowKeys: ['1']}" 
+                     :data="pageDataList" @toggle-expand-change="toggleExpandChangeEvent">
+                <vxe-table-column type="selection" width="60"/>
+                <vxe-table-column type="expand" width="60">
+                    <template v-slot="{ row, rowIndex }">
+                        <vxe-table border class="device-table"
+                            :data="row.devices" >
+                            <vxe-table-column field="name" title="名称"></vxe-table-column>
+                            <vxe-table-column field="ipAddress" title="ip地址"></vxe-table-column>
+                            <vxe-table-column field="status" title="状态" :formatter="formatDeviceStatus"></vxe-table-column>
+                            <vxe-table-column title="操作" min-width="100">
+                                <template v-slot="{ row }">
+                                    <el-button  size="mini" type="text" icon="el-icon-switch-button" @click="startApp(row)">启动</el-button>
+                                    <el-button  size="mini" type="text" icon="el-icon-delete" @click="stopApp(row)">停止</el-button>
+                                </template>
+                            </vxe-table-column>
+                            <template v-slot:empty>
+                                <span style="color: red;">当前应用还未部署到任何机器，无法查看服务实例</span>
+                            </template>
+                        </vxe-table>
+                        <!-- <span style="color: red;">当前应用未部署，无法查看实例</span> -->
                     </template>
-                </el-table-column>
-                <el-table-column label="操作" min-width="100">
+                </vxe-table-column>
+                <vxe-table-column field="name" title="应用模块名(机器)" min-width="130"></vxe-table-column>
+                <vxe-table-column field="path" title="脚本路径" min-width="100"></vxe-table-column>
+                <vxe-table-column field="packDir" title="包目录" min-width="130"></vxe-table-column>
+                <vxe-table-column field="packVer" title="包版本" min-width="80"></vxe-table-column>
+                <vxe-table-column field="packFile" title="包文件名" min-width="80"></vxe-table-column>
+                <vxe-table-column field="desc" title="描述信息" min-width="60"></vxe-table-column>
+                <vxe-table-column field="createTime" title="创建时间" min-width="100" :formatter="formatGroupTable"></vxe-table-column>
+                <vxe-table-column field="status" title="状态" min-width="80" :formatter="formatGroupTable"></vxe-table-column>
+                <vxe-table-column title="操作" min-width="100">
                     <template v-slot="{ row }">
-                        <el-button v-if="row.ipAddress==null ? true : false" size="mini" type="text" icon="el-icon-delete" @click="delGroupOne(row)">删除</el-button>
-                        <el-button v-if="row.ipAddress==null ? false : true" size="mini" type="text" icon="el-icon-switch-button" @click="delGroupOne(row)">启动</el-button>
-                        <el-button v-if="row.ipAddress==null ? false : true" size="mini" type="text" icon="el-icon-delete" @click="delGroupOne(row)">停止</el-button>
+                        <el-button size="mini" type="text" icon="el-icon-delete" @click="delGroupOne(row)">删除</el-button>
                     </template>
-                </el-table-column>
+                </vxe-table-column>
                 <template v-slot:empty>
                     <span style="color: red;">没有更多数据了！</span>
                 </template>
-            </el-table>
+            </vxe-table>
             <!--分页组件-->
             <div class="page-contanier">
                 <win-pagination name="groupPage" v-bind:childMsg="pageVO" @callFather="groupPageQuery"></win-pagination>
@@ -72,6 +83,26 @@
             right: 10px;
         }
     }
+    // 应用模块表格样式
+    .app-module-table /deep/ {
+        // 表头高度统一样式
+        .vxe-header--column {
+            height: 32px;
+            padding: 2px 0;
+        }
+        .vxe-body--column{
+            height: 28px;
+            padding: 2px 0;
+        }
+        // 表格展开箭头样式
+        .vxe-table--expanded .vxe-table--expand-icon{
+            border-color: #fff
+        }
+    }
+    // 机器实例表格样式
+    .device-table /deep/ {
+        background-color: #565661;
+    }
     // el-table 树形表格样式
     .el-table.tree-table-class /deep/ {
         width: 100%;
@@ -88,10 +119,7 @@
                 display: none;
             }
         }
-        // 展开按钮样式
-        .el-table__expand-icon .el-icon-arrow-right{
-            color: #fff;
-        }
     }
+   
 </style>
 

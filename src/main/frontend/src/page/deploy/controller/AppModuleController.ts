@@ -13,6 +13,7 @@ import dateUtils from "../../common/util/DateUtils";
 import { DeviceStatus, DeployTypeEnum } from "../const/DeployEnum";
 import { QueryReqVO, AppModuleTreeVO, UploadVO } from "../vo/AppModuleVO";
 import UploadDialog from "../view/uploadDialog.vue";
+import { async } from "q";
 
 
 @Component({ components: {UploadDialog} })
@@ -29,6 +30,7 @@ export default class AppModuleController extends BaseController {
     private isUploadDialog: boolean = false;
     /*组表格加载中*/
     private tableLoading: boolean = false;
+    private deviceLoading :boolean=false;
     /*选中项*/
     private selected: any = [];
     /** 上传弹框信息*/
@@ -45,34 +47,6 @@ export default class AppModuleController extends BaseController {
         this.queryPageList(this.queryReqVO);
     }
     
-    public tableRowClassName(row, rowIndex){
-        if (row.ipAddress) {
-            return 'row-children';
-        }else{
-            return 'row-node';
-        }
-    }
-    public cellClassName({ row, rowIndex, column, columnIndex }){
-        if(row.ipAddress && columnIndex === 0){
-            return 'col-checkbox-none';
-        }
-    }
-    private lazyLoad(tree, treeNode, resolve) {
-        console.log("***********lazyLoad**********");
-        console.log(tree);
-        console.log(treeNode);
-        resolve([
-            {
-              id: 31,
-              name: '设备1',
-              ipAddress: '192.168.0.73'
-            }, {
-              id: 32,
-              name: '设备2',
-              ipAddress: '192.168.0.74'
-            }
-          ])
-      }
     /** 查询设备组树形列表*/
     public queryPageList(queryReqVO: QueryReqVO) {
         console.log("queryPageList");
@@ -146,11 +120,11 @@ export default class AppModuleController extends BaseController {
         }
 
     }
-    // 子组件回调函数
+    // 子组件回调函数:如果上传成功关闭弹框并刷新表格
     private bindUploadSend(msg: WinRspType) {
         this.isUploadDialog = false;
         if (msg === WinRspType.SUCC) {
-            
+            this.queryPageList(this.queryReqVO);
         }
     }
 
@@ -199,36 +173,56 @@ export default class AppModuleController extends BaseController {
     }
     // 状态格式化
     private formatDeviceStatus(status:number){
-        if(DeviceStatus.not == status){
-            return DeviceStatusConst.NOT;
-        }else if(DeviceStatus.failure == status){
-            return DeviceStatusConst.FAILURE;
-        }else if(DeviceStatus.normal == status){
-            return DeviceStatusConst.NORMAL;
+        if(0 == status){
+            return "未启动";
+        }else if(1 == status){
+            return "已经启动";
+        }else if(2 == status){
+            return "启动失败";
         }else{
             return status;
         }
     }
-    // 设备状态显示类型
-    private deviceStatusType(status:number){
-        if(DeviceStatus.not == status){
-            return BaseTypeConst.info;
-        }else if(DeviceStatus.failure == status){
-            return BaseTypeConst.warning;
-        }else if(DeviceStatus.normal == status){
-            return BaseTypeConst.success;
-        }else{
-            return BaseTypeConst.primary;
-        }
-    }
       // 表格字段格式化
-      private formatGroupTable(row, column, cellValue, index) {
-        console.log("formatGroupTable************8");
-        console.log(row);
-        console.log(cellValue);
+      private formatGroupTable({row, column, cellValue, index}) {
+        // console.log("formatGroupTable************8");
         if (column.property === "createTime"  && cellValue) {
             return dateUtils.dateFtt("yyyy-MM-dd hh:mm:ss", new Date(cellValue));
         }
+        if(column.property === "status"){
+            return "未部署";
+        }
+    }
+    // 行展开、收起事件
+    toggleExpandChangeEvent ({row,rowIndex},event) {
+        let expandClass:string = event.target.className;
+        if(expandClass.indexOf("expand--active")<0){
+            console.log("展开行："+rowIndex);
+            // if(row.id==1){
+            //     row.devices=[{"id":"1","createTime":"2019-10-30T13:20:15.934+0000","updateTime":"2019-10-30T13:20:15.934+0000","name":"dev73","alias":"dev73","ipAddress":"192.168.0.73","userName":"root","port":22,"osType":"Centos7","status":1,"desc":null}];
+            // }else{
+            //     row.devices=[{"id":"1","createTime":"2019-10-30T13:20:15.934+0000","updateTime":"2019-10-30T13:20:15.934+0000","name":"test1111","alias":"test1111","ipAddress":"0.0.0.0","userName":"root","port":22,"osType":"Centos7","status":0,"desc":null}];
+            // }
+            this.deployService.appModuleInstantList(row.id)
+            .then((winResponseData: WinResponseData) =>{
+                if (WinRspType.SUCC === winResponseData.winRspType) {
+                    console.log(winResponseData.data);
+                    row.devices=winResponseData.data;
+                } else {
+                    this.win_message_error(row.name+"机器服务查询异常："+winResponseData.msg);
+                }
+            })
+        }
+      }
+    // 启动应用服务
+    startApp(row:any){
+        console.log("startApp");
+        console.log(row);
+    }
+    // 停止应用
+    stopApp(row:any){
+        console.log("stopApp");
+        console.log(row);
     }
 }
 

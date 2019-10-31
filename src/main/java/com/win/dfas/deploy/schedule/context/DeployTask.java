@@ -26,7 +26,7 @@ import java.util.concurrent.CountDownLatch;
 @Slf4j
 public class DeployTask implements Runnable{
     private SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static String TAG = "DeployTask-";
+    private static final String TASK = "[TASK]-";
     private static String LOG_SUFFIX=".log";
     /**
      * 部署和卸载命令字 1-部署；2-卸载
@@ -75,32 +75,32 @@ public class DeployTask implements Runnable{
 
     @Override
     public void run() {
-        TAG+=(mCmd==CMD_DEPLOY ? "deploy":"unDeploy")+"==> ";
-        writeTaskLog(TAG+"Start id="+mTaskId +" deployStatus="+mTaskPO.getStatus(), FileWriterTask.WRITE);
+        String logHeader =TASK + (mCmd==CMD_DEPLOY ? "deploy":"unDeploy")+"==> ";
+        writeTaskLog(logHeader +"Start id="+mTaskId +" deployStatus="+mTaskPO.getStatus(), FileWriterTask.WRITE);
 
         // 1. 从taskId中查询出策略
         final StrategyPO strategy = mTaskService.getStrategyByTask(mTaskPO);
         if(strategy == null) {
-            writeTaskLog(TAG+"strategy is not exist!", null);
-            saveStatus(mCmd,MSG_FAILURE);
+            writeTaskLog(logHeader +"strategy is not exist!", null);
+            updateStatus(mCmd,MSG_FAILURE);
             return;
         }else {
-            writeTaskLog(TAG+"strategy is "+strategy.getName(), null);
+            writeTaskLog(logHeader +"strategy is "+strategy.getName(), null);
         }
         // 2. 从taskId中查询出设备列表
         List<DevicePO> devList = mTaskService.getDevicesByTask(mTaskPO);
         if(devList == null || devList.size() == 0) {
-            writeTaskLog(TAG+"not find any devices!", null);
-            saveStatus(mCmd,MSG_FAILURE);
+            writeTaskLog(logHeader +"not find any devices!", null);
+            updateStatus(mCmd,MSG_FAILURE);
             return;
         }else {
-            writeTaskLog(TAG+"Find total "+devList.size() +" devices todo.", null);
+            writeTaskLog(logHeader +"Find total "+devList.size() +" devices todo.", null);
         }
 
         // 获取device对应的ScheduleContext对象
         List<ScheduleContext> remoteContextList = new ArrayList<ScheduleContext>();
         int devTotal = devList.size();
-        String msg=TAG+"Began asyn remote devices: ";
+        String msg= logHeader +"Began asyn remote devices: ";
         for(int i=0; i<devTotal; i++) {
             DevicePO device = devList.get(i);
             ScheduleContext remoteContext = Scheduler.get().getRemoteContext(device);
@@ -108,8 +108,8 @@ public class DeployTask implements Runnable{
             msg+="["+device.toSimpleString()+"];";
         }
         if(remoteContextList.size() == 0) {
-            writeTaskLog(TAG+"no valid remote devices", null);
-            saveStatus(mCmd,MSG_FAILURE);
+            writeTaskLog(logHeader +"no valid remote devices", null);
+            updateStatus(mCmd,MSG_FAILURE);
             return;
         }else {
             writeTaskLog(msg, null);
@@ -133,11 +133,11 @@ public class DeployTask implements Runnable{
         try{
             taskCount.await();
             // 5. 设置部署状态DEPLOY_DONE or DEPLOY_ERROR
-            saveStatus(mCmd,MSG_SUCCESS);
-            writeTaskLog(TAG+"All Finished!", null);
+            updateStatus(mCmd,MSG_SUCCESS);
+            writeTaskLog(logHeader +"All Finished!", null);
         } catch (InterruptedException e) {
-            writeTaskLog(TAG+"Interrupted Failure, "+e.toString()+", "+e.getMessage(), null);
-            saveStatus(mCmd,MSG_FAILURE);
+            writeTaskLog(logHeader +"Interrupted Failure, "+e.toString()+", "+e.getMessage(), null);
+            updateStatus(mCmd,MSG_FAILURE);
             return;
         }
 
@@ -147,7 +147,7 @@ public class DeployTask implements Runnable{
      * 该任务是具体执行远程单台机器的部署任务
      */
     private class RemoteDeployTask implements Runnable {
-        private String LOG = "RemoteDeployTask";
+        private static final String TASK = "RemoteDeployTask";
         private ScheduleContext remoteContext;
         private StrategyPO strategy;
         private CountDownLatch taskCount;
@@ -162,16 +162,16 @@ public class DeployTask implements Runnable{
         public void run() {
             try {
                 DevicePO device = remoteContext.getDevice();
-                LOG += "["+ device.toSimpleString()+"]==> ";
-                writeTaskLog(LOG +"start init environment... ",null);
+                String logHeader = TASK+ "["+ device.toSimpleString()+"]==> ";
+                writeTaskLog(logHeader +"start init environment... ",null);
                 // 1. 初始化远程节点的环境
                 boolean isInit = remoteContext.initRemoteDevice();
                 if (!isInit){
-                    writeTaskLog(LOG +"init error!",null);
-                    saveStatus(CMD_DEPLOY,MSG_FAILURE);
+                    writeTaskLog(logHeader +"init error!",null);
+                    updateStatus(CMD_DEPLOY,MSG_FAILURE);
                     return;
                 }else {
-                    writeTaskLog(LOG +"init finished!",null);
+                    writeTaskLog(logHeader +"init finished!",null);
                 }
 
                 // 2. 创建一个策略实现类，类型为java微服务,
@@ -179,14 +179,14 @@ public class DeployTask implements Runnable{
                 StrategyInterface strategyImpl = StrategyFactory.createStrategyImpl(StrategyFactory.STRATEGY_TYPE_JAVA_MS, remoteContext, strategy);
                 List<AppModulePO> moduleObjList = strategyImpl.list_modules();
                 strategyImpl.setListModules(moduleObjList);
-                writeTaskLog(LOG +"start deploy... ",null);
+                writeTaskLog(logHeader +"start deploy... ",null);
                 // 3. 执行deploy命令
                 boolean result = strategyImpl.deploy();
                 // 4. 执行完成后，添加和更新服务到设备对应的表中
                 if (result) {
-                    writeTaskLog(LOG +"deploy success!",null);
+                    writeTaskLog(logHeader +"deploy success!",null);
                     int moduleTotal = moduleObjList.size();
-                    writeTaskLog(LOG + "Batch update deviceRefModules, size is " + moduleObjList.size(),null);
+                    writeTaskLog(logHeader + "Batch update deviceRefModules, size is " + moduleObjList.size(),null);
                     List<DeviceModuleRefPO> devModList = new ArrayList<>();
                     for (AppModulePO appModulePO: moduleObjList) {
                         DeviceModuleRefPO refObj = new DeviceModuleRefPO();
@@ -197,14 +197,14 @@ public class DeployTask implements Runnable{
                     if(devModList.size() >0 ) {
                         mDeviceModuleService.updateBatch(devModList);
                     }
-                    writeTaskLog(LOG +"Batch update finished!",null);
-                    saveStatus(CMD_DEPLOY,MSG_SUCCESS);
+                    writeTaskLog(logHeader +"Batch update finished!",null);
+                    updateStatus(CMD_DEPLOY,MSG_SUCCESS);
                 }else {
-                    writeTaskLog(LOG +"deploy failure!",null);
+                    writeTaskLog(logHeader +"deploy failure!",null);
                 }
             } catch (Exception e) {
-                writeTaskLog(LOG +"deploy error!"+e.getMessage(),null);
-                saveStatus(CMD_DEPLOY,MSG_FAILURE);
+                writeTaskLog(TASK +"deploy error!"+e.getMessage(),null);
+                updateStatus(CMD_DEPLOY,MSG_FAILURE);
             } finally {
                 taskCount.countDown();
             }
@@ -216,7 +216,7 @@ public class DeployTask implements Runnable{
      * 该任务是具体执行远程单台机器的部署任务
      */
     private class RemoteUndeployTask implements Runnable {
-        private String LOG = "RemoteUndeployTask";
+        private static final String TASK = "RemoteUndeployTask";
         private ScheduleContext remoteContext;
         private StrategyPO strategy;
         private CountDownLatch taskCount;
@@ -231,8 +231,8 @@ public class DeployTask implements Runnable{
         public void run() {
             try {
                 DevicePO device = remoteContext.getDevice();
-                LOG+=" [" + device.getName() + "," + device.getIpAddress() + "]==> ";
-                writeTaskLog(LOG +"start unDeploy... ",null);
+                String logHeader = TASK+ "[" + device.getName() + "," + device.getIpAddress() + "]==> ";
+                writeTaskLog(logHeader +"start unDeploy... ",null);
                 // 1. 创建一个策略实现类，类型为java微服务
                 StrategyInterface strategyImpl = StrategyFactory.createStrategyImpl(StrategyFactory.STRATEGY_TYPE_JAVA_MS, remoteContext, strategy);
 
@@ -245,10 +245,10 @@ public class DeployTask implements Runnable{
 
                 // 4. 执行完成后，删除服务和设备对应关系
                 if (result) {
-                    writeTaskLog(LOG +"unDeploy success. ",null);
+                    writeTaskLog(logHeader +"unDeploy success. ",null);
                     int moduleTotal = moduleObjList.size();
                     List<DeviceModuleRefPO> devModList = new ArrayList<>();
-                    String appMsg = LOG + "Remove relative appModule size is " + moduleObjList.size()+",list=";
+                    String appMsg = logHeader + "Remove relative appModule size is " + moduleObjList.size()+",list=";
                     for (int i = 0; i < moduleTotal; i++) {
                         AppModulePO module = moduleObjList.get(i);
                         DeviceModuleRefPO refObj = new DeviceModuleRefPO();
@@ -261,15 +261,15 @@ public class DeployTask implements Runnable{
                     if(devModList.size()> 0) {
                         mDeviceModuleService.removeBatch(devModList);
                     }
-                    writeTaskLog(LOG +"unDeploy finished success!",null);
-                    saveStatus(CMD_UNDEPLOY,MSG_SUCCESS);
+                    writeTaskLog(logHeader +"unDeploy finished success!",null);
+                    updateStatus(CMD_UNDEPLOY,MSG_SUCCESS);
                 }else {
-                    writeTaskLog(LOG +"unDeploy failure!",null);
+                    writeTaskLog(logHeader +"unDeploy failure!",null);
                 }
-                log.info(LOG + " [" + device.getName() + "," + device.getIpAddress() + "] undeploy end. result=" + result);
+                log.info(logHeader + " [" + device.getName() + "," + device.getIpAddress() + "] undeploy end. result=" + result);
             } catch (Exception e) {
-                writeTaskLog(LOG +"unDeploy error!"+e.toString()+","+e.getMessage(),null);
-                saveStatus(CMD_UNDEPLOY,MSG_FAILURE);
+                writeTaskLog(TASK +"unDeploy error!"+e.toString()+","+e.getMessage(),null);
+                updateStatus(CMD_UNDEPLOY,MSG_FAILURE);
             } finally {
                 taskCount.countDown();
             }
@@ -281,7 +281,7 @@ public class DeployTask implements Runnable{
      * @param mCmd
      * @param msgType
      */
-    private void saveStatus(int mCmd,String msgType) {
+    private void updateStatus(int mCmd, String msgType) {
         if (MSG_UNDERWAY.equals(msgType)){
             if (mCmd==CMD_DEPLOY){
                 mTaskPO.setStatus(DeployEnum.TaskStatus.DEPLOY_UNDERWAY.getValue());

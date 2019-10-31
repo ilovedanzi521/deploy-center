@@ -17,7 +17,7 @@
                                 <div slot="left-footer">
                                         <el-button-group>
                                             <win-button type="info" icon="el-icon-plus" size="small" @click="deviceOperation('','ADD')">新增设备</win-button>
-                                            <win-button v-popover:popover1 type="info" icon="el-icon-delete" size="small">删除设备</win-button>
+                                            <win-button type="info" icon="el-icon-delete" size="small" @click="deleteDevices">删除设备</win-button>
                                         </el-button-group>
                                 </div>
                             </el-transfer>

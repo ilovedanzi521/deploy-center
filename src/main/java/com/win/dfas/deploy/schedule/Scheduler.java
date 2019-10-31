@@ -88,6 +88,10 @@ public class Scheduler {
        return mAppManager;
     }
 
+    public DeployEnvBean getDeployEnvConfig(){
+        return this.mEnvConfig;
+    }
+
     public ScheduleContext getSechduleContext(String host) {
        return mContextMap.get(host);
     }

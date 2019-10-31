@@ -6,6 +6,7 @@ import com.win.dfas.common.vo.WinResponseData;
 import com.win.dfas.deploy.common.annotation.SysLog;
 import com.win.dfas.deploy.dto.AppModuleInstanceDTO;
 import com.win.dfas.deploy.po.AppModulePO;
+import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.service.AppModuleService;
 import com.win.dfas.deploy.service.ScheduleCenterService;
 import com.win.dfas.deploy.vo.response.AppModuleTreeVO;
@@ -47,6 +48,11 @@ public class AppModuleController extends BaseController<AppModulePO> {
     public WinResponseData pageList(@RequestBody BaseReqVO reqVO){
         PageVO<AppModuleTreeVO> pageVO = this.appModuleService.getAppModuleTreePageInfo(reqVO);
         return WinResponseData.handleSuccess(pageVO);
+    }
+    @GetMapping("/instanceList/{id}")
+    public WinResponseData instanceList(@PathVariable Long id){
+        List<DevicePO> devices = this.appModuleService.getInstanceList(id);
+        return WinResponseData.handleSuccess(devices);
     }
 
     @GetMapping("/treeList")

@@ -88,9 +88,9 @@ public class GroupController extends BaseController<GroupPO> {
 
         Boolean success = this.groupService.safeRemoveBatch(Arrays.asList(ids));
         if (success){
-            return WinResponseData.handleSuccess("删除组成功！");
+            return WinResponseData.handleSuccess("批量删除组成功！");
         }else {
-            return WinResponseData.handleError("删除组失败！");
+            return WinResponseData.handleError("批量删除组失败！");
         }
     }
 

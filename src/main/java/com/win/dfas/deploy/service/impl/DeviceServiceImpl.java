@@ -1,15 +1,21 @@
 package com.win.dfas.deploy.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.win.dfas.deploy.common.enumerate.DeviceEnum;
+import com.win.dfas.deploy.common.exception.BaseException;
+import com.win.dfas.deploy.common.validator.ValidatorUtils;
+import com.win.dfas.deploy.common.validator.group.AddGroup;
 import com.win.dfas.deploy.dao.DeviceDao;
 import com.win.dfas.deploy.po.DevicePO;
+import com.win.dfas.deploy.schedule.Scheduler;
 import com.win.dfas.deploy.schedule.utils.ShellUtils;
 import com.win.dfas.deploy.service.DeviceService;
 import com.win.dfas.deploy.service.ScheduleCenterService;
 import com.win.dfas.deploy.util.SpringContextUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +43,11 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DevicePO> implemen
 
     @Override
     public DevicePO connectTest(DevicePO device) {
+        if (device.getId()==null){
+            //新增设备
+            this.safeSave(device);
+        }
+        //调度中心测试设备连通性
         List<String> resultList = mScheduleService.connectDevice(device);
         boolean isSuccess = false;
         String devName = "unknown";
@@ -57,6 +68,54 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DevicePO> implemen
             device.setAlias(devName);
             device.setStatus(DeviceEnum.ConnectStatus.FAILURE.getValue());
         }
+        //更新设备状态
+        this.updateById(device);
+//        更新调度中心设备
+        Scheduler.get().addDevice(device);
         return device;
+    }
+
+    @Override
+    public Boolean safeSave(DevicePO devicePO) {
+        ValidatorUtils.validateEntity(devicePO, AddGroup.class);
+        DevicePO existPo = this.getOne(new QueryWrapper<DevicePO>().eq("ip_address",devicePO.getIpAddress()));
+        if (existPo!=null){
+            throw new BaseException("当前设备已经存在，禁止重复添加设备！");
+        }
+        Boolean saved = this.save(devicePO);
+        if (!saved){
+            throw new BaseException("设备添加失败，请联系管理员！");
+        }
+        Scheduler.get().addDevice(devicePO);
+        return saved;
+    }
+
+    /**
+     * 安全删除单个设备（包括更新调度中心设备上下文）
+     * @param id
+     * @return
+     */
+    @Override
+    public Boolean safeRemove(Long id) {
+        DevicePO existPo = this.getById(id);
+        if (existPo == null){
+            throw new BaseException("设备已经不存在！");
+        }
+        Scheduler.get().delDevice(existPo);
+        return this.removeById(id);
+    }
+
+    /**
+     * 安全批量删除设备（包括更新调度中心设备上下文）
+     * @param ids
+     * @return
+     */
+    @Override
+    public Boolean safeRemoveBatch(List<Long> ids) {
+        List<DevicePO> list = (List<DevicePO>) this.listByIds(ids);
+        for (DevicePO device : list) {
+            Scheduler.get().delDevice(device);
+        }
+        return this.removeByIds(ids);
     }
 }

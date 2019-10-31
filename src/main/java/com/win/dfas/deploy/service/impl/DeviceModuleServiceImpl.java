@@ -23,10 +23,12 @@ public class DeviceModuleServiceImpl extends ServiceImpl<DeviceModuleDao, Device
         Iterator<DeviceModuleRefPO> it = list.iterator();
         while(it.hasNext()) {
             DeviceModuleRefPO devModObj = it.next();
-            boolean removed=remove(new QueryWrapper<DeviceModuleRefPO>()
+            DeviceModuleRefPO existRef = this.getOne(new QueryWrapper<DeviceModuleRefPO>()
                     .eq("device_id",devModObj.getDeviceId())
                     .eq("module_id",devModObj.getModuleId()));
-            return save(devModObj);
+            if (existRef == null){
+                this.save(devModObj);
+            }
         }
         return true;
     }

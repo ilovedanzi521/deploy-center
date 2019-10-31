@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.win.dfas.common.vo.BaseRepVO;
 import com.win.dfas.common.vo.WinResponseData;
+import com.win.dfas.deploy.common.annotation.SysLog;
+import com.win.dfas.deploy.common.validator.ValidatorUtils;
+import com.win.dfas.deploy.common.validator.group.AddGroup;
 import com.win.dfas.deploy.po.DeviceModuleRefPO;
 import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.schedule.Scheduler;
@@ -17,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Null;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -39,23 +43,51 @@ public class DeviceController extends BaseController<DevicePO> {
     public IService<DevicePO> getBaseService() {
         return this.deviceService;
     }
-/*
-    @GetMapping("/list")
-    public WinResponseData list(){
-        List<DevicePO> list = deviceService.list(null);
-        return WinResponseData.handleSuccess(list);
-    }*/
+
+    @SysLog("安全新增设备")
+    @PostMapping("/safeSave")
+    public WinResponseData safeSave(@RequestBody DevicePO devicePO){
+        Boolean success = this.deviceService.safeSave(devicePO);
+        if (!success){
+            return WinResponseData.handleError("保存失败！");
+        }
+        return WinResponseData.handleSuccess("保存成功！");
+    }
+    @SysLog("安全删除设备")
+    @DeleteMapping("/safeRemove/{id}")
+    public WinResponseData safeRemove(@PathVariable Long id){
+
+        Boolean success = this.deviceService.safeRemove(id);
+        if (!success){
+            return WinResponseData.handleError("删除设备失败！");
+        }
+        return WinResponseData.handleSuccess("删除设备成功！");
+    }
+
+    @SysLog("安全批量删除设备")
+    @PostMapping("/safeRemoveBatch")
+    public WinResponseData safeRemove(@RequestBody Long[] ids){
+
+        Boolean success = this.deviceService.safeRemoveBatch(Arrays.asList(ids));
+        if (!success){
+            return WinResponseData.handleError("批量删除设备失败！");
+        }
+        return WinResponseData.handleSuccess("批量删除设备成功！");
+    }
 
     @PostMapping("/connectTest")
-    public WinResponseData connectTest(@Validated @RequestBody DevicePO device){
+    public WinResponseData connectTest(@RequestBody DevicePO device){
+
         DevicePO dev = deviceService.connectTest(device);
-//        updateById(dev);
         return WinResponseData.handleSuccess(dev);
     }
 
     @GetMapping("/connectDev")
     public WinResponseData connectDevice(@RequestParam String ipAddr ) {
         DevicePO dev = scheduleService.getDevice(ipAddr);
+        if (dev==null){
+            return WinResponseData.handleError("请先添加设备!");
+        }
         return connectTest(dev);
     }
 }

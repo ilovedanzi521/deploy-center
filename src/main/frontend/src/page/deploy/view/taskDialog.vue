@@ -129,5 +129,6 @@
 }
 .logtext {
     font-size: 8px;
+    overflow-y:auto;
 }
 </style>

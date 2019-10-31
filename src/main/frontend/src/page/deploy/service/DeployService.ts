@@ -6,6 +6,9 @@ import { DeployBaseUrl } from "../const/DeployConst";
 import { TaskReqVO } from "../vo/TaskVO";
 
 export default class DeployService {
+    appModuleInstantList(id: any) {
+        return AxiosFun.get(DeployBaseUrl +"/app/module/instanceList/"+id, null);
+    }
     taskInfo(id: number) {
         return AxiosFun.get(DeployBaseUrl +"/task/detail/"+id, null);
     }
@@ -47,12 +50,12 @@ export default class DeployService {
         return AxiosFun.get(DeployBaseUrl +"/device/list", null);
     }
 
-    deviceConnectTest(vo: DeviceReqVO): Promise<WinResponseData> {
+    deviceConnectTest(vo: DeviceRepVO): Promise<WinResponseData> {
         return AxiosFun.post(DeployBaseUrl +"/device/connectTest", vo);
     }
 
     insertDevice(vo: DeviceRepVO): Promise<WinResponseData> {
-        return AxiosFun.post(DeployBaseUrl +"/device/save", vo);
+        return AxiosFun.post(DeployBaseUrl +"/device/safeSave", vo);
     }
 
     saveGroup(vo: GroupReqVO): Promise<WinResponseData> {
@@ -64,6 +67,6 @@ export default class DeployService {
     }
 
     removeDeviceById(id: number): Promise<WinResponseData> {
-        return AxiosFun.winDelete(DeployBaseUrl +"/device/remove/"+id);
+        return AxiosFun.winDelete(DeployBaseUrl +"/device/safeRemove/"+id);
     }
 }

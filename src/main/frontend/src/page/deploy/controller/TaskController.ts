@@ -67,6 +67,9 @@ export default class TaskController extends BaseController{
         };
         this.showDialog = true;
     }
+    refresh(){
+        this.queryPageList(this.queryReqVO);
+    }
     // 表格字段格式化
     formatCellValue({row, column, cellValue, index}) {
         if (column.property === "createTime") {

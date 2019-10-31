@@ -192,4 +192,7 @@ export default class GroupDialogController extends BaseController{
         }
         this.isDeviceDialog = true;
     }
+    deleteDevices(){
+        
+    }
 }

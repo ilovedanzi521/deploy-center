@@ -19,6 +19,31 @@ const routers = [
                 name: "directional",
                 component: Directional
             },
+            {
+                path: "/deploy/index",
+                name: "deployIndex",
+                component: DeployIndex,
+            },
+            {
+                path: "/deploy/group",
+                name: "deployGroup",
+                component: DeployGroup,
+            },
+            {
+                path: "/deploy/appmodule",
+                name: "deployAppModule",
+                component: DeployAppModule,
+            },
+            {
+                path: "/deploy/task",
+                name: "deployTask",
+                component: DeployTask,
+            },
+            {
+                path: "/deploy/strategy",
+                name: "strategyManagement",
+                component: StrategyManagement,
+            },
         ]
     },
     {
@@ -33,31 +58,6 @@ const routerChildren = [
         path: "/home",
         name: "home",
         component: Home
-    },
-    {
-        path: "/deploy/index",
-        name: "deployIndex",
-        component: DeployIndex,
-    },
-    {
-        path: "/deploy/group",
-        name: "deployGroup",
-        component: DeployGroup,
-    },
-    {
-        path: "/deploy/appmodule",
-        name: "deployAppModule",
-        component: DeployAppModule,
-    },
-    {
-        path: "/deploy/task",
-        name: "deployTask",
-        component: DeployTask,
-    },
-    {
-        path: "/deploy/strategy",
-        name: "strategyManagement",
-        component: StrategyManagement,
     },
 ];
 
@@ -74,5 +74,6 @@ if ("development" === process.env.NODE_ENV) {
             routers.push({ ...item, children: [] });
         }
     });
+    localStorage.setItem("Authorization", "development");
 }
 export default routers;

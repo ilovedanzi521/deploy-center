@@ -125,6 +125,7 @@ export default class DeviceDialogController extends BaseController{
                             }else {
                                 this.deviceStatusText= "未连接";
                             }
+                            this.send(WinRspType.SUCC);
                         } else {
                             this.win_message_error(winResponseData.msg);
                         }

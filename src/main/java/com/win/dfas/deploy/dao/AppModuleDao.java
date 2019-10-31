@@ -6,7 +6,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.win.dfas.deploy.dto.AppModuleDTO;
 import com.win.dfas.deploy.po.AppModulePO;
+import com.win.dfas.deploy.po.DevicePO;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * @包名 com.win.dfas.deploy.dao
@@ -19,4 +22,10 @@ public interface AppModuleDao extends BaseMapper<AppModulePO> {
     //IPage 分页器， Wrapper 条件构造器
     IPage<AppModuleDTO> getPageList(IPage<AppModuleDTO> page, @Param(Constants.WRAPPER) Wrapper query) throws Exception;
 
+    /**
+     * 获取单个应用模块的实例列表（运行在哪些机器上）
+     * @param id
+     * @return
+     */
+    List<DevicePO> getInstanceList(Long id);
 }

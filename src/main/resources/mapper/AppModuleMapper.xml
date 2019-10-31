@@ -3,4 +3,11 @@
 <mapper namespace="com.win.dfas.deploy.dao.AppModuleDao">
 <!--说明：单表的所有操作不用写代码（如果只有简单的单表操作，mapper.xml文件也不需要），mybatis-plus已经自动处理-->
 
+    <!--根据组id查单个设备详情机器关联设备列表-->
+    <select id="getInstanceList" parameterType="long" resultType="com.win.dfas.deploy.po.DevicePO">
+      SELECT device.* FROM DC_DEVICE_MODULE_REF as ref
+      inner join DC_DEVICE as device on device.id=ref.device_id
+      WHERE ref.module_id = #{id}
+    </select>
+
 </mapper>

@@ -11,6 +11,7 @@ import com.win.dfas.deploy.common.exception.BaseException;
 import com.win.dfas.deploy.dao.AppModuleDao;
 import com.win.dfas.deploy.dto.AppModuleInstanceDTO;
 import com.win.dfas.deploy.po.AppModulePO;
+import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
 import com.win.dfas.deploy.service.AppModuleService;
 import com.win.dfas.deploy.service.ScheduleCenterService;
@@ -102,6 +103,12 @@ public class AppModuleServiceImpl extends ServiceImpl<AppModuleDao, AppModulePO>
     public List<AppModuleInstanceDTO> treeList() {
 
         return null;
+    }
+
+    @Override
+    public List<DevicePO> getInstanceList(Long id) {
+
+        return this.baseMapper.getInstanceList(id);
     }
 
     /**

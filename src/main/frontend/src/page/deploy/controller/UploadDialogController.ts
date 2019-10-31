@@ -63,6 +63,7 @@ export default class UploadDialogController extends BaseController{
     private successUpload(winResponseData:WinResponseData, file){
         if (WinRspType.SUCC === winResponseData.winRspType) {
             this.win_message_success(winResponseData.msg);
+            this.send(WinRspType.SUCC);
         } else {
             this.win_message_error(winResponseData.msg);
         }

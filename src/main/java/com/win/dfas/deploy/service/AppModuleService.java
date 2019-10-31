@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.win.dfas.common.vo.BaseReqVO;
 import com.win.dfas.deploy.dto.AppModuleInstanceDTO;
 import com.win.dfas.deploy.po.AppModulePO;
+import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.vo.response.AppModuleTreeVO;
 import com.win.dfas.deploy.vo.response.PageVO;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,4 +42,10 @@ public interface AppModuleService extends IService<AppModulePO> {
 
     List<AppModuleInstanceDTO> treeList();
 
+    /**
+     * 获取应用模块服务器启动实例
+     * @param id
+     * @return
+     */
+    List<DevicePO> getInstanceList(Long id);
 }

@@ -6,6 +6,7 @@
                 <li>
                     <win-button-group>
                         <win-button type="info" icon="el-icon-plus" round @click="addTask">添加任务</win-button>
+                        <win-button type="info" icon="el-icon-refresh" round @click="refresh">刷新</win-button>
                     </win-button-group>
                 </li>
             </ul>
