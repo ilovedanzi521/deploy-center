@@ -1,5 +1,6 @@
 package com.win.dfas.deploy.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.extra.ftp.Ftp;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -10,9 +11,11 @@ import com.win.dfas.common.vo.BaseReqVO;
 import com.win.dfas.deploy.common.exception.BaseException;
 import com.win.dfas.deploy.dao.AppModuleDao;
 import com.win.dfas.deploy.dto.AppModuleInstanceDTO;
+import com.win.dfas.deploy.dto.DeviceModuleRefDTO;
+import com.win.dfas.deploy.dto.SubInstanceDTO;
 import com.win.dfas.deploy.po.AppModulePO;
-import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
+import com.win.dfas.deploy.schedule.context.ScheduleContext;
 import com.win.dfas.deploy.service.AppModuleService;
 import com.win.dfas.deploy.service.ScheduleCenterService;
 import com.win.dfas.deploy.util.DeployUtils;
@@ -101,14 +104,40 @@ public class AppModuleServiceImpl extends ServiceImpl<AppModuleDao, AppModulePO>
 
     @Override
     public List<AppModuleInstanceDTO> treeList() {
-
-        return null;
+        List<AppModulePO> list = this.list();
+        List<AppModuleInstanceDTO> instanceDTOS = new ArrayList<>(list.size());
+        if (CollectionUtil.isNotEmpty(list)){
+            for (AppModulePO appModulePO: list) {
+                AppModuleInstanceDTO instanceDTO = new AppModuleInstanceDTO();
+                instanceDTO.setMicroServiceName(appModulePO.getName());
+                instanceDTO.setMicroServiceAlias(appModulePO.getPackFile());
+                List<DeviceModuleRefDTO> refDTOS = this.getInstanceList(appModulePO.getId());
+                List<SubInstanceDTO> subInstanceDTOS = new ArrayList<>(refDTOS.size());
+                if (CollectionUtil.isNotEmpty(refDTOS)){
+                    for (DeviceModuleRefDTO refDTO: refDTOS) {
+                        SubInstanceDTO subInstanceDTO = new SubInstanceDTO();
+                        subInstanceDTO.setHostName(refDTO.getDeviceName());
+                        subInstanceDTO.setIpAddr(refDTO.getIpAddress());
+                        subInstanceDTOS.add(subInstanceDTO);
+                    }
+                    instanceDTO.setInstanceList(subInstanceDTOS);
+                }
+                instanceDTOS.add(instanceDTO);
+            }
+        }
+        return instanceDTOS;
     }
 
     @Override
-    public List<DevicePO> getInstanceList(Long id) {
-
-        return this.baseMapper.getInstanceList(id);
+    public List<DeviceModuleRefDTO> getInstanceList(Long id) {
+        List<DeviceModuleRefDTO> refDTOS = this.baseMapper.getInstanceList(id);
+        if (CollectionUtil.isNotEmpty(refDTOS)){
+            for (DeviceModuleRefDTO refDto : refDTOS) {
+                int status = this.mScheduleService.moduleStatus(refDto.getIpAddress(),refDto.getModuleName());
+                refDto.setStatus(status);
+            }
+        }
+        return refDTOS;
     }
 
     /**

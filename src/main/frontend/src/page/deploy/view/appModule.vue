@@ -21,13 +21,13 @@
                     <template v-slot="{ row, rowIndex }">
                         <vxe-table border class="device-table"
                             :data="row.devices" >
-                            <vxe-table-column field="name" title="名称"></vxe-table-column>
+                            <vxe-table-column field="deviceName" title="名称"></vxe-table-column>
                             <vxe-table-column field="ipAddress" title="ip地址"></vxe-table-column>
                             <vxe-table-column field="status" title="状态" :formatter="formatDeviceStatus"></vxe-table-column>
                             <vxe-table-column title="操作" min-width="100">
                                 <template v-slot="{ row }">
-                                    <el-button  size="mini" type="text" icon="el-icon-switch-button" @click="startApp(row)">启动</el-button>
-                                    <el-button  size="mini" type="text" icon="el-icon-delete" @click="stopApp(row)">停止</el-button>
+                                    <el-button  size="mini" type="text" icon="el-icon-switch-button" @click="startApp(row,rowIndex)">启动</el-button>
+                                    <el-button  size="mini" type="text" icon="el-icon-delete" @click="stopApp(row,rowIndex)">停止</el-button>
                                 </template>
                             </vxe-table-column>
                             <template v-slot:empty>

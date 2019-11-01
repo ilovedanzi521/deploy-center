@@ -1,18 +1,15 @@
 import {WinResponseData} from "../../common/vo/BaseVO";
 import AxiosFun from "win-biz";
 import {DeviceRepVO, DeviceReqVO, GroupQueryVO, GroupReqVO} from "../vo/GroupVO";
-import { QueryReqVO } from "../vo/AppModuleVO";
 import { DeployBaseUrl } from "../const/DeployConst";
 import { TaskReqVO } from "../vo/TaskVO";
+import { QueryReqVO } from "../vo/DeployVO";
 
 export default class DeployService {
-    viewDeviceLog(params) {
+    viewDeviceLog(params: { "ipAddress": string; "strategyName": string; }): Promise<WinResponseData> {
         return AxiosFun.get(DeployBaseUrl +"/task/log/device", params);
     }
-    appModuleInstantList(id: any) {
-        return AxiosFun.get(DeployBaseUrl +"/app/module/instanceList/"+id, null);
-    }
-    taskInfo(id: number) {
+    taskInfo(id: number): Promise<WinResponseData> {
         return AxiosFun.get(DeployBaseUrl +"/task/detail/"+id, null);
     }
     taskUnDeploy(id: number): Promise<WinResponseData> {
@@ -24,25 +21,39 @@ export default class DeployService {
     insertTask(vo: TaskReqVO): Promise<WinResponseData> {
         return AxiosFun.post(DeployBaseUrl +"/task/save", vo);
     }
-    strategyList(): Promise<WinResponseData> {
+    taskPageList(vo: QueryReqVO): Promise<WinResponseData> {
+        return AxiosFun.post(DeployBaseUrl +"/task/pageList", vo);
+    }
+    appModuleInstantList(id: any): Promise<WinResponseData> {
+        return AxiosFun.get(DeployBaseUrl +"/app/module/instanceList/"+id, null);
+    }
+    startAppModule(params: { "ipAddress": any; "strategyName": any; }): Promise<WinResponseData> {
+        return AxiosFun.get(DeployBaseUrl +"/app/module/moduleStart", params);
+    }
+    stopAppModule(params: { "ipAddress": any; "strategyName": any; }): Promise<WinResponseData> {
+        return AxiosFun.get(DeployBaseUrl +"/app/module/moduleStop", params);
+    }
+    public static uploadUrl: string = DeployBaseUrl +"/app/module/upload";
+
+    appModulePageList(vo: QueryReqVO): Promise<WinResponseData> {
+        return AxiosFun.post(DeployBaseUrl +"/app/module/pageList", vo);
+    }
+    strategyPageList(vo:QueryReqVO): Promise<WinResponseData> {
+        return AxiosFun.post(DeployBaseUrl +"/strategy/pageList", vo);
+    }
+    strategyDetail(id: number): Promise<WinResponseData> {
+        return AxiosFun.get(DeployBaseUrl +"/strategy/detail/"+id, null);
+    }
+    strategyList() : Promise<WinResponseData> {
         return AxiosFun.get(DeployBaseUrl +"/strategy/list", null);
     }
     groupList(): Promise<WinResponseData> {
         return AxiosFun.get(DeployBaseUrl +"/group/list", null);
     }
-    public static uploadUrl: string = DeployBaseUrl +"/app/module/upload";
-
-    taskPageList(vo: import("../vo/DeployVO").QueryReqVO) {
-        return AxiosFun.post(DeployBaseUrl +"/task/pageList", vo);
-    }
-
-    appModulePageList(vo: QueryReqVO) {
-        return AxiosFun.post(DeployBaseUrl +"/app/module/pageList", vo);
-    }
-    removeGroupBatch(delGroupIds: any[]) {
+    removeGroupBatch(delGroupIds: any[]): Promise<WinResponseData> {
         return AxiosFun.post(DeployBaseUrl +"/group/safeRemoveBatch",delGroupIds);
     }
-    userList() {
+    userList(): Promise<WinResponseData> {
         return AxiosFun.get(DeployBaseUrl +"/sys/user/list", null);
     }
     groupTreeList(vo: GroupQueryVO): Promise<WinResponseData>{

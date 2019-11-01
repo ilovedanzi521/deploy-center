@@ -1,8 +1,11 @@
 package com.win.dfas.deploy.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.win.dfas.common.vo.BaseReqVO;
 import com.win.dfas.deploy.po.AppModulePO;
 import com.win.dfas.deploy.po.StrategyPO;
+import com.win.dfas.deploy.vo.response.PageVO;
+import com.win.dfas.deploy.vo.response.StrategyDetailVO;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,4 +24,18 @@ public interface StrategyService extends IService<StrategyPO> {
      * @return
      */
     List<AppModulePO> getAppModules(StrategyPO strategy);
+
+    /**
+     * 查策略详情
+     * @param id
+     * @return
+     */
+    StrategyDetailVO getDetailById(Long id);
+
+    /**
+     * 查分页列表
+     * @param reqVO
+     * @return
+     */
+    PageVO<StrategyPO> getPageInfo(BaseReqVO reqVO);
 }

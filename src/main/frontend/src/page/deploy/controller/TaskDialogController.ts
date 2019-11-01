@@ -93,10 +93,28 @@ export default class TaskDialogController extends BaseController{
                 console.log(winResponseData.data);
                 if (WinRspType.SUCC === winResponseData.winRspType) {
                     this.taskDetailVO = winResponseData.data;
+                    this.taskDetailVO.status= this.formmatStatus(this.taskDetailVO.status);
                 } else {
                     this.win_message_error(winResponseData.msg);
                 }
             });
+        }
+    }
+    formmatStatus(status: number): any {
+        if(status === 0){
+            return "未部署";
+        }else if(status === 1){
+            return "部署中...";
+        }else if(status === 2){
+            return "部署成功";
+        }else if(status === 3){
+            return "部署失败";
+        }else if(status === 4){
+            return "卸载中...";
+        }else if(status === 5){
+            return "卸载成功";
+        }else if(status === 6){
+            return "卸载失败";
         }
     }
     // 初始化组下拉框数据

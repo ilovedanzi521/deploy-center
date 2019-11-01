@@ -11,7 +11,7 @@ import {GroupConst, DeviceStatusConst, BaseTypeConst, DialogTitleConst} from "..
 import {BaseConst} from "../../common/const/BaseConst";
 import dateUtils from "../../common/util/DateUtils";
 import { DeviceStatus, DeployTypeEnum } from "../const/DeployEnum";
-import { QueryReqVO, AppModuleTreeVO, UploadVO } from "../vo/AppModuleVO";
+import { QueryReqVO, AppModuleTreeVO, UploadVO, DeviceModuleRefVO } from "../vo/AppModuleVO";
 import UploadDialog from "../view/uploadDialog.vue";
 import { async } from "q";
 
@@ -51,7 +51,7 @@ export default class AppModuleController extends BaseController {
     public queryPageList(queryReqVO: QueryReqVO) {
         console.log("queryPageList");
         this.tableLoading = true;
-        this.deployService.appModulePageList(this.queryReqVO)
+        this.deployService.appModulePageList(queryReqVO)
             .then((winResponseData: WinResponseData) =>{
                 if (WinRspType.SUCC === winResponseData.winRspType) {
                     this.pageDataList = winResponseData.data.list;
@@ -172,15 +172,17 @@ export default class AppModuleController extends BaseController {
         this.selected=selection;
     }
     // 状态格式化
-    private formatDeviceStatus(status:number){
-        if(0 == status){
-            return "未启动";
-        }else if(1 == status){
-            return "已经启动";
-        }else if(2 == status){
-            return "启动失败";
-        }else{
-            return status;
+    formatDeviceStatus({row, column, cellValue, index}){
+        if(column.property === "status"){
+            if(cellValue == 0){
+                return "服务未运行";
+            }else if(cellValue < 0){
+                return "服务运行异常";
+            }else if(cellValue>0){
+                return "服务正运行";
+            }else{
+                return "未知码:"+cellValue;
+            }
         }
     }
       // 表格字段格式化
@@ -195,10 +197,15 @@ export default class AppModuleController extends BaseController {
     }
     // 行展开、收起事件
     toggleExpandChangeEvent ({row,rowIndex},event) {
+        // 判断是展开还是折叠操作
         let expandClass:string = event.target.className;
         if(expandClass.indexOf("expand--active")<0){
             console.log("展开行："+rowIndex);
-            this.deployService.appModuleInstantList(row.id)
+            this.queryDevices(row,rowIndex);
+        }
+      }
+    queryDevices(row,rowIndex){
+        this.deployService.appModuleInstantList(row.id)
             .then((winResponseData: WinResponseData) =>{
                 if (WinRspType.SUCC === winResponseData.winRspType) {
                     console.log(winResponseData.data);
@@ -213,18 +220,61 @@ export default class AppModuleController extends BaseController {
                 } else {
                     this.win_message_error(row.name+"机器服务查询异常："+winResponseData.msg);
                 }
-            })
-        }
-      }
+            });
+    }
     // 启动应用服务
-    startApp(row:any){
-        console.log("startApp");
+    startApp(row:DeviceModuleRefVO,rowIndex:number){
+        console.log("startApp-"+rowIndex);
         console.log(row);
+        if(row.status>0){
+            this.win_message_box_warning("服务已经启动");
+            return;
+        }
+        if(row.ipAddress&&row.moduleName){
+            let params={
+                "ipAddress":row.ipAddress,
+                "strategyName":row.moduleName
+            }
+            this.deployService.startAppModule(params)
+                .then((winResponseData: WinResponseData) =>{
+                    if (WinRspType.SUCC === winResponseData.winRspType) {
+                        console.log(winResponseData.data);
+                        if(winResponseData.data){
+                            console.log(this.pageDataList[rowIndex]);
+                            this.queryDevices(this.pageDataList[rowIndex],rowIndex);
+                        }
+                    } else {
+                        this.win_message_error(row.ipAddress+"机器服务查询异常："+winResponseData.msg);
+                    }
+                });
+        }
+
     }
     // 停止应用
-    stopApp(row:any){
-        console.log("stopApp");
+    stopApp(row:DeviceModuleRefVO,rowIndex:number){
+        console.log("stopApp-"+rowIndex);
         console.log(row);
+        if(row.status=0){
+            this.win_message_box_warning("服务已经停止");
+            return;
+        }
+        if(row.ipAddress&&row.moduleName){
+            let params={
+                "ipAddress":row.ipAddress,
+                "strategyName":row.moduleName
+            }
+            this.deployService.stopAppModule(params)
+                .then((winResponseData: WinResponseData) =>{
+                    if (WinRspType.SUCC === winResponseData.winRspType) {
+                        console.log(winResponseData.data);
+                        if(winResponseData.data){
+                            this.queryDevices(this.pageDataList[rowIndex],rowIndex);
+                        }
+                    } else {
+                        this.win_message_error(row.ipAddress+"机器服务查询异常："+winResponseData.msg);
+                    }
+                });
+        }
     }
 }
 

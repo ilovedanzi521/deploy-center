@@ -5,6 +5,7 @@ import com.win.dfas.common.vo.BaseReqVO;
 import com.win.dfas.common.vo.WinResponseData;
 import com.win.dfas.deploy.common.annotation.SysLog;
 import com.win.dfas.deploy.dto.AppModuleInstanceDTO;
+import com.win.dfas.deploy.dto.DeviceModuleRefDTO;
 import com.win.dfas.deploy.po.AppModulePO;
 import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.service.AppModuleService;
@@ -51,7 +52,7 @@ public class AppModuleController extends BaseController<AppModulePO> {
     }
     @GetMapping("/instanceList/{id}")
     public WinResponseData instanceList(@PathVariable Long id){
-        List<DevicePO> devices = this.appModuleService.getInstanceList(id);
+        List<DeviceModuleRefDTO> devices = this.appModuleService.getInstanceList(id);
         return WinResponseData.handleSuccess(devices);
     }
 
@@ -68,20 +69,20 @@ public class AppModuleController extends BaseController<AppModulePO> {
     }
 
     @GetMapping("/moduleStart")
-    public WinResponseData moduleStart(@RequestParam String ipAddr, String moduleName) {
-       boolean isStart = mScheduleService.moduleStart(ipAddr, moduleName);
+    public WinResponseData moduleStart(@RequestParam String ipAddress, String moduleName) {
+       boolean isStart = mScheduleService.moduleStart(ipAddress, moduleName);
        return WinResponseData.handleSuccess(isStart);
     }
 
     @GetMapping("/moduleStatus")
-    public WinResponseData moduleStatus(@RequestParam String ipAddr, String moduleName) {
-        int status = mScheduleService.moduleStatus(ipAddr, moduleName);
+    public WinResponseData moduleStatus(@RequestParam String ipAddress, String moduleName) {
+        int status = mScheduleService.moduleStatus(ipAddress, moduleName);
         return WinResponseData.handleSuccess(String.valueOf(status));
     }
 
     @GetMapping("/moduleStop")
-    public WinResponseData moduleStop(@RequestParam String ipAddr, String moduleName) {
-        boolean isStop = mScheduleService.moduleStop(ipAddr, moduleName);
-        return WinResponseData.handleSuccess(String.valueOf(isStop));
+    public WinResponseData moduleStop(@RequestParam String ipAddress, String moduleName) {
+        boolean isStop = mScheduleService.moduleStop(ipAddress, moduleName);
+        return WinResponseData.handleSuccess(isStop);
     }
 }

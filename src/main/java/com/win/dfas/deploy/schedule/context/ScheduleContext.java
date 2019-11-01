@@ -198,8 +198,10 @@ public class ScheduleContext {
         log.info("moduleStatus command: " + command + " params: "+ Arrays.toString(params));
 
         // 如果remote host没有初始化，则调用远程命令之前必须初始化
-        initRemoteDevice();
-
+        boolean inited= initRemoteDevice();
+        if (!inited){
+            return -1;
+        }
         List<String> resultList = ShellUtils.envExecShell(params);
 
         ShellUtils.listLog(log, resultList);

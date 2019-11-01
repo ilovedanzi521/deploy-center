@@ -4,11 +4,14 @@ import { WinResponseData } from "../../common/vo/BaseVO";
 import BaseController from "../../common/controller/BaseController";
 import DeployService from "../service/DeployService";
 import PageVO from "../../common/vo/PageVO";
-import {StrategyRepVO} from "../vo/StrategyVO";
+import {StrategyRepVO, StrategyReqVO} from "../vo/StrategyVO";
 import dateUtils from "../../common/util/DateUtils";
+import { QueryReqVO } from "../vo/DeployVO";
+import StrategyDialog from "../view/strategyDialog.vue"
+import { BaseConst, OperationTypeEnum } from "win-biz";
 
 
-@Component({})
+@Component({components: {StrategyDialog}})
 export default class StrategyManagementController extends BaseController {
     /** 部署服务*/
     private deployService: DeployService = new DeployService();
@@ -16,24 +19,21 @@ export default class StrategyManagementController extends BaseController {
     /** 查询对象 策略列表*/
     private strategyList: StrategyRepVO[]=[];
     /*组表格加载中*/
-    private groupLoading: boolean = false;
+    private tableLoading: boolean = false;
     /*选中项*/
     private selected: any = [];
+    private toDialogMsg: {
+        dialogTitle: string;
+        type: OperationTypeEnum;
+        data: any;
+    };
+    private queryReqVO: QueryReqVO=new QueryReqVO();
+
+    private showDialog:boolean=false;
 
     /** 初始化*/
     private mounted() {
-        this.strategyQuery();
-    }
-
-    public rowClassName({ row, rowIndex }){
-        if (!row.ipAddress) {
-            return 'row-orange';
-        }
-    }
-    public cellClassName({ row, rowIndex, column, columnIndex }){
-        if(row.ipAddress && columnIndex === 0){
-            return 'col-checkbox-none';
-        }
+        this.strategyPageList(this.queryReqVO);
     }
 
     /**
@@ -41,27 +41,49 @@ export default class StrategyManagementController extends BaseController {
      *
      * @param vo
      */
-    public strategyQuery() {
-        this.deployService.strategyList()
+    public strategyPageList(queryReqVO: QueryReqVO) {
+        this.tableLoading = true;
+        this.deployService.strategyPageList(queryReqVO)
         .then((winResponseData: WinResponseData) =>{
             if (WinRspType.SUCC === winResponseData.winRspType) {
-                this.strategyList = winResponseData.data;
+                this.strategyList = winResponseData.data.list;
+                this.pageVO = winResponseData.data;
             } else {
                 this.win_message_error(winResponseData.msg);
             }
         })
         .finally(() =>{
-            this.groupLoading = false;
+            this.tableLoading = false;
         });
     }
-
-
-       /** 查看策略详情*/
-       public showStrategyDetail(row: StrategyRepVO){
-        console.log(row);
-       
+/**
+     * 分页按钮查询
+     *
+     * @param vo
+     */
+    public strategyPageQuery(pageVO: PageVO) {
+        this.queryReqVO.reqPageNum = pageVO.pageNum;
+        this.queryReqVO.reqPageSize = pageVO.pageSize;
+        this.strategyPageList(this.queryReqVO);
     }
 
+       /** 查看策略详情*/
+    showStrategyDetail(row: StrategyRepVO){
+        console.log(row);
+        this.toDialogMsg = {
+            dialogTitle: "详情-" + row.name,
+            type: OperationTypeEnum.VIEW,
+            data: row
+        };
+        this.showDialog=true;
+    }
+    // 子组件回调函数
+    private bindDialogSend(msg: WinRspType) {
+        this.showDialog = false;
+        if (msg === WinRspType.SUCC) {
+            this.strategyPageList(this.queryReqVO);
+        }
+    }
     /**删除策略 */
     public delStrategy(row: StrategyRepVO){
         console.log("***********delStrategy************");

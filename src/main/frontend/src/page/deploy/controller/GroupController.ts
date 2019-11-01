@@ -56,7 +56,7 @@ export default class GroupController extends BaseController {
     /** 查询设备组树形列表*/
     public queryGroupTreeList(groupQueryVO: GroupQueryVO) {
         this.groupLoading = true;
-        this.deployService.groupTreeList(this.groupQueryVO)
+        this.deployService.groupTreeList(groupQueryVO)
             .then((winResponseData: WinResponseData) =>{
                 if (WinRspType.SUCC === winResponseData.winRspType) {
                     this.groupTreeList = winResponseData.data.list;

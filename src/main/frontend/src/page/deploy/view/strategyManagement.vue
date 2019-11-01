@@ -3,11 +3,11 @@
         <div style="margin-top:9px;">
             <!--树形表格-->
             <win-table border resizable 
-                        class="strategyTable"  :cell-class-name="cellClassName"
+                        class="strategyTable" 
                         :show-selection="false" :show-index="false"
                        @cell-dblclick="view" 
                        @select-all="handleSelectAll" @select-change="handleSelectChange"
-                        :loading="groupLoading" :data="strategyList">
+                        :loading="tableLoading" :data="strategyList">
                 <win-table-column type="selection" width="60" ></win-table-column>
                 <win-table-column field="name" min-width="130" title="策略名称"></win-table-column>
                 <win-table-column field="path" title="脚本路径" min-width="100"></win-table-column>
@@ -23,9 +23,11 @@
                 </template>
             </win-table>
             <!--分页组件-->
-            <!-- <div class="page-contanier">
-                <win-pagination name="strategyPage" v-bind:childMsg="pageVO" @callFather="strategyQuery"></win-pagination>
-            </div> -->
+            <div class="page-contanier">
+                <win-pagination name="strategyPage" v-bind:childMsg="pageVO" @callFather="strategyPageQuery"></win-pagination>
+            </div>
+            <!-- 添加弹框 -->
+            <StrategyDialog v-if="showDialog" :toChildMsg="toDialogMsg" @bindSend="bindDialogSend"></StrategyDialog>
         </div>
     </div>
 

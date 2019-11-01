@@ -1,5 +1,6 @@
 
 export const DeployBaseUrl:string = "http://localhost:8888/deploy";
+// export const DeployBaseUrl:string = "/deploy";
 
 export const DialogTitleConst={
     GROUP_ADD: "新增设备组",

@@ -161,6 +161,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskPO> implements Tas
             detailVO.setLogPath(taskDTO.getLogPath());
             detailVO.setStrategyName(taskDTO.getStrategy().getName());
             detailVO.setGroupName(taskDTO.getGroup().getName());
+            detailVO.setCreateTime(taskDTO.getCreateTime());
 
             // 2. 查策略绑定应用模块列表
             detailVO.setAppModules(strategyService.getAppModules(taskDTO.getStrategy()));
@@ -179,13 +180,17 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskPO> implements Tas
         ScheduleContext context = Scheduler.get().getRemoteContext(ipAddress);
         List<String> lines = new ArrayList<>();
         if (context==null){
-            lines.add("调度中心不存在设备："+ipAddress);
+            String errLine = "调度中心不存在设备："+ipAddress;
+            lines.add(errLine);
+            log.error(errLine);
             return lines;
         }
         String filePath = context.getLogFile(strategyName);
-        log.info("readUtf8Lines from"+filePath);
+        log.info("readUtf8Lines from "+filePath);
         if (!FileUtil.file(filePath).exists()){
-            lines.add(filePath+"日志文件不存在！");
+            String errLine = filePath+"日志文件不存在！";
+            lines.add(errLine);
+            log.error(errLine);
             return lines;
         }
         return FileUtil.readUtf8Lines(filePath);
