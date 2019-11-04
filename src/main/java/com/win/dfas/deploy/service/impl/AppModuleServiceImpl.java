@@ -84,7 +84,9 @@ public class AppModuleServiceImpl extends ServiceImpl<AppModuleDao, AppModulePO>
         DeployEnvBean deployEnv = SpringContextUtils.getBean("deploy_env_bean", DeployEnvBean.class);
         File zipTempFile = null;
         try {
+            //1,解析部署包，并检查格式
             DeployUtils.parseDeployZipFile(file,deployEnv);
+            //2，保存部署包到java默认临时目录
             zipTempFile = DeployUtils.saveZipToTempFile(file,deployEnv);
         } catch (IOException e) {
             FileUtil.del(zipTempFile);
@@ -92,6 +94,7 @@ public class AppModuleServiceImpl extends ServiceImpl<AppModuleDao, AppModulePO>
         }
         Boolean upgraded = false;
         try {
+            //3.解压部署包到仓库并升级模块和策略数据
             upgraded = this.mScheduleService.upgradAppModule(zipTempFile.getAbsolutePath(),deployEnv.getHomeDir());
         } catch (IOException e) {
             throw new BaseException(e.getMessage());

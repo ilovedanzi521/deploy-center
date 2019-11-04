@@ -5,6 +5,7 @@ import { TaskReqVO, TaskTableVO, TaskDetailVO } from "../vo/TaskVO";
 import { StrategyRepVO } from "../vo/StrategyVO";
 import { GroupDetailVO } from "../vo/GroupVO";
 import DeployService from "../service/DeployService";
+import dateUtils from "win-biz/common/util/DateUtils";
 
 @Component
 export default class TaskDialogController extends BaseController{
@@ -94,11 +95,15 @@ export default class TaskDialogController extends BaseController{
                 if (WinRspType.SUCC === winResponseData.winRspType) {
                     this.taskDetailVO = winResponseData.data;
                     this.taskDetailVO.status= this.formmatStatus(this.taskDetailVO.status);
+                    this.taskDetailVO.createTime = this.formatDate(this.taskDetailVO.createTime);
                 } else {
                     this.win_message_error(winResponseData.msg);
                 }
             });
         }
+    }
+    formatDate(time:string){
+        return dateUtils.dateFtt("yyyy-MM-dd hh:mm:ss", new Date(time));
     }
     formmatStatus(status: number): any {
         if(status === 0){

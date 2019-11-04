@@ -103,7 +103,7 @@ Deploy() {
   echo "[Deploy install java-micro-service done]"
 
   echo "[Deploy $JavaServiceModulePath start...]"
-  $JavaServiceModulePath start --PACK_DIR=$PACK_DIR --PACK_VER=$PACK_VER --PACK_FILE=$PACK_FILE --JDK_DIR=$JDK_DIR --JDK_VER=$JDK_VER
+  $JavaServiceModulePath start --PACK_DIR=$PACK_DIR --PACK_VER=$PACK_VER --PACK_FILE=$PACK_FILE --JDK_VER=$JDK_VER
   echo "[Deploy $JavaServiceModulePath start done]"
 
   echo "[Deploy OK.]"

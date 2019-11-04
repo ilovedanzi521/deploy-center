@@ -32,6 +32,7 @@ public class ShellUtils {
      * @return
      */
     public static List<String> envExecShell(String... commands) {
+        log.info("envExecShell:"+Arrays.toString(commands));
         return RuntimeUtil.execForLines(commands);
     }
 

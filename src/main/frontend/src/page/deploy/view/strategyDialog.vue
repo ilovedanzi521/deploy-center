@@ -7,7 +7,7 @@
                             <win-input v-model="strategyDetailVO.name" readonly/>
                         </win-form-item>
                         <win-form-item label="描述:">
-                            <win-input v-model="strategyDetailVO.desc" readonly type="textarea" :rows="4" size="mini" style="width:200px"/>
+                            <win-input v-model="strategyDetailVO.desc" readonly type="textarea" :rows="4" style="width:200px"/>
                         </win-form-item>
                         <win-form-item label="创建时间:">
                             <win-input v-model="strategyDetailVO.createTime" readonly/>
@@ -41,7 +41,7 @@
     export default class StrategyDialog extends StrategyDialogController{}
 </script>
 <style lang="scss" scoped>
-.el-textarea__inner {
+.strategyDetailForm /deep/.el-textarea__inner {
     width: 100%;
 }
 </style>

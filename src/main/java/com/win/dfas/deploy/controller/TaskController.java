@@ -4,6 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.win.dfas.common.vo.BaseReqVO;
 import com.win.dfas.common.vo.WinResponseData;
+import com.win.dfas.deploy.common.annotation.SysLog;
 import com.win.dfas.deploy.common.exception.BaseException;
 import com.win.dfas.deploy.po.TaskPO;
 import com.win.dfas.deploy.schedule.Scheduler;
@@ -50,12 +51,14 @@ public class TaskController extends BaseController<TaskPO> {
         PageVO<TaskDTO> pageVO = this.taskService.getPageInfo(reqVO);
         return WinResponseData.handleSuccess(pageVO);
     }
+    @SysLog("部署任务")
     @GetMapping("/deploy")
     public WinResponseData deploy(@RequestParam Long id) {
         this.taskService.deploy(id);
         return WinResponseData.handleSuccess("启动异步部署...");
     }
 
+    @SysLog("卸载任务")
     @GetMapping("/undeploy")
     public WinResponseData undeploy(@RequestParam Long id) {
         this.taskService.unDeploy(id);
@@ -74,7 +77,7 @@ public class TaskController extends BaseController<TaskPO> {
         return WinResponseData.handleSuccess(taskService.getDetailById(id));
     }
     @GetMapping("/logInfo")
-    public WinResponseData logInfo(String filePath){
+    public WinResponseData logInfo(@RequestParam String filePath){
         log.info("filePath="+filePath);
         try {
             filePath = URLDecoder.decode(filePath,"UTF-8");
@@ -87,7 +90,7 @@ public class TaskController extends BaseController<TaskPO> {
     }
 
     @GetMapping("/log/device")
-    public WinResponseData deviceLog(String ipAddress,String strategyName){
+    public WinResponseData deviceLog(@RequestParam String ipAddress,@RequestParam String strategyName){
         log.info("ipAddress="+ipAddress+",strategyName"+strategyName);
         try {
             strategyName = URLDecoder.decode(strategyName,"UTF-8");

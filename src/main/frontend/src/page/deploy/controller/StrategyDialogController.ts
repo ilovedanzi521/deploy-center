@@ -46,12 +46,15 @@ export default class StrategyDialogController extends BaseController{
             .then((winResponseData: WinResponseData) =>{
                 if (WinRspType.SUCC === winResponseData.winRspType) {
                     this.strategyDetailVO = winResponseData.data;
-                    this.strategyDetailVO.createTime = dateUtils.dateFtt("yyyy-MM-dd hh:mm:ss", new Date(this.strategyDetailVO.createTime));
-                    this.strategyDetailVO.updateTime = dateUtils.dateFtt("yyyy-MM-dd hh:mm:ss", new Date(this.strategyDetailVO.updateTime));
+                    this.strategyDetailVO.createTime = this.formatDate(this.strategyDetailVO.createTime);
+                    this.strategyDetailVO.updateTime =  this.formatDate(this.strategyDetailVO.updateTime);;
                 } else {
                     this.win_message_error(winResponseData.msg);
                 }
             })
         }
+    }
+    formatDate(time:string){
+        return dateUtils.dateFtt("yyyy-MM-dd hh:mm:ss", new Date(time));
     }
 }

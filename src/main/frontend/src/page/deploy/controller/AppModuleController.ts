@@ -31,6 +31,11 @@ export default class AppModuleController extends BaseController {
     /*组表格加载中*/
     private tableLoading: boolean = false;
     private deviceLoading :boolean=false;
+    // 机器服务列表加载条
+    private devicesTableLoading:boolean=false;
+    // 启停按钮加载进度
+    private startBtnLoading:boolean=false;
+    private stopBtnLoading:boolean=false;
     /*选中项*/
     private selected: any = [];
     /** 上传弹框信息*/
@@ -174,7 +179,7 @@ export default class AppModuleController extends BaseController {
     // 状态格式化
     formatDeviceStatus({row, column, cellValue, index}){
         if(column.property === "status"){
-            if(cellValue == 0){
+            if(cellValue === 0){
                 return "服务未运行";
             }else if(cellValue < 0){
                 return "服务运行异常";
@@ -205,6 +210,7 @@ export default class AppModuleController extends BaseController {
         }
       }
     queryDevices(row,rowIndex){
+        this.devicesTableLoading = true;
         this.deployService.appModuleInstantList(row.id)
             .then((winResponseData: WinResponseData) =>{
                 if (WinRspType.SUCC === winResponseData.winRspType) {
@@ -220,7 +226,10 @@ export default class AppModuleController extends BaseController {
                 } else {
                     this.win_message_error(row.name+"机器服务查询异常："+winResponseData.msg);
                 }
-            });
+            })
+            .finally(()=>{
+                this.devicesTableLoading=false;
+            })
     }
     // 启动应用服务
     startApp(row:DeviceModuleRefVO,rowIndex:number){
@@ -231,9 +240,10 @@ export default class AppModuleController extends BaseController {
             return;
         }
         if(row.ipAddress&&row.moduleName){
+            this.startBtnLoading = true;
             let params={
                 "ipAddress":row.ipAddress,
-                "strategyName":row.moduleName
+                "moduleName":row.moduleName
             }
             this.deployService.startAppModule(params)
                 .then((winResponseData: WinResponseData) =>{
@@ -246,7 +256,10 @@ export default class AppModuleController extends BaseController {
                     } else {
                         this.win_message_error(row.ipAddress+"机器服务查询异常："+winResponseData.msg);
                     }
-                });
+                })
+                .finally(() =>{
+                    this.startBtnLoading = false;
+                })
         }
 
     }
@@ -254,14 +267,15 @@ export default class AppModuleController extends BaseController {
     stopApp(row:DeviceModuleRefVO,rowIndex:number){
         console.log("stopApp-"+rowIndex);
         console.log(row);
-        if(row.status=0){
+        if(row.status===0){
             this.win_message_box_warning("服务已经停止");
             return;
         }
-        if(row.ipAddress&&row.moduleName){
+        if(row.ipAddress&&row.moduleName){ 
+            this.stopBtnLoading = true;
             let params={
                 "ipAddress":row.ipAddress,
-                "strategyName":row.moduleName
+                "moduleName":row.moduleName
             }
             this.deployService.stopAppModule(params)
                 .then((winResponseData: WinResponseData) =>{
@@ -273,7 +287,10 @@ export default class AppModuleController extends BaseController {
                     } else {
                         this.win_message_error(row.ipAddress+"机器服务查询异常："+winResponseData.msg);
                     }
-                });
+                })
+                .finally(() =>{
+                    this.stopBtnLoading = false;
+                })
         }
     }
 }

@@ -68,20 +68,23 @@ public class AppModuleController extends BaseController<AppModulePO> {
         return WinResponseData.handleSuccess("上传成功");
     }
 
+    @SysLog("启动应用")
     @GetMapping("/moduleStart")
-    public WinResponseData moduleStart(@RequestParam String ipAddress, String moduleName) {
+    public WinResponseData moduleStart(@RequestParam String ipAddress,@RequestParam String moduleName) {
        boolean isStart = mScheduleService.moduleStart(ipAddress, moduleName);
        return WinResponseData.handleSuccess(isStart);
     }
 
     @GetMapping("/moduleStatus")
-    public WinResponseData moduleStatus(@RequestParam String ipAddress, String moduleName) {
+    public WinResponseData moduleStatus(@RequestParam String ipAddress,@RequestParam String moduleName) {
+
         int status = mScheduleService.moduleStatus(ipAddress, moduleName);
         return WinResponseData.handleSuccess(String.valueOf(status));
     }
 
+    @SysLog("关闭应用")
     @GetMapping("/moduleStop")
-    public WinResponseData moduleStop(@RequestParam String ipAddress, String moduleName) {
+    public WinResponseData moduleStop(@RequestParam String ipAddress,@RequestParam String moduleName) {
         boolean isStop = mScheduleService.moduleStop(ipAddress, moduleName);
         return WinResponseData.handleSuccess(isStop);
     }

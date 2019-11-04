@@ -19,15 +19,15 @@
                 <vxe-table-column type="selection" width="60"/>
                 <vxe-table-column type="expand" width="60">
                     <template v-slot="{ row, rowIndex }">
-                        <vxe-table border class="device-table"
+                        <vxe-table border class="device-table" :loading="devicesTableLoading"
                             :data="row.devices" >
                             <vxe-table-column field="deviceName" title="名称"></vxe-table-column>
                             <vxe-table-column field="ipAddress" title="ip地址"></vxe-table-column>
                             <vxe-table-column field="status" title="状态" :formatter="formatDeviceStatus"></vxe-table-column>
                             <vxe-table-column title="操作" min-width="100">
                                 <template v-slot="{ row }">
-                                    <el-button  size="mini" type="text" icon="el-icon-switch-button" @click="startApp(row,rowIndex)">启动</el-button>
-                                    <el-button  size="mini" type="text" icon="el-icon-delete" @click="stopApp(row,rowIndex)">停止</el-button>
+                                    <el-button  size="mini" type="text" icon="el-icon-switch-button" :loading="startBtnLoading" @click="startApp(row,rowIndex)">启动</el-button>
+                                    <el-button  size="mini" type="text" icon="el-icon-delete" :loading="stopBtnLoading" @click="stopApp(row,rowIndex)">停止</el-button>
                                 </template>
                             </vxe-table-column>
                             <template v-slot:empty>
@@ -88,11 +88,11 @@
         // 表头高度统一样式
         .vxe-header--column {
             height: 32px;
-            padding: 2px 0;
+            padding: 2px 0 !important;
         }
         .vxe-body--column{
             height: 28px;
-            padding: 2px 0;
+            padding: 2px 0 !important;
         }
         // 表格展开箭头样式
         .vxe-table--expanded .vxe-table--expand-icon{

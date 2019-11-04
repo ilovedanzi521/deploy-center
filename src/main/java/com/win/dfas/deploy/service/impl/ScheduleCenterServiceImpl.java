@@ -165,10 +165,11 @@ public class ScheduleCenterServiceImpl implements ScheduleCenterService {
     @Override
     public boolean moduleStop(String ipAddr, String moduleName) {
         ScheduleContext context = Scheduler.get().getRemoteContext(ipAddr);
-        if(context != null) {
-            return context.moduleStop(moduleName);
+        if(context == null) {
+            throw new BaseException("调度中心不存在机器"+ipAddr+"上下文");
         }
-        return false;
+
+        return context.moduleStop(moduleName);
     }
 
     /**

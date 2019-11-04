@@ -57,7 +57,7 @@ Start(){
   # Start java_ms_xxx service
   if test -r $absAppPath
   then
-    $CC_HOME_DIR/modules/java_sdk.sh --JAR_FILE=$appPath --JDK_DIR=$JDK_DIR --JDK_VER=$JDK_VER
+    $CC_HOME_DIR/modules/java_sdk.sh --JAR_FILE=$appPath --JDK_VER=$JDK_VER
   else
     echo "Can not founds $appPath, code=2"
   fi

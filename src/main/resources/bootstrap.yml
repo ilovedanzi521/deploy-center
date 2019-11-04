@@ -1,7 +1,7 @@
 server:
   port: 8888 #本地开发环境时用，生产部署时，应该设置为0，系统随机创建端口
   servlet:
-    context-path: /deploy
+    context-path: /dfas-deploy-center
 spring:
   profiles:
     active: dev

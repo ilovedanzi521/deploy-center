@@ -24,13 +24,13 @@ export default class DeployService {
     taskPageList(vo: QueryReqVO): Promise<WinResponseData> {
         return AxiosFun.post(DeployBaseUrl +"/task/pageList", vo);
     }
-    appModuleInstantList(id: any): Promise<WinResponseData> {
+    appModuleInstantList(id: number): Promise<WinResponseData> {
         return AxiosFun.get(DeployBaseUrl +"/app/module/instanceList/"+id, null);
     }
-    startAppModule(params: { "ipAddress": any; "strategyName": any; }): Promise<WinResponseData> {
+    startAppModule(params: { "ipAddress": string; "moduleName": string; }): Promise<WinResponseData> {
         return AxiosFun.get(DeployBaseUrl +"/app/module/moduleStart", params);
     }
-    stopAppModule(params: { "ipAddress": any; "strategyName": any; }): Promise<WinResponseData> {
+    stopAppModule(params: { "ipAddress": string; "moduleName": string; }): Promise<WinResponseData> {
         return AxiosFun.get(DeployBaseUrl +"/app/module/moduleStop", params);
     }
     public static uploadUrl: string = DeployBaseUrl +"/app/module/upload";

@@ -4,7 +4,7 @@ echo "Start $0 $*"
 
 # initialize env variable
 # manual configure FTP_SERVER and FTP_PORT
-CC_FTP_SERVER=192.168.0.70
+CC_FTP_SERVER=192.168.0.72
 CC_FTP_PORT=21
 CC_FTP_ROOT=/pub/repo
 CC_FTP_USER=ftp

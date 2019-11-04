@@ -76,7 +76,7 @@ public class ScheduleContext {
                 mIsInit.set(ShellUtils.isSuccess(resultList));
 
                 if(resultList == null) {
-                    log.info("initRemoteDevice ===> ");
+                    log.error("initRemoteDevice ===> ");
                     ShellUtils.listLog(log, resultList);
                 }
             }else {
@@ -94,7 +94,11 @@ public class ScheduleContext {
      */
     public List<String> devConnect() {
         // 如果remote host没有初始化，则调用远程命令之前必须初始化
-        initRemoteDevice();
+        boolean inited = initRemoteDevice();
+        if (!inited){
+            log.error("devConnect failure, "+mHost.getIpAddress()+" can't init");
+            return null;
+        }
         String command = mEnvConfig.getHomeDir()+File.separator+sCommShell;
         String[] params = {
                 "ssh",
@@ -129,8 +133,11 @@ public class ScheduleContext {
         log.info("packPath command: "+command+" params: ", params.toString());
 
         // 如果remote host没有初始化，则调用远程命令之前必须初始化
-        initRemoteDevice();
-
+        boolean inited = initRemoteDevice();
+        if (!inited){
+            log.error("packPath failure, "+mHost.getIpAddress()+" can't init");
+            return "";
+        }
         List<String> resultList = ShellUtils.envExecShell(params);
         if(resultList != null && resultList.size()>0) {
             return resultList.get(0);
@@ -181,6 +188,7 @@ public class ScheduleContext {
 
         AppModulePO module = mAppManager.getModuleByName(moduleName);
         if(module == null || StrUtil.isEmpty(module.getName())) {
+            log.error("模块["+moduleName+"]未初始化到调度中心");
             return -1;
         }
 
@@ -200,6 +208,7 @@ public class ScheduleContext {
         // 如果remote host没有初始化，则调用远程命令之前必须初始化
         boolean inited= initRemoteDevice();
         if (!inited){
+            log.error("moduleStatus failure, "+mHost.getIpAddress()+" can't init");
             return -1;
         }
         List<String> resultList = ShellUtils.envExecShell(params);
@@ -227,10 +236,20 @@ public class ScheduleContext {
         String command = remoteShellPath;
 
         // 如果remote host没有初始化，则调用远程命令之前必须初始化
-        initRemoteDevice();
+        boolean inited = initRemoteDevice();
+        if (!inited){
+            log.error("moduleStart failure, "+mHost.getIpAddress()+" can't init");
+            return false;
+        }
 
         AppModulePO module = mAppManager.getModuleByName(moduleName);
         if(module == null || StrUtil.isEmpty(module.getName())) {
+            log.error("模块["+moduleName+"]未初始化到调度中心");
+            return false;
+        }
+        AppModulePO jdkModule = StrategyFactory.getJavaSdkModule(StrategyFactory.JDK_MODULE_NAME);
+        if (jdkModule == null||StrUtil.isEmpty(jdkModule.getPackVer())){
+            log.error("模块["+StrategyFactory.JDK_MODULE_NAME+"]未初始化到调度中心");
             return false;
         }
 
@@ -243,7 +262,8 @@ public class ScheduleContext {
                 "start",
                 "--PACK_DIR="+module.getPackDir(),
                 "--PACK_VER="+module.getPackVer(),
-                "--PACK_FILE="+module.getPackFile()
+                "--PACK_FILE="+module.getPackFile(),
+                "--JDK_VER="  +jdkModule.getPackVer()
         };
         log.info("moduleStart command: " + command + " params: " + Arrays.toString(params));
 
@@ -265,12 +285,15 @@ public class ScheduleContext {
         String remoteShellPath = getModuleShellPath(moduleName);
         String command = remoteShellPath;
         String caller = "stop";
-
         // 如果remote host没有初始化，则调用远程命令之前必须初始化
-        initRemoteDevice();
-
+        boolean inited = initRemoteDevice();
+        if (!inited){
+            log.error("moduleStop failure, "+mHost.getIpAddress()+" can't init");
+            return false;
+        }
         AppModulePO module = mAppManager.getModuleByName(moduleName);
         if(module == null || StrUtil.isEmpty(module.getName())) {
+            log.error("模块["+moduleName+"]未初始化到调度中心");
             return false;
         }
 
@@ -280,7 +303,7 @@ public class ScheduleContext {
                 String.valueOf(mHost.getPort()),
                 mHost.getIpAddress(),
                 command,
-                "stop",
+                caller,
                 "--PACK_DIR="+module.getPackDir(),
                 "--PACK_VER="+module.getPackVer(),
                 "--PACK_FILE="+module.getPackFile()

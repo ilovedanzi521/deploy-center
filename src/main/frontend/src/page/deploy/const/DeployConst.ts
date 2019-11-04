@@ -1,6 +1,6 @@
 
-export const DeployBaseUrl:string = "http://localhost:8888/deploy";
-// export const DeployBaseUrl:string = "/deploy";
+// export const DeployBaseUrl:string = "http://localhost:8888/deploy";
+export const DeployBaseUrl:string = ("development" === process.env.NODE_ENV) ? "http://localhost:8888/dfas-deploy-center" : "/dfas-deploy-center";
 
 export const DialogTitleConst={
     GROUP_ADD: "新增设备组",
