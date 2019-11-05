@@ -19,7 +19,7 @@
                 <vxe-table-column type="selection" width="60"/>
                 <vxe-table-column type="expand" width="60">
                     <template v-slot="{ row, rowIndex }">
-                        <vxe-table border class="device-table" :loading="devicesTableLoading"
+                        <vxe-table border class="device-table" size="mini" :loading="devicesTableLoading"
                             :data="row.devices" >
                             <vxe-table-column field="deviceName" title="名称"></vxe-table-column>
                             <vxe-table-column field="ipAddress" title="ip地址"></vxe-table-column>

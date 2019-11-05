@@ -76,6 +76,8 @@ export default class GroupController extends BaseController {
      * @param vo
      */
     public groupPageQuery(pageVO: PageVO) {
+        console.log("groupPageQuery");
+        console.log(pageVO);
         this.groupQueryVO.reqPageNum = pageVO.pageNum;
         this.groupQueryVO.reqPageSize = pageVO.pageSize;
         this.queryGroupTreeList(this.groupQueryVO);
