@@ -1,5 +1,5 @@
 server:
-  port: 0
+  port: 9000
 deploy-center:
   homeDir: /root/repo
   deployDir: /root/deploy

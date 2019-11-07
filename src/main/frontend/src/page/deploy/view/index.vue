@@ -221,7 +221,7 @@
                 </win-table>
                 <!--分页组件-->
                 <div class="page-contanier">
-                    <win-pagination name="logPage" v-bind:childMsg="logPageVO" @callFather="logPageQuery"></win-pagination>
+                    <win-pagination v-bind:pageInfo="pageVO" @pageInfoChange="logPageQuery"></win-pagination>
                 </div>
             </win-col>
         </win-row>

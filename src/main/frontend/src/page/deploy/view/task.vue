@@ -40,7 +40,7 @@
             </win-table>
             <!--分页组件-->
             <div class="page-contanier">
-                <win-pagination name="groupPage" v-bind:childMsg="pageVO" @callFather="pageQuery"></win-pagination>
+                <win-pagination v-bind:pageInfo="pageVO" @pageInfoChange="pageQuery"></win-pagination>
             </div>
         </div>
         <!-- 添加任务弹框 -->

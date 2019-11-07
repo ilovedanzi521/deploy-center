@@ -47,7 +47,7 @@
             </win-table>
             <!--分页组件-->
             <div class="page-contanier">
-                <win-pagination name="groupPage" v-bind:childMsg="pageVO" @callFather="groupPageQuery"></win-pagination>
+                <win-pagination v-bind:pageInfo="pageVO" @pageInfoChange="groupPageQuery"></win-pagination>
             </div>
             <!-- 设备组弹框begin：新增/删除 -->
             <GroupDialog v-if="isGroupDialog" :toChildMsg="groupDialogMsg" @bindSend="toGroupDialogForm" ></GroupDialog>

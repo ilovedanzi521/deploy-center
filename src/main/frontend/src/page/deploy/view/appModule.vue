@@ -56,7 +56,7 @@
             </vxe-table>
             <!--分页组件-->
             <div class="page-contanier">
-                <win-pagination name="groupPage" v-bind:childMsg="pageVO" @callFather="groupPageQuery"></win-pagination>
+                <win-pagination v-bind:pageInfo="pageVO" @pageInfoChange="pageQuery"></win-pagination>
             </div>
             <!--上传应用弹框 -->
             <UploadDialog v-if="isUploadDialog" :toChildMsg="toUploadDialogMsg" @bindSend="bindUploadSend" ></UploadDialog>

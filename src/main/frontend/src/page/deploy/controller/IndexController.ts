@@ -2,12 +2,12 @@ import Component from "vue-class-component";
 import { WinRspType } from "../../common/enum/BaseEnum";
 import { WinResponseData } from "../../common/vo/BaseVO";
 import BaseController from "../../common/controller/BaseController";
-import { LogDetailVO, LogPageVO, LogQueryReqVO } from "../vo/LogVO";
+import { LogDetailVO, LogQueryReqVO } from "../vo/LogVO";
 import DeployService from "../service/DeployService";
 import dateUtils from "win-biz/common/util/DateUtils";
 import { StatisticsRepVO } from "../vo/DeployVO";
 import { Emit } from "vue-property-decorator";
-import { OperationTypeEnum } from "win-biz";
+import { OperationTypeEnum, PageVO } from "win-biz";
 import { GroupTreeVO } from "../vo/GroupVO";
 import { DialogTitleConst, DeployBaseUrl } from "../const/DeployConst";
 import { DeployTypeEnum } from "../const/DeployEnum";
@@ -26,8 +26,6 @@ export default class IndexController extends BaseController {
     private logTableData: LogDetailVO[]=[];
     // 查询条件
     private logQueryVO: LogQueryReqVO=new LogQueryReqVO();
-    // 分页对象
-    public logPageVO: LogPageVO = new LogPageVO();
     // 表格加载进度
     private logLoading: boolean = false;
     private taskLoading: boolean = false;
@@ -39,6 +37,7 @@ export default class IndexController extends BaseController {
 
     // 初始化
     mounted(){
+        this.pageVO.pageSize=25;
         this.initTaskStatistics();
         this.initAppStatistics();
         this.queryLogPageList(this.logQueryVO);
@@ -96,7 +95,7 @@ export default class IndexController extends BaseController {
         }
     }
     // 分页栏查询
-    logPageQuery(pageVO: LogPageVO) {
+    logPageQuery(pageVO: PageVO) {
         this.logQueryVO.reqPageNum = pageVO.pageNum;
         this.logQueryVO.reqPageSize = pageVO.pageSize;
         this.queryLogPageList(this.logQueryVO);

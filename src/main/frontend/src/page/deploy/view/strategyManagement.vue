@@ -24,7 +24,7 @@
             </win-table>
             <!--分页组件-->
             <div class="page-contanier">
-                <win-pagination name="strategyPage" v-bind:childMsg="pageVO" @callFather="strategyPageQuery"></win-pagination>
+                    <win-pagination v-bind:pageInfo="pageVO" @pageInfoChange="strategyPageQuery"></win-pagination>
             </div>
             <!-- 添加弹框 -->
             <StrategyDialog v-if="showDialog" :toChildMsg="toDialogMsg" @bindSend="bindDialogSend"></StrategyDialog>

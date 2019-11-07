@@ -59,6 +59,7 @@ export default class AppModuleController extends BaseController {
         this.deployService.appModulePageList(queryReqVO)
             .then((winResponseData: WinResponseData) =>{
                 if (WinRspType.SUCC === winResponseData.winRspType) {
+
                     this.pageDataList = winResponseData.data.list;
                     console.log(this.pageDataList);
                     this.pageVO = winResponseData.data;
@@ -76,7 +77,7 @@ export default class AppModuleController extends BaseController {
      *
      * @param vo
      */
-    public groupPageQuery(pageVO: PageVO) {
+    public pageQuery(pageVO: PageVO) {
         this.queryReqVO.reqPageNum = pageVO.pageNum;
         this.queryReqVO.reqPageSize = pageVO.pageSize;
         this.queryPageList(this.queryReqVO);
