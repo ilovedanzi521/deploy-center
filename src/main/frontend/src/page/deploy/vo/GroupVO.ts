@@ -8,7 +8,7 @@ export class GroupReqVO{
     id: number;
     name: string;
     desc: string;
-    deviceIds: number[];
+    deviceIds: number[]=[];
 }
 export class DeviceReqVO extends BaseReqVO{
     ipAddress:String;

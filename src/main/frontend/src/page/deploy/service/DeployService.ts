@@ -80,6 +80,9 @@ export default class DeployService {
     deviceConnectTest(vo: DeviceRepVO): Promise<WinResponseData> {
         return AxiosFun.post(DeployBaseUrl +"/device/connectTest", vo);
     }
+    testConnectByIp(ipAddress: string): Promise<WinResponseData> {
+        return AxiosFun.get(DeployBaseUrl +"/device/connectDev?ipAddr="+ipAddress);
+    }
 
     insertDevice(vo: DeviceRepVO): Promise<WinResponseData> {
         return AxiosFun.post(DeployBaseUrl +"/device/safeSave", vo);
@@ -88,6 +91,9 @@ export default class DeployService {
     saveGroup(vo: GroupReqVO): Promise<WinResponseData> {
         return AxiosFun.post(DeployBaseUrl +"/group/safeSave", vo);
     }
+    safeUpdateGroup(vo: GroupReqVO): Promise<WinResponseData> {
+        return AxiosFun.post(DeployBaseUrl +"/group/safeUpdate", vo);
+    }
 
     removeGroupById(id: number): Promise<WinResponseData> {
         return AxiosFun.winDelete(DeployBaseUrl +"/group/safeRemove/"+id);
@@ -95,5 +101,8 @@ export default class DeployService {
 
     removeDeviceById(id: number): Promise<WinResponseData> {
         return AxiosFun.winDelete(DeployBaseUrl +"/device/safeRemove/"+id);
+    }
+    removeDeviceBatch(ids: number[]): Promise<WinResponseData> {
+        return AxiosFun.post(DeployBaseUrl +"/device/safeRemoveBatch",ids);
     }
 }

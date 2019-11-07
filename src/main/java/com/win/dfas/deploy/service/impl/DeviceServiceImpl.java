@@ -10,7 +10,9 @@ import com.win.dfas.deploy.dao.DeviceDao;
 import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.schedule.Scheduler;
 import com.win.dfas.deploy.schedule.utils.ShellUtils;
+import com.win.dfas.deploy.service.DeviceModuleService;
 import com.win.dfas.deploy.service.DeviceService;
+import com.win.dfas.deploy.service.GroupDeviceRefService;
 import com.win.dfas.deploy.service.ScheduleCenterService;
 import com.win.dfas.deploy.util.SpringContextUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -36,10 +38,10 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DevicePO> implemen
     @Autowired
     private ScheduleCenterService mScheduleService;
 
-    public DeviceServiceImpl() {
-        //mScheduleService = new ScheduleCenterService();
-        //mScheduleService = (ScheduleCenterService)SpringContextUtils.getBean("schedule_center_service");
-    }
+    @Autowired
+    private DeviceModuleService deviceModuleService;
+    @Autowired
+    private GroupDeviceRefService groupDeviceRefService;
 
     @Override
     public DevicePO connectTest(DevicePO device) {
@@ -97,12 +99,33 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DevicePO> implemen
      */
     @Override
     public Boolean safeRemove(Long id) {
+        beforeSafeRemove(id);
+//        删除设备
+        return this.removeById(id);
+    }
+
+    private void beforeSafeRemove(Long id) {
         DevicePO existPo = this.getById(id);
         if (existPo == null){
-            throw new BaseException("设备已经不存在！");
+            throw new BaseException(existPo.getIpAddress()+"机器已经不存在！");
         }
+        if(detectedDeviceModule(id)){
+            throw new BaseException(existPo.getIpAddress()+"机器已经部署任务，无法进行安全删除！");
+        }
+//        删除组中的设备
+        this.groupDeviceRefService.removeByDeviceId(id);
+//        删除调度中心设备
         Scheduler.get().delDevice(existPo);
-        return this.removeById(id);
+    }
+
+    private boolean detectedDeviceModule(Long deviceId) {
+        QueryWrapper queryWrapper=new QueryWrapper();
+        queryWrapper.eq("device_id",deviceId);
+        int count = this.deviceModuleService.count(queryWrapper);
+        if (count>0){
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -112,9 +135,8 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DevicePO> implemen
      */
     @Override
     public Boolean safeRemoveBatch(List<Long> ids) {
-        List<DevicePO> list = (List<DevicePO>) this.listByIds(ids);
-        for (DevicePO device : list) {
-            Scheduler.get().delDevice(device);
+        for (Long id : ids) {
+            beforeSafeRemove(id);
         }
         return this.removeByIds(ids);
     }

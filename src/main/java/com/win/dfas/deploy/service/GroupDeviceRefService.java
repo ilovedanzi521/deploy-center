@@ -11,4 +11,11 @@ import com.win.dfas.deploy.po.GroupDeviceRefPO;
  * @创建时间 2019/10/08 15:20
  */
 public interface GroupDeviceRefService extends IService<GroupDeviceRefPO> {
+
+    /**
+     * 根据设备id删除关联记录
+     * @param deviceId
+     * @return
+     */
+    boolean removeByDeviceId(Long deviceId);
 }

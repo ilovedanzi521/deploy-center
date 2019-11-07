@@ -228,22 +228,21 @@ export default class GroupController extends BaseController {
         }
     }
     // 连接测试并保存状态
-    private connectTest(row: GroupTreeVO){
-        // this.win_message_box_warning("是否进行设备连接测试？","提示")
-        //     .then(() => {
-        //         this.deviceReqVO.ipAddress = row.ipAddress;
-        //         this.deviceReqVO.port = row.port;
-        //         this.deviceReqVO.userName = row.userName;
-        //         this.deployService.deviceConnectTest(this.deviceReqVO)
-        //             .then((winResponseData: WinResponseData) =>{
-        //                 if (WinRspType.SUCC === winResponseData.winRspType) {
-        //                     this.queryGroupTreeList(this.groupQueryVO);
-        //                     this.successMessage(winResponseData.msg);
-        //                 } else {
-        //                     this.errorMessage(winResponseData.msg);
-        //                 }
-        //             });
-        //     });
+    private testConnect(row: GroupTreeVO){
+        this.win_message_box_warning("是否测试设备连通性？","提示")
+            .then(() => {
+                if(row.ipAddress){
+                    this.deployService.testConnectByIp(row.ipAddress)
+                        .then((winResponseData: WinResponseData) =>{
+                            if (WinRspType.SUCC === winResponseData.winRspType) {
+                                this.win_message_success(winResponseData.msg);
+                                this.queryGroupTreeList(this.groupQueryVO);
+                            } else {
+                                this.win_message_error(winResponseData.msg);
+                            }
+                        });
+                }
+            });
         
     }
 }

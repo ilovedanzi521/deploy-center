@@ -41,6 +41,9 @@ export default class GroupDialogController extends BaseController{
     private deviceIds: number[]=[];
     private devices: DeviceRepVO[]=[];
     private deviceTransferData: any =[];
+
+    // 穿梭框左边选中值
+    private leftCheckedKeys: number[]=[];
     /**
      * 按钮是否显示
      */
@@ -64,6 +67,9 @@ export default class GroupDialogController extends BaseController{
         this.isDeviceDialog = false;
         if (msg === WinRspType.SUCC) {
             this.initDeviceTransferData();
+        }else if(msg === WinRspType.WARN){
+            this.initDeviceTransferData();
+            this.isDeviceDialog = true;
         }
     }
     /*###################################33*/
@@ -106,10 +112,22 @@ export default class GroupDialogController extends BaseController{
         this.$refs[formName].validate((valid: boolean) => {
             if (valid) {
                 console.log(this.groupReqVO);
-                this.deployService.saveGroup(this.groupReqVO)
-                    .then((winResponseData: WinResponseData) =>{
-                        this.groupDialogMessage(winResponseData);
-                });
+                if(this.groupReqVO.id){
+                    this.deployService.safeUpdateGroup(this.groupReqVO)
+                        .then((winResponseData: WinResponseData) =>{
+                            this.groupDialogMessage(winResponseData);
+                        }).finally(()=>{
+                            this.saveLoading = false;
+                        })
+                        
+                }else{
+                    this.deployService.saveGroup(this.groupReqVO)
+                        .then((winResponseData: WinResponseData) =>{
+                            this.groupDialogMessage(winResponseData);
+                        }).finally(()=>{
+                            this.saveLoading = false;
+                        })
+                }
             } else {
                 this.saveLoading = false;
                 this.win_message_error("组表单验证未通过");
@@ -145,10 +163,10 @@ export default class GroupDialogController extends BaseController{
     }
 
     /*初始化设备穿梭框可选数据*/
-    private initDeviceTransferData() {
+    async initDeviceTransferData() {
         let me = this;
         me.deviceTransferData = [];
-        this.deployService.deviceList()
+        await this.deployService.deviceList()
             .then((winResponseData: WinResponseData) =>{
                 if (WinRspType.SUCC === winResponseData.winRspType) {
                     console.log(winResponseData.data);
@@ -169,10 +187,9 @@ export default class GroupDialogController extends BaseController{
 
     // 消息
     private groupDialogMessage(winResponseData: WinResponseData) {
-        this.saveLoading = false;
         if (WinRspType.SUCC === winResponseData.winRspType) {
-            this.dialogVisibleSon = false;
             this.win_message_success(winResponseData.msg);
+            this.dialogVisibleSon = false;
             this.send(WinRspType.SUCC);
         } else {
             this.win_message_error(winResponseData.msg);
@@ -192,7 +209,26 @@ export default class GroupDialogController extends BaseController{
         }
         this.isDeviceDialog = true;
     }
+    // 批量删除设备
     deleteDevices(){
-        
+        if(this.leftCheckedKeys.length>0){
+            this.deployService.removeDeviceBatch(this.leftCheckedKeys)
+            .then((winResponseData: WinResponseData) =>{
+                if (WinRspType.SUCC === winResponseData.winRspType) {
+                    console.log(winResponseData.data);
+                   this.win_message_success(winResponseData.msg);
+                   this.initDeviceTransferData();
+                } else {
+                    this.win_message_error(winResponseData.msg);
+                }
+            })
+        }else{
+            this.win_message_box_warning("请选择设备！");
+        }
+    }
+
+    // 处理左边选中事件
+    leftCheckChangeHandle(checked, changed){
+        this.leftCheckedKeys = checked;
     }
 }

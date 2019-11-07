@@ -32,7 +32,7 @@
                 <win-table-column field="createTime" title="创建时间" min-width="100" :formatter="formatGroupTable"></win-table-column>
                 <win-table-column field="status" title="连接状态" min-width="80">
                     <template v-slot="{ row }" >
-                        <el-tag v-if="row.ipAddress==null ? false : true" :type="deviceStatusType(row.status)" >{{formatDeviceStatus(row.status)}}</el-tag>
+                        <el-tag v-if="row.ipAddress==null ? false : true" :type="deviceStatusType(row.status)" @click="testConnect(row)">{{formatDeviceStatus(row.status)}}</el-tag>
                     </template>
                 </win-table-column>
                 <win-table-column title="操作" min-width="100">

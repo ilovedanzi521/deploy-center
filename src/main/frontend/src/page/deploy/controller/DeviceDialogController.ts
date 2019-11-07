@@ -42,6 +42,7 @@ export default class DeviceDialogController extends BaseController{
     /*设备对话框-提交按钮*/
     private deviceSubmitText :string = "";
     private deviceStatusText : string = "未连接";
+    private showSubmitBtn :boolean = true;
 
     private deviceRepVO: DeviceRepVO=new DeviceRepVO();
     private deviceReqVO: DeviceReqVO = new DeviceReqVO();
@@ -87,6 +88,7 @@ export default class DeviceDialogController extends BaseController{
             this.deviceSubmitText = BaseConst.CONFIRM;
         }
         this.deviceDialogVisible = true;
+        this.showSubmitBtn = true;
     }
 
     public submitDeviceDialog(formName: string){
@@ -125,7 +127,8 @@ export default class DeviceDialogController extends BaseController{
                             }else {
                                 this.deviceStatusText= "未连接";
                             }
-                            this.send(WinRspType.SUCC);
+                            this.showSubmitBtn = false;
+                            this.send(WinRspType.WARN);
                         } else {
                             this.win_message_error(winResponseData.msg);
                         }

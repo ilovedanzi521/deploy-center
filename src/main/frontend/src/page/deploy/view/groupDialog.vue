@@ -13,7 +13,12 @@
                     </win-col>
                     <win-col :span="16">
                         <win-form-item>
-                            <el-transfer :titles="['可选设备', '已选设备']" v-model="groupReqVO.deviceIds" :data="deviceTransferData">
+                            <el-transfer filterable :titles="['可选设备', '已选设备']" 
+                                v-model="groupReqVO.deviceIds" :data="deviceTransferData" @left-check-change="leftCheckChangeHandle"
+                                :format="{
+                                    noChecked: '${total}',
+                                    hasChecked: '${checked}/${total}'
+                                }">
                                 <div slot="left-footer">
                                         <el-button-group>
                                             <win-button type="info" icon="el-icon-plus" size="small" @click="deviceOperation('','ADD')">新增设备</win-button>
