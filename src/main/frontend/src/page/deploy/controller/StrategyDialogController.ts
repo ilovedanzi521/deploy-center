@@ -49,7 +49,7 @@ export default class StrategyDialogController extends BaseController{
                     this.strategyDetailVO.createTime = this.formatDate(this.strategyDetailVO.createTime);
                     this.strategyDetailVO.updateTime =  this.formatDate(this.strategyDetailVO.updateTime);;
                 } else {
-                    this.win_message_error(winResponseData.msg);
+                    this.win_message_box_error(winResponseData.msg);
                 }
             })
         }

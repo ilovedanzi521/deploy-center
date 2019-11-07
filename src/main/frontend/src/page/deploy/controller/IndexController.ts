@@ -51,7 +51,7 @@ export default class IndexController extends BaseController {
                 if (WinRspType.SUCC === winResponseData.winRspType) {
                     this.taskStatistics = winResponseData.data;
                 } else {
-                    this.win_message_error(winResponseData.msg);
+                    this.win_message_box_error(winResponseData.msg);
                 }
             })
             .finally(() =>{
@@ -66,7 +66,7 @@ export default class IndexController extends BaseController {
                 if (WinRspType.SUCC === winResponseData.winRspType) {
                     this.appStatistics = winResponseData.data;
                 } else {
-                    this.win_message_error(winResponseData.msg);
+                    this.win_message_box_error(winResponseData.msg);
                 }
             })
             .finally(() =>{
@@ -82,7 +82,7 @@ export default class IndexController extends BaseController {
                     this.logTableData = winResponseData.data.list;
                     this.pageVO = winResponseData.data;
                 } else {
-                    this.win_message_error(winResponseData.msg);
+                    this.win_message_box_error(winResponseData.msg);
                 }
             })
             .finally(() =>{

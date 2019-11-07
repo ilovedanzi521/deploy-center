@@ -1,5 +1,6 @@
 <template>
-    <win-fdialog width="30%" class="DeviceDialog" :title="deviceDialogTitle" :visible.sync="deviceDialogVisible" append-to-body :close-on-click-modal="false" :close-on-press-escape="false" >
+    <win-fdialog width="30%" class="DeviceDialog"  append-to-body :close-on-click-modal="false" :close-on-press-escape="false" 
+        :before-close="closeDeviceDialog" :title="deviceDialogTitle" :visible.sync="deviceDialogVisible">
         <win-form class="form" :inline="true" :rules="deviceRules" :model="deviceRepVO" ref="deviceForm" :disabled="false" label-position="left" label-width="80px" v-testName="{'TEST_NAME':'DeviceDialog_wz'}">
                 <div class="hr">
                     <win-row>
@@ -40,7 +41,7 @@
             </win-form>
             <div slot="footer" class="dialog-footer" >
                 <win-button type="info" @click="connectTest('deviceForm')">连接测试</win-button>
-                <win-button @click="deviceDialogVisible = false">取消</win-button>
+                <win-button @click="closeDeviceDialog">取消</win-button>
                 <win-button v-if="showSubmitBtn" type="primary"  @click="submitDeviceDialog('deviceForm')">{{deviceSubmitText}}</win-button>
             </div>
     </win-fdialog>

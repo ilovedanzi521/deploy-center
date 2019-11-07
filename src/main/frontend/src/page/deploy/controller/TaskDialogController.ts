@@ -83,8 +83,6 @@ export default class TaskDialogController extends BaseController{
             this.allDisabled = true;
             this.getInfo(this.toChildMsg.data.id);
         }
-        if(this.dialogVisibleSon){
-        }
     }
     getInfo(id:number) {
         console.log("***********getLogInfo");
@@ -98,7 +96,7 @@ export default class TaskDialogController extends BaseController{
                     this.taskDetailVO.status= this.formmatStatus(this.taskDetailVO.status);
                     this.taskDetailVO.createTime = this.formatDate(this.taskDetailVO.createTime);
                 } else {
-                    this.win_message_error(winResponseData.msg);
+                    this.win_message_box_error(winResponseData.msg);
                 }
             });
         }
@@ -135,7 +133,7 @@ export default class TaskDialogController extends BaseController{
                         me.strategyData = winResponseData.data;
                     }
                 } else {
-                    this.win_message_error(winResponseData.msg);
+                    this.win_message_box_error(winResponseData.msg);
                 }
             });
 
@@ -152,7 +150,7 @@ export default class TaskDialogController extends BaseController{
                         me.groupData = winResponseData.data;
                     }
                 } else {
-                    this.win_message_error(winResponseData.msg);
+                    this.win_message_box_error(winResponseData.msg);
                 }
             });
     }
@@ -175,11 +173,11 @@ export default class TaskDialogController extends BaseController{
                             this.send(WinRspType.SUCC);
                             this.win_message_success(winResponseData.msg);
                         } else {
-                            this.win_message_error(winResponseData.msg);
+                            this.win_message_box_error(winResponseData.msg);
                         }
                     })
             } else {
-                this.win_message_error("表单验证未通过");
+                this.win_message_box_error("表单验证未通过");
                 return false;
             }
         });
@@ -197,11 +195,11 @@ export default class TaskDialogController extends BaseController{
                             this.send(WinRspType.SUCC);
                             this.win_message_success(winResponseData.msg);
                         } else {
-                            this.win_message_error(winResponseData.msg);
+                            this.win_message_box_error(winResponseData.msg);
                         }
                     })
             } else {
-                this.win_message_error("表单验证未通过");
+                this.win_message_box_error("表单验证未通过");
                 return false;
             }
         });
@@ -221,7 +219,7 @@ export default class TaskDialogController extends BaseController{
                 if (WinRspType.SUCC === winResponseData.winRspType) {
                     this.deviceLogInfo=winResponseData.data;
                 } else {
-                    this.win_message_error(winResponseData.msg);
+                    this.win_message_box_error(winResponseData.msg);
                 }
             });
         }

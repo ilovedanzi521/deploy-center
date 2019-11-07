@@ -12,17 +12,11 @@ import com.win.dfas.deploy.common.enumerate.DeployEnum;
 import com.win.dfas.deploy.common.exception.BaseException;
 import com.win.dfas.deploy.dao.TaskDao;
 import com.win.dfas.deploy.dto.StatisticsDTO;
-import com.win.dfas.deploy.po.AppModulePO;
 import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.po.StrategyPO;
 import com.win.dfas.deploy.po.TaskPO;
-import com.win.dfas.deploy.schedule.AppManager;
 import com.win.dfas.deploy.schedule.Scheduler;
-import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
 import com.win.dfas.deploy.schedule.context.ScheduleContext;
-import com.win.dfas.deploy.schedule.context.StrategyFactory;
-import com.win.dfas.deploy.schedule.context.StrategyInterface;
-import com.win.dfas.deploy.schedule.utils.ShellUtils;
 import com.win.dfas.deploy.service.GroupService;
 import com.win.dfas.deploy.service.ScheduleCenterService;
 import com.win.dfas.deploy.service.StrategyService;
@@ -35,10 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,7 +90,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskPO> implements Tas
     @Override
     public void deploy(Long id) {
         TaskPO task = this.getById(id);
-        if (beforeDeploy(task)){
+        if (beforeDeployValid(task)){
             this.mScheduleService.deploy(id);
         }
     }
@@ -110,7 +100,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskPO> implements Tas
      * @param task
      * @return
      */
-    private boolean beforeDeploy(TaskPO task) {
+    private boolean beforeDeployValid(TaskPO task) {
         if(task == null) {
             throw new BaseException("部署异常：任务["+task.getId()+"]已经不存在！");
         }else if (DeployEnum.TaskStatus.DEPLOY_UNDERWAY.getValue().equals(task.getStatus())){
@@ -240,7 +230,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskPO> implements Tas
             }
         }else {
             taskPO=existPo;
-            if(beforeDeploy(existPo)){
+            if(beforeDeployValid(existPo)){
                 this.deploy(existPo.getId());
             }
         }

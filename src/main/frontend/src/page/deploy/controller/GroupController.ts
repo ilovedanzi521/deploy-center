@@ -62,7 +62,7 @@ export default class GroupController extends BaseController {
                     this.groupTreeList = winResponseData.data.list;
                     this.pageVO = winResponseData.data;
                 } else {
-                    this.win_message_error(winResponseData.msg);
+                    this.win_message_box_error(winResponseData.msg);
                 }
             })
             .finally(() =>{
@@ -133,7 +133,7 @@ export default class GroupController extends BaseController {
                                 this.queryGroupTreeList(this.groupQueryVO);
                                 this.win_message_success(winResponseData.msg);
                             } else {
-                                this.win_message_error(winResponseData.msg);
+                                this.win_message_box_error(winResponseData.msg);
                             }
                         });
                         
@@ -159,7 +159,7 @@ export default class GroupController extends BaseController {
                             this.queryGroupTreeList(this.groupQueryVO);
                             this.win_message_success(winResponseData.msg);
                         } else {
-                            this.win_message_error(winResponseData.msg);
+                            this.win_message_box_error(winResponseData.msg);
                         }
                     });
             });
@@ -175,7 +175,7 @@ export default class GroupController extends BaseController {
                             this.queryGroupTreeList(this.groupQueryVO);
                             this.win_message_success(winResponseData.msg);
                         } else {
-                            this.win_message_error(winResponseData.msg);
+                            this.win_message_box_error(winResponseData.msg);
                         }
                     });
             });
@@ -238,7 +238,7 @@ export default class GroupController extends BaseController {
                                 this.win_message_success(winResponseData.msg);
                                 this.queryGroupTreeList(this.groupQueryVO);
                             } else {
-                                this.win_message_error(winResponseData.msg);
+                                this.win_message_box_error(winResponseData.msg);
                             }
                         });
                 }

@@ -49,7 +49,7 @@ export default class StrategyManagementController extends BaseController {
                 this.strategyList = winResponseData.data.list;
                 this.pageVO = winResponseData.data;
             } else {
-                this.win_message_error(winResponseData.msg);
+                this.win_message_box_error(winResponseData.msg);
             }
         })
         .finally(() =>{

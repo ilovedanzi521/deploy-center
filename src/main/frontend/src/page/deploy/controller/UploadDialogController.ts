@@ -65,13 +65,13 @@ export default class UploadDialogController extends BaseController{
             this.win_message_success(winResponseData.msg);
             this.send(WinRspType.SUCC);
         } else {
-            this.win_message_error(winResponseData.msg);
+            this.win_message_box_error(winResponseData.msg);
         }
     }
     // 上传失败提示
     private errorUpload(err, file){
         console.log("errorUpload");
         console.log(err);
-        this.win_message_error(err.message);
+        this.win_message_box_error(err.message);
     }
 }

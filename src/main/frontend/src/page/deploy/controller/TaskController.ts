@@ -51,7 +51,7 @@ export default class TaskController extends BaseController{
                     this.pageVO = winResponseData.data;
                     this.taskTableData = this.pageVO.list;
                 } else {
-                    this.win_message_error(winResponseData.msg);
+                    this.win_message_box_error(winResponseData.msg);
                 }
             })
             .finally(() =>{
@@ -115,7 +115,7 @@ export default class TaskController extends BaseController{
                                 this.win_message_success(winResponseData.msg);
                                 this.queryPageList(this.queryReqVO);
                             } else {
-                                this.win_message_error(winResponseData.msg);
+                                this.win_message_box_error(winResponseData.msg);
                             }
                         });
                     
@@ -142,7 +142,7 @@ export default class TaskController extends BaseController{
                                 this.win_message_success(winResponseData.msg);
                                 this.queryPageList(this.queryReqVO);
                             } else {
-                                this.win_message_error(winResponseData.msg);
+                                this.win_message_box_error(winResponseData.msg);
                             }
                         });
                         

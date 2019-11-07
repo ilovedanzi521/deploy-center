@@ -130,7 +130,7 @@ export default class GroupDialogController extends BaseController{
                 }
             } else {
                 this.saveLoading = false;
-                this.win_message_error("组表单验证未通过");
+                this.win_message_box_error("组表单验证未通过");
                 return false;
             }
         });
@@ -180,7 +180,7 @@ export default class GroupDialogController extends BaseController{
                         })
                     }
                 } else {
-                    this.win_message_error(winResponseData.msg);
+                    this.win_message_box_error(winResponseData.msg);
                 }
             })
     }
@@ -192,7 +192,7 @@ export default class GroupDialogController extends BaseController{
             this.dialogVisibleSon = false;
             this.send(WinRspType.SUCC);
         } else {
-            this.win_message_error(winResponseData.msg);
+            this.win_message_box_error(winResponseData.msg);
         }
     }
 
@@ -219,7 +219,7 @@ export default class GroupDialogController extends BaseController{
                    this.win_message_success(winResponseData.msg);
                    this.initDeviceTransferData();
                 } else {
-                    this.win_message_error(winResponseData.msg);
+                    this.win_message_box_error(winResponseData.msg);
                 }
             })
         }else{
