@@ -1,7 +1,9 @@
 package com.win.dfas.deploy.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.win.dfas.common.vo.BaseReqVO;
 import com.win.dfas.deploy.po.SysLogPO;
+import com.win.dfas.deploy.vo.response.PageVO;
 
 /**
  * @包名 com.win.dfas.deploy.service
@@ -12,4 +14,5 @@ import com.win.dfas.deploy.po.SysLogPO;
  */
 public interface SysLogService extends IService<SysLogPO> {
 
+    PageVO<SysLogPO> getPageInfo(BaseReqVO reqVO);
 }

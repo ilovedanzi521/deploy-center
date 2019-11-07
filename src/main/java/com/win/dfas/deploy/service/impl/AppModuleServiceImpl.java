@@ -8,14 +8,15 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.win.dfas.common.vo.BaseReqVO;
+import com.win.dfas.deploy.common.enumerate.DeployEnum;
 import com.win.dfas.deploy.common.exception.BaseException;
 import com.win.dfas.deploy.dao.AppModuleDao;
 import com.win.dfas.deploy.dto.AppModuleInstanceDTO;
 import com.win.dfas.deploy.dto.DeviceModuleRefDTO;
+import com.win.dfas.deploy.dto.StatisticsDTO;
 import com.win.dfas.deploy.dto.SubInstanceDTO;
 import com.win.dfas.deploy.po.AppModulePO;
 import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
-import com.win.dfas.deploy.schedule.context.ScheduleContext;
 import com.win.dfas.deploy.service.AppModuleService;
 import com.win.dfas.deploy.service.ScheduleCenterService;
 import com.win.dfas.deploy.util.DeployUtils;
@@ -106,7 +107,7 @@ public class AppModuleServiceImpl extends ServiceImpl<AppModuleDao, AppModulePO>
     }
 
     @Override
-    public List<AppModuleInstanceDTO> treeList() {
+    public List<AppModuleInstanceDTO> appInstanceList() {
         List<AppModulePO> list = this.list();
         List<AppModuleInstanceDTO> instanceDTOS = new ArrayList<>(list.size());
         if (CollectionUtil.isNotEmpty(list)){
@@ -133,7 +134,7 @@ public class AppModuleServiceImpl extends ServiceImpl<AppModuleDao, AppModulePO>
 
     @Override
     public List<DeviceModuleRefDTO> getInstanceList(Long id) {
-        List<DeviceModuleRefDTO> refDTOS = this.baseMapper.getInstanceList(id);
+        List<DeviceModuleRefDTO> refDTOS = this.baseMapper.selectDeviceModuleRefList(id);
         if (CollectionUtil.isNotEmpty(refDTOS)){
             for (DeviceModuleRefDTO refDto : refDTOS) {
                 int status = this.mScheduleService.moduleStatus(refDto.getIpAddress(),refDto.getModuleName());
@@ -141,6 +142,36 @@ public class AppModuleServiceImpl extends ServiceImpl<AppModuleDao, AppModulePO>
             }
         }
         return refDTOS;
+    }
+
+    @Override
+    public StatisticsDTO getStatisticsInfo() {
+        int total = 0;
+        int success = 0;
+        int error = 0;
+        List<AppModulePO> appList = this.list();
+        if (CollectionUtil.isNotEmpty(appList)){
+            for (AppModulePO appModulePO : appList) {
+                List<DeviceModuleRefDTO> refDTOS = this.getInstanceList(appModulePO.getId());
+                if (CollectionUtil.isNotEmpty(refDTOS)){
+                    total+=refDTOS.size();
+                    for (DeviceModuleRefDTO refDTO: refDTOS) {
+                        int status = refDTO.getStatus();
+                        if (status>0){
+                            success++;
+                        }else if (status==-1){
+                            error++;
+                        }
+                    }
+                }
+            }
+        }
+        StatisticsDTO dto = new StatisticsDTO();
+        dto.setTotal(total);
+        dto.setSuccess(success);
+        dto.setError(error);
+        dto.setWarning(total-success-error);
+        return dto;
     }
 
     /**

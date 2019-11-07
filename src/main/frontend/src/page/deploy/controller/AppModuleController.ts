@@ -84,13 +84,11 @@ export default class AppModuleController extends BaseController {
 
     /** 新增/修改设备组*/
     public uploadAppModule(){
-        console.log("uploadAppModule"+OperationTypeEnum);
         this.toUploadDialogMsg={
             dialogTitle: DialogTitleConst.APP_UPLOAD,
             type : DeployTypeEnum.UPLOAD,
             data : null
         }
-        // this.toUploadDialogMsg.dialogTitle= AppModuleConst.UPLOAD_TITLE;
         this.isUploadDialog = true;
     }
     public delGroupBatch(){

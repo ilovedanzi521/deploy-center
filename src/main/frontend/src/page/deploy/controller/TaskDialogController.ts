@@ -31,6 +31,7 @@ export default class TaskDialogController extends BaseController{
     private allDisabled:boolean = false;
     // 提交按钮加载
     private submitLoading: boolean = false;
+    private submitAndDeployLoading: boolean =false;
     //任务新增修改VO
     private taskReqVO: TaskReqVO = new TaskReqVO();
     private taskDetailVO: TaskDetailVO= new TaskDetailVO();
@@ -165,7 +166,6 @@ export default class TaskDialogController extends BaseController{
         console.log("********submitDialog**********");
         this.$refs[formName].validate((valid: boolean) => {
             if (valid) {
-                console.log(this.taskReqVO);
                 this.deployService.insertTask(this.taskReqVO)
                     .then((winResponseData: WinResponseData) =>{
                         if (WinRspType.SUCC === winResponseData.winRspType) {
@@ -184,7 +184,28 @@ export default class TaskDialogController extends BaseController{
             }
         });
     }
-
+    // 一键部署
+    submitAndDeployDialog(formName:string){
+        this.$refs[formName].validate((valid: boolean) => {
+            if (valid) {
+                this.deployService.oneKeyDeploy(this.taskReqVO)
+                    .then((winResponseData: WinResponseData) =>{
+                        if (WinRspType.SUCC === winResponseData.winRspType) {
+                            console.log(winResponseData.data);
+                            this.dialogVisibleSon = false;
+                            //传参到GroupDialog组件更新穿梭框设备可选列表
+                            this.send(WinRspType.SUCC);
+                            this.win_message_success(winResponseData.msg);
+                        } else {
+                            this.win_message_error(winResponseData.msg);
+                        }
+                    })
+            } else {
+                this.win_message_error("表单验证未通过");
+                return false;
+            }
+        });
+    }
     viewLog(ipAddress:string){
         if(ipAddress && this.taskDetailVO.strategyName){
             this.remoteDialogTitle +="["+ipAddress+"]";

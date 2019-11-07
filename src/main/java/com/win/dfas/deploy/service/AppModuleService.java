@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.win.dfas.common.vo.BaseReqVO;
 import com.win.dfas.deploy.dto.AppModuleInstanceDTO;
 import com.win.dfas.deploy.dto.DeviceModuleRefDTO;
+import com.win.dfas.deploy.dto.StatisticsDTO;
 import com.win.dfas.deploy.po.AppModulePO;
 import com.win.dfas.deploy.vo.response.AppModuleTreeVO;
 import com.win.dfas.deploy.vo.response.PageVO;
@@ -40,7 +41,11 @@ public interface AppModuleService extends IService<AppModulePO> {
      */
     void uploadFile(MultipartFile file);
 
-    List<AppModuleInstanceDTO> treeList();
+    /**
+     * 获取所有应用所有服务实例列表
+     * @return
+     */
+    List<AppModuleInstanceDTO> appInstanceList();
 
     /**
      * 获取应用模块服务器启动实例
@@ -48,4 +53,10 @@ public interface AppModuleService extends IService<AppModulePO> {
      * @return
      */
     List<DeviceModuleRefDTO> getInstanceList(Long id);
+
+    /**
+     * 获取应用服务实例统计信息
+     * @return
+     */
+    StatisticsDTO getStatisticsInfo();
 }

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.win.dfas.deploy.dto.AppModuleDTO;
 import com.win.dfas.deploy.dto.DeviceModuleRefDTO;
+import com.win.dfas.deploy.dto.StatisticsDTO;
 import com.win.dfas.deploy.po.AppModulePO;
 import org.apache.ibatis.annotations.Param;
 
@@ -27,5 +28,11 @@ public interface AppModuleDao extends BaseMapper<AppModulePO> {
      * @param id
      * @return
      */
-    List<DeviceModuleRefDTO> getInstanceList(Long id);
+    List<DeviceModuleRefDTO> selectDeviceModuleRefList(Long id);
+
+    /**
+     * 获取所有应用服务统计信息
+     * @return
+     */
+    StatisticsDTO selectStatisticsInfo();
 }

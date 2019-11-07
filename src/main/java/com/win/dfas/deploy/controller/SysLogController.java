@@ -1,9 +1,14 @@
 package com.win.dfas.deploy.controller;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.win.dfas.common.vo.BaseReqVO;
+import com.win.dfas.common.vo.WinResponseData;
 import com.win.dfas.deploy.po.SysLogPO;
 import com.win.dfas.deploy.service.SysLogService;
+import com.win.dfas.deploy.vo.response.PageVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,5 +28,11 @@ public class SysLogController extends BaseController<SysLogPO> {
     @Override
     public IService<SysLogPO> getBaseService() {
         return this.sysLogService;
+    }
+
+    @PostMapping("/pageList")
+    public WinResponseData pageList(@RequestBody BaseReqVO reqVO){
+        PageVO<SysLogPO> pageVO = this.sysLogService.getPageInfo(reqVO);
+        return WinResponseData.handleSuccess(pageVO);
     }
 }

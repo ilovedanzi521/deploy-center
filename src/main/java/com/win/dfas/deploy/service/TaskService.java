@@ -2,6 +2,7 @@ package com.win.dfas.deploy.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.win.dfas.common.vo.BaseReqVO;
+import com.win.dfas.deploy.dto.StatisticsDTO;
 import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.po.StrategyPO;
 import com.win.dfas.deploy.po.TaskPO;
@@ -86,4 +87,19 @@ public interface TaskService extends IService<TaskPO> {
      * @return
      */
     List<String> getDeployLogInfo(String ipAddress, String strategyName);
+
+    /**
+     * 获取统计数据
+     * @return
+     */
+    StatisticsDTO getStatisticsInfo();
+
+    /**
+     * 安全保存任务
+     * @param taskPO
+     * @return
+     */
+    TaskPO safeSave(TaskPO taskPO);
+
+    Boolean oneKeyDeploy(TaskPO taskPO);
 }

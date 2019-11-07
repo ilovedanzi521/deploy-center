@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
+import com.win.dfas.deploy.dto.StatisticsDTO;
 import com.win.dfas.deploy.po.TaskPO;
 import com.win.dfas.deploy.dto.TaskDTO;
 import org.apache.ibatis.annotations.Param;
@@ -23,4 +24,10 @@ public interface TaskDao extends BaseMapper<TaskPO> {
      * @return
      */
     IPage<TaskDTO> getPageList(IPage<TaskDTO> page, @Param(Constants.WRAPPER) Wrapper query);
+
+    /**
+     * 查统计信息
+     * @return
+     */
+    StatisticsDTO selectStatisticsInfo();
 }

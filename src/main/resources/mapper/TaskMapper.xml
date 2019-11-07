@@ -57,4 +57,12 @@
             and
             dc_group_device_ref.device_id=dc_device.id
     </select>
+
+    <select id="selectStatisticsInfo" resultType="com.win.dfas.deploy.dto.StatisticsDTO">
+        select count(id) as total,
+        SUM(CASE WHEN status in(0,1,5) THEN 1 ELSE 0 END) AS warning,
+        SUM(CASE WHEN status in(2,4) THEN 1 ELSE 0 END) AS success,
+        SUM(CASE WHEN status in(3,6) THEN 1 ELSE 0 END) AS error
+        from dc_task;
+    </select>
 </mapper>

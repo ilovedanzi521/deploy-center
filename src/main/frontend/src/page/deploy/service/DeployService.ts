@@ -4,8 +4,18 @@ import {DeviceRepVO, DeviceReqVO, GroupQueryVO, GroupReqVO} from "../vo/GroupVO"
 import { DeployBaseUrl } from "../const/DeployConst";
 import { TaskReqVO } from "../vo/TaskVO";
 import { QueryReqVO } from "../vo/DeployVO";
+import { LogQueryReqVO } from "../vo/LogVO";
 
 export default class DeployService {
+    indexAppInstanceStatistics(): Promise<WinResponseData> {
+        return AxiosFun.get(DeployBaseUrl +"/index/statistics/appInstance", null);
+    }
+    indexTaskStatistics(): Promise<WinResponseData> {
+        return AxiosFun.get(DeployBaseUrl +"/index/statistics/task", null);
+    }
+    logPageList(vo: LogQueryReqVO): Promise<WinResponseData> {
+        return AxiosFun.post(DeployBaseUrl +"/sys/log/pageList", vo);
+    }
     viewDeviceLog(params: { "ipAddress": string; "strategyName": string; }): Promise<WinResponseData> {
         return AxiosFun.get(DeployBaseUrl +"/task/log/device", params);
     }
@@ -19,7 +29,10 @@ export default class DeployService {
         return AxiosFun.get(DeployBaseUrl +"/task/deploy?id="+id, null);
     }
     insertTask(vo: TaskReqVO): Promise<WinResponseData> {
-        return AxiosFun.post(DeployBaseUrl +"/task/save", vo);
+        return AxiosFun.post(DeployBaseUrl +"/task/safeSave", vo);
+    }
+    oneKeyDeploy(vo: TaskReqVO): Promise<WinResponseData> {
+        return AxiosFun.post(DeployBaseUrl +"/task/oneKeyDeploy", vo);
     }
     taskPageList(vo: QueryReqVO): Promise<WinResponseData> {
         return AxiosFun.post(DeployBaseUrl +"/task/pageList", vo);

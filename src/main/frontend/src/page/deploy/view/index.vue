@@ -7,22 +7,29 @@
                 <win-row :gutter="20">
                     <!-- 左侧上面行布局：左右同等表单 -->
                     <win-col :span="12">
-                        <win-form class="statisticsForm" label-position="right"  label-width="120px">
+                        <win-form class="statisticsForm" label-position="right"  label-width="120px" v-loading="taskLoading" :model="taskStatistics">
                             <!-- 第一行 操作栏 -->
                             <win-row>
                                 <div style="float: right;">
-                                    <win-button icon="el-icon-s-grid" style="background:rgba(37,44,87,1);" @click="toTaskVue" ></win-button>
+                                    <el-dropdown @command="handleTaskCommand">
+                                        <win-button icon="el-icon-menu" style="background:rgba(37,44,87,1);" ></win-button>
+                                        <el-dropdown-menu slot="dropdown">
+                                            <el-dropdown-item icon="el-icon-s-grid" command="list">任务列表</el-dropdown-item>
+                                            <el-dropdown-item icon="el-icon-refresh" command="refrash">刷新</el-dropdown-item>
+                                        </el-dropdown-menu>
+                                    </el-dropdown>
                                 </div>
                             </win-row>
                             <!-- 仪表行 -->
                             <win-row>
                                 <win-col :span="12">
                                     <div class="title-h2">
-                                        <span>已发布任务：6</span>
+                                        <span>已发布任务：{{taskStatistics.success}}</span>
                                     </div>
                                 </win-col>
                                 <win-col :span="12">
-                                    <el-progress type="dashboard" :percentage="60" :color="'rgb(19, 206, 102)'"></el-progress>
+                                    <!-- <el-progress type="dashboard" :percentage="60" :color="'rgb(19, 206, 102)'"></el-progress> -->
+                                    <el-progress type="dashboard" :percentage="taskStatistics.successPercent" :color="progressColor('success')"></el-progress>
                                 </win-col>
                             </win-row>
                             <!-- 明细行 -->
@@ -30,62 +37,72 @@
                                 <win-col :span="7">
                                     <win-form-item label="任务总数:">
                                         <div style="color: #fff;">
-                                            <span>10</span>
+                                            <span>{{taskStatistics.total}}</span>
                                         </div>
                                     </win-form-item>
                                 </win-col>
                                 <win-col :span="17">
                                     <div class="progress">
-                                        <el-progress :percentage="100" :color="'#409eff'"></el-progress>
+                                        <!-- <el-progress :percentage="100" :color="'#409eff'"></el-progress> -->
+                                        <el-progress :percentage="100" :color="progressColor('info')"></el-progress>
                                     </div>
                                 </win-col>
                             </win-row>
                             <win-row type="flex">
                                 <win-col :span="7">
-                                    <win-form-item label="未发布:">
+                                    <win-form-item label="警告:">
                                         <div style="color: #fff;">
-                                            <span> 2</span>
+                                            <span>{{taskStatistics.warning}}</span>
                                         </div>
                                     </win-form-item>
                                 </win-col>
                                 <win-col :span="17">
                                     <div class="progress">
-                                        <el-progress :percentage="20" :color="'orange'"></el-progress>
+                                        <!-- <el-progress :percentage="20" :color="'orange'"></el-progress> -->
+                                        <el-progress :percentage="taskStatistics.warningPercent" :color="progressColor('warning')"></el-progress>
                                     </div>
                                 </win-col>
                             </win-row>
                             <win-row type="flex">
                                 <win-col :span="7">
-                                    <win-form-item label="发布异常:">
+                                    <win-form-item label="异常:">
                                         <div style="color: #fff;">
-                                            <span>2</span>
+                                            <span>{{taskStatistics.error}}</span>
                                         </div>
                                     </win-form-item>
                                 </win-col>
                                 <win-col :span="17">
                                     <div class="progress">
-                                        <el-progress :percentage="20" :color="'red'"></el-progress>
+                                        <!-- <el-progress :percentage="20" :color="'orange'"></el-progress> -->
+                                        <el-progress :percentage="taskStatistics.errorPercent" :color="progressColor('error')"></el-progress>
                                     </div>
                                 </win-col>
                             </win-row>
                         </win-form>
                     </win-col>
                     <win-col :span="12">
-                        <win-form class="statisticsForm">
+                        <win-form class="statisticsForm" label-position="right" label-width="120px" v-loading="appLoading" :model="appStatistics">
                             <win-row>
                                 <div style="float: right;">
-                                    <win-button icon="el-icon-s-grid" style="background:rgba(37,44,87,1);" @click="toAppModuleVue" ></win-button>
+                                    <el-dropdown @command="handleAppCommand">
+                                        <win-button icon="el-icon-menu" style="background:rgba(37,44,87,1);" ></win-button>
+                                        <el-dropdown-menu slot="dropdown">
+                                            <el-dropdown-item icon="el-icon-s-grid" command="list">应用列表</el-dropdown-item>
+                                            <el-dropdown-item icon="el-icon-refresh" command="refrash">刷新</el-dropdown-item>
+                                        </el-dropdown-menu>
+                                    </el-dropdown>
                                 </div>
                             </win-row>
                             <!-- 仪表行 -->
                             <win-row>
                                 <win-col :span="12">
                                     <div class="title-h2">
-                                        <span>已启动服务：6</span>
+                                        <span>已启动服务：{{appStatistics.success}}</span>
                                     </div>
                                 </win-col>
                                 <win-col :span="12">
-                                    <el-progress type="dashboard" :percentage="60" :color="'rgb(19, 206, 102)'"></el-progress>
+                                    <!-- <el-progress type="dashboard" :percentage="60" :color="'rgb(19, 206, 102)'"></el-progress> -->
+                                    <el-progress type="dashboard" :percentage="appStatistics.successPercent" :color="progressColor('success')"></el-progress>
                                 </win-col>
                             </win-row>
                             <!-- 明细行 -->
@@ -93,41 +110,41 @@
                                 <win-col :span="7">
                                     <win-form-item label="服务总数:">
                                         <div style="color: #fff;">
-                                            <span>10</span>
+                                            <span>{{appStatistics.total}}</span>
                                         </div>
                                     </win-form-item>
                                 </win-col>
                                 <win-col :span="17">
                                     <div class="progress">
-                                        <el-progress :percentage="100" :color="'#409eff'"></el-progress>
+                                        <el-progress :percentage="100" :color="progressColor('info')"></el-progress>
                                     </div>
                                 </win-col>
                             </win-row>
                             <win-row type="flex">
                                 <win-col :span="7">
-                                    <win-form-item label="未启动:">
+                                    <win-form-item label="警告:">
                                         <div style="color: #fff;">
-                                            <span> 2</span>
+                                            <span>{{appStatistics.warning}}</span>
                                         </div>
                                     </win-form-item>
                                 </win-col>
                                 <win-col :span="17">
                                     <div class="progress">
-                                        <el-progress :percentage="20" :color="'orange'"></el-progress>
+                                        <el-progress :percentage="appStatistics.warningPercent" :color="progressColor('warning')"></el-progress>
                                     </div>
                                 </win-col>
                             </win-row>
                             <win-row type="flex">
                                 <win-col :span="7">
-                                    <win-form-item label="启动异常:">
+                                    <win-form-item label="异常:">
                                         <div style="color: #fff;">
-                                            <span>2</span>
+                                            <span>{{appStatistics.error}}</span>
                                         </div>
                                     </win-form-item>
                                 </win-col>
                                 <win-col :span="17">
                                     <div class="progress">
-                                        <el-progress :percentage="20" :color="'red'"></el-progress>
+                                        <el-progress :percentage="appStatistics.errorPercent" :color="progressColor('error')"></el-progress>
                                     </div>
                                 </win-col>
                             </win-row>
@@ -144,26 +161,47 @@
                         </win-form-item>
                         <win-form-item >
                             <el-card class="quick-card" shadow="always">
-                                <div class="quick-image">
-                                    <i icon="el-icon-s-platform"></i>
-                                </div>
-                                <div>
-                                    添加设备
-                                </div>
+                                <win-col :span="2">
+                                    <div class="quick-image">
+                                        <img src="../../../assets/image/deploy/device.svg"/>
+                                    </div>
+                                </win-col>
+                                <win-col :span="22">
+                                    <ul>
+                                        <li><el-link type="primary" style="font-size:20px;" @click="toAddDevice">添加设备</el-link></li>
+                                        <li><div>新增设备组，将应用快速部署到一批设备上。</div></li>
+                                    </ul>
+                                </win-col>
                             </el-card>
                         </win-form-item>
                         <win-form-item >
                             <el-card class="quick-card" shadow="always">
-                                <div>
-                                    上传应用包
-                                </div>
+                                <win-col :span="2">
+                                    <div class="quick-image">
+                                        <img src="../../../assets/image/deploy/upload.svg" />
+                                    </div>
+                                </win-col>
+                                <win-col :span="22">
+                                    <ul>
+                                        <li><el-link type="primary" style="font-size:20px;" @click="toUploadApp">上传应用包</el-link></li>
+                                        <li><div>上传应用部署包，实现自动升级、解压、安装、部署。</div></li>
+                                    </ul>
+                                </win-col>
                             </el-card>
                         </win-form-item>
                         <win-form-item >
                             <el-card class="quick-card" shadow="always">
-                                <div>
-                                    一键部署
-                                </div>
+                                <win-col :span="2">
+                                    <div class="quick-image">
+                                        <img src="../../../assets/image/deploy/deploy.svg" />
+                                    </div>
+                                </win-col>
+                                <win-col :span="22">
+                                    <ul>
+                                        <li><el-link type="primary" style="font-size:20px;"  @click="toDeployTask">一键部署</el-link></li>
+                                        <li><div>创建发布任务，选择一种策略和设备组，一键部署多个应用到目标机器上。</div></li>
+                                    </ul>
+                                </win-col>
                             </el-card>
                         </win-form-item>
                     </win-form>
@@ -174,13 +212,12 @@
                     <span>操作日志</span>
                 </div>
                 <!-- 右侧布局：表格 -->
-                <win-table border stripe class="log-table"
+                <win-table border stripe class="log-table" :loading="logLoading"
                         :show-selection="false" :show-index="false" 
                         :data="logTableData" >
-                    <win-table-column title="用户" field="name" ></win-table-column>
-                    <win-table-column title="操作" field="operate"></win-table-column>
-                    <win-table-column title="时间" field="createTime" ></win-table-column>
-                    
+                    <win-table-column title="用户" field="username" ></win-table-column>
+                    <win-table-column title="操作" field="operation"></win-table-column>
+                    <win-table-column title="时间" field="createTime"  :formatter="formatGroupTable"></win-table-column>
                 </win-table>
                 <!--分页组件-->
                 <div class="page-contanier">
@@ -188,8 +225,12 @@
                 </div>
             </win-col>
         </win-row>
-        
-
+        <!-- 弹框 -->
+        <GroupDialog v-if="showGroupDialog" :toChildMsg="toGroupDialogData" @bindSend="backFromGroupDialog" ></GroupDialog>
+        <!--上传应用弹框 -->
+        <UploadDialog v-if="showUploadDialog" :toChildMsg="toUploadDialogData" @bindSend="backFromUploadDialog" ></UploadDialog>
+        <!-- 添加任务弹框 -->
+        <TaskDialog v-if="showTaskDialog" :toChildMsg="toTaskDialogData" @bindSend="backFromTaskDialog"></TaskDialog>
     </div>
 </template>
 
@@ -235,9 +276,8 @@
         background:rgba(37,44,87,1);
         opacity:1;
         .quick-image {
-            font-size: 30px;
-            color: #E0E104;
-            background-color: #fff
+
+            margin-top: 15px;
         }
     }
 }

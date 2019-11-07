@@ -104,6 +104,7 @@
             <div slot="footer" class="dialog-footer">
                 <win-button @click="closeDialog">取消</win-button>
                 <win-button v-if="toChildMsg.type==='ADD'" type="primary" :loading="submitLoading" @click="submitDialog('taskForm')">确认</win-button>
+                <win-button v-if="toChildMsg.type==='ADD'" type="primary" :loading="submitAndDeployLoading" @click="submitAndDeployDialog('taskForm')">确认并部署</win-button>
             </div>
             <win-fdialog append-to-body  width="45%"  :title="remoteDialogTitle" :visible.sync="remoteDialogVisibleSon" :close-on-click-modal="false" :close-on-press-escape="false">
                  <!-- 注意需要给 el-scrollbar 设置高度，判断是否滚动是看它的height判断的 -->

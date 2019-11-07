@@ -1,9 +1,10 @@
-import { BaseReqVO} from "win-biz";
+import {  BaseRepVO} from "win-biz";
+import { BaseReqVO } from "../../common/vo/BaseVO";
 
 
-export class LogQueryReqVO{
-    reqPageNum: number;
-    reqPageSize: number;
+export class LogQueryReqVO extends BaseReqVO{
+
+
 }
 export class LogPageVO{
     /**
@@ -24,8 +25,11 @@ export class LogPageVO{
     list: any[];
 }
 
-export class LogDetailVO {
-    name:string;
-    operate: string;
-    createTime:string;
+export class LogDetailVO extends BaseRepVO{
+    username:string;
+    operation: string;
+    method:string;
+    params:string;
+    time:number;
+    ip:string;
 }

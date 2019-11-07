@@ -11,6 +11,7 @@ import com.win.dfas.common.vo.BaseReqVO;
 import com.win.dfas.deploy.common.enumerate.DeployEnum;
 import com.win.dfas.deploy.common.exception.BaseException;
 import com.win.dfas.deploy.dao.TaskDao;
+import com.win.dfas.deploy.dto.StatisticsDTO;
 import com.win.dfas.deploy.po.AppModulePO;
 import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.po.StrategyPO;
@@ -99,8 +100,19 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskPO> implements Tas
     @Override
     public void deploy(Long id) {
         TaskPO task = this.getById(id);
+        if (beforeDeploy(task)){
+            this.mScheduleService.deploy(id);
+        }
+    }
+
+    /**
+     * 部署前检查状态
+     * @param task
+     * @return
+     */
+    private boolean beforeDeploy(TaskPO task) {
         if(task == null) {
-            throw new BaseException("部署异常：任务["+id+"]已经不存在！");
+            throw new BaseException("部署异常：任务["+task.getId()+"]已经不存在！");
         }else if (DeployEnum.TaskStatus.DEPLOY_UNDERWAY.getValue().equals(task.getStatus())){
             throw new BaseException("部署异常：任务正在部署中！");
         }else if (DeployEnum.TaskStatus.DEPLOY_SUCCESS.getValue().equals(task.getStatus())){
@@ -110,7 +122,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskPO> implements Tas
         }else if (DeployEnum.TaskStatus.UNINSTALL_FAILURE.getValue().equals(task.getStatus())){
             throw new BaseException("部署异常：任务已经部署！");
         }
-        this.mScheduleService.deploy(id);
+        return true;
     }
 
     @Override
@@ -194,5 +206,45 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskPO> implements Tas
             return lines;
         }
         return FileUtil.readUtf8Lines(filePath);
+    }
+
+    @Override
+    public StatisticsDTO getStatisticsInfo() {
+
+        return this.baseMapper.selectStatisticsInfo();
+    }
+
+    @Override
+    public TaskPO safeSave(TaskPO taskPO) {
+        if (getExistTask(taskPO) != null){
+            throw new BaseException("任务已经存在！");
+        }
+        this.save(taskPO);
+        return taskPO;
+    }
+
+    private TaskPO getExistTask(TaskPO taskPO) {
+        QueryWrapper<TaskPO> queryWrapper = new QueryWrapper<TaskPO>();
+        queryWrapper.eq("strategy_id",taskPO.getStrategyId());
+        queryWrapper.eq("group_id",taskPO.getGroupId());
+        return this.getOne(queryWrapper);
+    }
+
+    @Override
+    public Boolean oneKeyDeploy(TaskPO taskPO) {
+        TaskPO existPo=getExistTask(taskPO);
+        if (existPo == null){
+            boolean saved =  this.save(taskPO);
+            if (saved){
+                this.deploy(taskPO.getId());
+            }
+        }else {
+            taskPO=existPo;
+            if(beforeDeploy(existPo)){
+                this.deploy(existPo.getId());
+            }
+        }
+
+        return true;
     }
 }

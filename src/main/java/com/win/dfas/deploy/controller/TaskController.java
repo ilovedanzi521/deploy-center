@@ -51,11 +51,24 @@ public class TaskController extends BaseController<TaskPO> {
         PageVO<TaskDTO> pageVO = this.taskService.getPageInfo(reqVO);
         return WinResponseData.handleSuccess(pageVO);
     }
+    @SysLog("添加任务")
+    @PostMapping("/safeSave")
+    public WinResponseData safeSave(@RequestBody TaskPO taskPO) {
+        this.taskService.safeSave(taskPO);
+        return WinResponseData.handleSuccess(taskPO);
+    }
     @SysLog("部署任务")
     @GetMapping("/deploy")
     public WinResponseData deploy(@RequestParam Long id) {
         this.taskService.deploy(id);
         return WinResponseData.handleSuccess("启动异步部署...");
+    }
+
+    @SysLog("一键部署")
+    @PostMapping("/oneKeyDeploy")
+    public WinResponseData oneKeyDeploy(@RequestBody TaskPO taskPO) {
+        this.taskService.oneKeyDeploy(taskPO);
+        return WinResponseData.handleSuccess(taskPO);
     }
 
     @SysLog("卸载任务")

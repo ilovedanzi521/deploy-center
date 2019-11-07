@@ -4,7 +4,7 @@
 <!--说明：单表的所有操作不用写代码（如果只有简单的单表操作，mapper.xml文件也不需要），mybatis-plus已经自动处理-->
 
     <!--根据组id查单个设备详情机器关联设备列表-->
-    <select id="getInstanceList" parameterType="long" resultType="com.win.dfas.deploy.dto.DeviceModuleRefDTO">
+    <select id="selectDeviceModuleRefList" parameterType="long" resultType="com.win.dfas.deploy.dto.DeviceModuleRefDTO">
       SELECT ref.*,device.name as deviceName,device.ip_address as ipAddress,app.name as moduleName
       FROM DC_DEVICE_MODULE_REF as ref
       inner join DC_DEVICE as device on device.id=ref.device_id
