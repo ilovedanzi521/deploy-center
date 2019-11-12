@@ -86,6 +86,7 @@ public class AppModuleServiceImpl extends ServiceImpl<AppModuleDao, AppModulePO>
 
     @Override
     public void uploadFile(MultipartFile file) {
+        log.info("==> begin upload file "+file.getOriginalFilename());
         DeployEnvBean deployEnv = SpringContextUtils.getBean("deploy_env_bean", DeployEnvBean.class);
         File zipTempFile = null;
         try {
@@ -94,7 +95,6 @@ public class AppModuleServiceImpl extends ServiceImpl<AppModuleDao, AppModulePO>
             //2，保存部署包到java默认临时目录
             zipTempFile = DeployUtils.saveZipToTempFile(file,deployEnv);
         } catch (IOException e) {
-            FileUtil.del(zipTempFile);
             throw new BaseException("上传异常:"+e.getMessage());
         }
         Boolean upgraded = false;

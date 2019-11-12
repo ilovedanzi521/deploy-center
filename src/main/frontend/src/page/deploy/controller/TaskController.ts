@@ -124,13 +124,6 @@ export default class TaskController extends BaseController{
             this.win_message_box_error("当前状态任务无法部署！");
         }
     }
-    // 是否可部署
-    isDeployTask(row: any) {
-        if(row.status===1 ||row.status===2 ||row.status ===4||row.status ===6){
-            return false;
-        }
-        return true;
-    }
     // 卸载按钮
     unDeploy(row: TaskTableVO){
         if(this.isUnDeployTask(row)){
@@ -151,12 +144,52 @@ export default class TaskController extends BaseController{
             this.win_message_box_error("当前状态任务无法卸载！");
         }
     }
-    isUnDeployTask(row: any) {
-        if(row.status===0 ||row.status===1 ||row.status===3 || row.status ===4|| row.status ===5){
-            return false;
+    
+    remove(row: any){
+        if(this.isRemoveTask(row)){
+            this.win_message_box_info('确认删除任务['+row.id+']?')
+                .then(() => {
+                    this.deployService.removeTaskById(row.id)
+                        .then((winResponseData: WinResponseData) =>{
+                            if (WinRspType.SUCC === winResponseData.winRspType) {
+                                this.win_message_success(winResponseData.msg);
+                                this.queryPageList(this.queryReqVO);
+                            } else {
+                                this.win_message_box_error(winResponseData.msg);
+                            }
+                        });
+                        
+                });
+        }else{
+            this.win_message_box_error("当前状态任务无法删除！");
         }
-        return true;
     }
+    // 是否可部署
+    isDeployTask(row: any) {
+        // 未部署、部署失败、卸载成功的任务可部署
+        if(row.status===0 ||row.status===3 ||row.status ===5){
+            return true;
+        }
+        return false;
+    }
+    // 是否可卸载
+    isUnDeployTask(row: any) {
+        // 部署成功、卸载失败任务可卸载
+        if(row.status===2 ||row.status===6){
+            return true;
+        }
+        return false;
+    }
+    // 是否可删除
+    isRemoveTask(row:any){
+        // 未部署、部署失败、卸载成功的任务可删除
+        if(row.status===0 || row.status===3||row.status===5){
+            return true;
+        }
+        return false;
+    }
+
+
     // 查看日志按钮
     viewLog(row: TaskTableVO){
         this.toDialogMsg={

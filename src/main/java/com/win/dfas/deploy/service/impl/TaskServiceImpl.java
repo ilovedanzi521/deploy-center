@@ -12,15 +12,10 @@ import com.win.dfas.deploy.common.enumerate.DeployEnum;
 import com.win.dfas.deploy.common.exception.BaseException;
 import com.win.dfas.deploy.dao.TaskDao;
 import com.win.dfas.deploy.dto.StatisticsDTO;
-import com.win.dfas.deploy.po.DevicePO;
-import com.win.dfas.deploy.po.StrategyPO;
-import com.win.dfas.deploy.po.TaskPO;
+import com.win.dfas.deploy.po.*;
 import com.win.dfas.deploy.schedule.Scheduler;
 import com.win.dfas.deploy.schedule.context.ScheduleContext;
-import com.win.dfas.deploy.service.GroupService;
-import com.win.dfas.deploy.service.ScheduleCenterService;
-import com.win.dfas.deploy.service.StrategyService;
-import com.win.dfas.deploy.service.TaskService;
+import com.win.dfas.deploy.service.*;
 import com.win.dfas.deploy.vo.response.PageVO;
 import com.win.dfas.deploy.dto.TaskDTO;
 import com.win.dfas.deploy.vo.response.TaskDetailVO;
@@ -31,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @包名 com.win.dfas.deploy.service.impl
@@ -50,6 +47,8 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskPO> implements Tas
     private StrategyService strategyService;
     @Autowired
     private GroupService groupService;
+    @Autowired
+    private DeviceModuleService deviceModuleService;
     /**
      * 从任务ID获取对应的策略
      * @param taskId - task id
@@ -237,4 +236,36 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskPO> implements Tas
 
         return true;
     }
+
+    @Override
+    public Boolean safeRemove(Long id) {
+        beforeRemoveSafeValid(id);
+        return this.removeById(id);
+    }
+
+    @Override
+    public Boolean safeRemoveBatch(List<Long> ids) {
+        for (Long id : ids) {
+            beforeRemoveSafeValid(id);
+        }
+        return this.removeByIds(ids);
+    }
+
+    private void beforeRemoveSafeValid(Long taskId) {
+        TaskPO taskPO = this.getById(taskId);
+        if (taskPO == null){
+            throw new BaseException("任务"+taskId+"已经不存在！");
+        }else if (DeployEnum.TaskStatus.isDeployd(taskPO.getStatus())){
+            throw new BaseException("["+DeployEnum.TaskStatus.getName(taskPO.getStatus())+"]任务禁止删除！请卸载后再删除");
+        }
+        List<DevicePO> deviceList = this.groupService.getDevicesByGroupId(taskPO.getGroupId());
+        List<AppModulePO> appModuleList = this.strategyService.getAppModulesByStrategyId(taskPO.getStrategyId());
+        if (CollectionUtil.isNotEmpty(deviceList) && CollectionUtil.isNotEmpty(appModuleList)){
+            QueryWrapper<DeviceModuleRefPO> queryWrapper = new QueryWrapper<>();
+            queryWrapper.in("device_id",deviceList.stream().map(entity -> entity.getId()).collect(Collectors.toList()));
+            queryWrapper.in("module_id",appModuleList.stream().map(entity -> entity.getId()).collect(Collectors.toList()));
+            this.deviceModuleService.remove(queryWrapper);
+        }
+    }
+
 }

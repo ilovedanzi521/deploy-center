@@ -57,6 +57,19 @@ public class TaskController extends BaseController<TaskPO> {
         this.taskService.safeSave(taskPO);
         return WinResponseData.handleSuccess(taskPO);
     }
+
+    @SysLog("安全删除任务")
+    @DeleteMapping("/safeRemove/{id}")
+    public WinResponseData safeRemove(@PathVariable Long id){
+
+        return WinResponseData.handleSuccess(this.taskService.safeRemove(id));
+    }
+    @SysLog("安全批量删除任务")
+    @PostMapping("/safeRemoveBatch")
+    public WinResponseData safeRemoveBatch(@RequestBody List<Long> ids){
+
+        return WinResponseData.handleSuccess(this.taskService.safeRemoveBatch(ids));
+    }
     @SysLog("部署任务")
     @GetMapping("/deploy")
     public WinResponseData deploy(@RequestParam Long id) {

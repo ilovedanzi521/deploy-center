@@ -1,5 +1,7 @@
 package com.win.dfas.deploy.common.enumerate;
 
+import java.util.Map;
+
 /**
  * @包名 com.win.dfas.deploy.common.enumerate
  * @类名 DeployEnum
@@ -37,6 +39,15 @@ public class DeployEnum {
                 }
             }
             return null;
+        }
+        public static Boolean isDeployd(Integer value){
+            if (DEPLOY_UNDERWAY.value.equals(value)
+                    || DEPLOY_SUCCESS.value.equals(value)
+                    || UNINSTALL_UNDERWAY.value.equals(value)
+                    || UNINSTALL_FAILURE.value.equals(value)){
+                return true;
+            }
+            return false;
         }
 
         public String getName() {

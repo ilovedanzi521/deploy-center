@@ -31,6 +31,9 @@ export default class DeployService {
     insertTask(vo: TaskReqVO): Promise<WinResponseData> {
         return AxiosFun.post(DeployBaseUrl +"/task/safeSave", vo);
     }
+    removeTaskById(id: number): Promise<WinResponseData> {
+        return AxiosFun.winDelete(DeployBaseUrl +"/task/safeRemove/"+id);
+    }
     oneKeyDeploy(vo: TaskReqVO): Promise<WinResponseData> {
         return AxiosFun.post(DeployBaseUrl +"/task/oneKeyDeploy", vo);
     }

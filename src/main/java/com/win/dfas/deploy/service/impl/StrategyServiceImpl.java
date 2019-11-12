@@ -99,4 +99,14 @@ public class StrategyServiceImpl extends ServiceImpl<StrategyDao, StrategyPO> im
 
         return new PageVO(page);
     }
+
+    @Override
+    public List<AppModulePO> getAppModulesByStrategyId(Long strategyId) {
+        StrategyPO strategyPO = this.getById(strategyId);
+        if (strategyPO!=null){
+            return this.getAppModulesByStrategyPath(strategyPO.getPath());
+        }
+        return null;
+    }
+
 }

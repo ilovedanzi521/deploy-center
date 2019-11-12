@@ -13,7 +13,8 @@
         </div>
         <!-- 表格 -->
         <div style="margin-top:5px;">
-            <win-table border resizable :data="taskTableData" :show-selection="false" :show-index="false">
+            <win-table border resizable :data="taskTableData" :show-selection="false" :show-index="false"
+                    :loading="tableLoading">
                 <win-table-column type="selection" width="60" ></win-table-column>
                 <win-table-column  title="序号" type="index" width="60"></win-table-column>
                 <win-table-column  title="任务ID" field="id" width="160"></win-table-column>
@@ -32,8 +33,9 @@
                 </win-table-column>
                 <win-table-column title="操作" >
                     <template v-slot="{ row }">
-                        <win-button size="mini" type="text" icon="el-icon-orange" @click="deploy(row)">部署</win-button>
-                        <win-button size="mini" type="text" icon="el-icon-delete" @click="unDeploy(row)">卸载</win-button>
+                        <win-button v-if="isDeployTask(row)" size="mini" type="text" icon="el-icon-orange" @click="deploy(row)">部署</win-button>
+                        <win-button v-if="isUnDeployTask(row)" size="mini" type="text" icon="el-icon-delete" @click="unDeploy(row)">卸载</win-button>
+                        <win-button v-if="isRemoveTask(row)" size="mini" type="text" icon="el-icon-delete" @click="remove(row)">删除</win-button>
                         <win-button size="mini" type="text" icon="el-icon-view" @click="viewLog(row)">详情日志</win-button>
                     </template>
                 </win-table-column>

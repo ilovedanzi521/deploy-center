@@ -38,4 +38,11 @@ public interface StrategyService extends IService<StrategyPO> {
      * @return
      */
     PageVO<StrategyPO> getPageInfo(BaseReqVO reqVO);
+
+    /**
+     * 通过策略id查绑定应用模块列表
+     * @param strategyId
+     * @return
+     */
+    List<AppModulePO> getAppModulesByStrategyId(Long strategyId);
 }

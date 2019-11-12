@@ -87,13 +87,13 @@ public class AppModuleController extends BaseController<AppModulePO> {
         boolean isStop = mScheduleService.moduleStop(ipAddress, moduleName);
         return WinResponseData.handleSuccess(isStop);
     }
-    @SysLog("安全删除")
+    @SysLog("安全删除应用模块")
     @DeleteMapping("/safeRemove/{id}")
     public WinResponseData safeRemove(@PathVariable Long id){
 
         return WinResponseData.handleSuccess(this.appModuleService.safeRemove(id));
     }
-    @SysLog("安全批量删除")
+    @SysLog("安全批量删除应用模块")
     @PostMapping("/safeRemoveBatch")
     public WinResponseData safeRemoveBatch(@RequestBody List<Long> ids){
 

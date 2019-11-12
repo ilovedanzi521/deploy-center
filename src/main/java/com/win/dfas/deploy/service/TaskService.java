@@ -101,5 +101,24 @@ public interface TaskService extends IService<TaskPO> {
      */
     TaskPO safeSave(TaskPO taskPO);
 
+    /**
+     * 一键部署
+     * @param taskPO
+     * @return
+     */
     Boolean oneKeyDeploy(TaskPO taskPO);
+
+    /**
+     * 安全删除单个任务
+     * @param id
+     * @return
+     */
+    Boolean safeRemove(Long id);
+
+    /**
+     * 安全批量删除任务
+     * @param ids
+     * @return
+     */
+    Boolean safeRemoveBatch(List<Long> ids);
 }
