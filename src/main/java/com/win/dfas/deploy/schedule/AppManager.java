@@ -223,6 +223,18 @@ public class AppManager {
         return null;
     }
 
+    /**
+     * 删除内存应用模块记录
+     * @param path
+     * @return
+     */
+    public Boolean removeModuleByPath(String path){
+        if (StrUtil.isNotEmpty(path) && mModuleFiles!=null){
+            return mModuleFiles.remove(path)!=null;
+        }
+        return false;
+    }
+
     public StrategyPO getStrategyById(Long id) {
         return mStrategyService.getById(id);
     }

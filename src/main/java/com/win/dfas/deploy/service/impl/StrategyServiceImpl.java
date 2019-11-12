@@ -42,13 +42,13 @@ import java.util.List;
 @Transactional(rollbackFor = Exception.class)
 public class StrategyServiceImpl extends ServiceImpl<StrategyDao, StrategyPO> implements StrategyService {
     @Override
-    public List<AppModulePO> getAppModules(StrategyPO strategy){
+    public List<AppModulePO> getAppModulesByStrategyPath(String strategyPath){
         DeployEnvBean mEnvConfig = Scheduler.get().getDeployEnvConfig();
         String shellFile = "";
-        if(!StrUtil.isEmpty(strategy.getPath())) {
-            shellFile = mEnvConfig.getScriptsDir() + File.separator + strategy.getPath();
+        if(StrUtil.isNotEmpty(strategyPath)) {
+            shellFile = mEnvConfig.getScriptsDir() + File.separator + strategyPath;
         }else {
-            log.error(strategy.getName()+"-策略脚本不存在！");
+            log.error(strategyPath+"-策略脚本不存在！");
             return null;
         }
         return getStrategyAppModuleList(shellFile);

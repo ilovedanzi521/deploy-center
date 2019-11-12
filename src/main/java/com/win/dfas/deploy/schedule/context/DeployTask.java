@@ -116,9 +116,9 @@ public class DeployTask implements Runnable{
         }
 
         // 3. 批量执行发布命令
-        final CountDownLatch taskCount = new CountDownLatch(remoteContextList.size());
-        int taskTotal = remoteContextList.size();
-        for(int i=0; i<taskTotal; i++) {
+        int subTaskSize = remoteContextList.size();
+        final CountDownLatch taskCount = new CountDownLatch(subTaskSize);
+        for(int i=0; i<subTaskSize; i++) {
             ScheduleContext remoteContext = remoteContextList.get(i);
             Runnable singleTask = null;
             if(mCmd == DeployTask.CMD_DEPLOY) {

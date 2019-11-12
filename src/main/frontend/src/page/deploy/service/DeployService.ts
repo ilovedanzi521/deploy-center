@@ -51,6 +51,12 @@ export default class DeployService {
     appModulePageList(vo: QueryReqVO): Promise<WinResponseData> {
         return AxiosFun.post(DeployBaseUrl +"/app/module/pageList", vo);
     }
+    removeAppModuleById(id: number): Promise<WinResponseData> {
+        return AxiosFun.winDelete(DeployBaseUrl +"/app/module/safeRemove/"+id);
+    }
+    removeAppModuleBatch(ids: number[]): Promise<WinResponseData> {
+        return AxiosFun.post(DeployBaseUrl +"/app/module/safeRemoveBatch",ids);
+    }
     strategyPageList(vo:QueryReqVO): Promise<WinResponseData> {
         return AxiosFun.post(DeployBaseUrl +"/strategy/pageList", vo);
     }

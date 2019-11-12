@@ -20,10 +20,10 @@ import java.util.List;
 public interface StrategyService extends IService<StrategyPO> {
     /**
      * 查策略绑定应用模块列表
-     * @param strategy
+     * @param strategyPath
      * @return
      */
-    List<AppModulePO> getAppModules(StrategyPO strategy);
+    List<AppModulePO> getAppModulesByStrategyPath(String strategyPath);
 
     /**
      * 查策略详情

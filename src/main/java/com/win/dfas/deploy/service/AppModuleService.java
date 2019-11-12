@@ -59,4 +59,18 @@ public interface AppModuleService extends IService<AppModulePO> {
      * @return
      */
     StatisticsDTO getStatisticsInfo();
+
+    /**
+     * 安全删除
+     * @param id
+     * @return
+     */
+    Boolean safeRemove(Long id);
+
+    /**
+     * 安全批量删除
+     * @param ids
+     * @return
+     */
+    Boolean safeRemoveBatch(List<Long> ids);
 }

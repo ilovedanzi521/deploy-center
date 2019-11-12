@@ -6,7 +6,7 @@
                 <li>
                     <win-button-group>
                         <win-button type="info" icon="el-icon-plus" round @click="uploadAppModule">上传应用</win-button>
-                        <win-button type="info" icon="el-icon-delete" round :disabled="selected.length == 0" @click="delGroupBatch">删除应用</win-button>
+                        <win-button type="info" icon="el-icon-delete" round :disabled="selected.length == 0" @click="delAppModuleBatch">删除应用</win-button>
                     </win-button-group>
                 </li>
             </ul>
@@ -15,7 +15,8 @@
             <vxe-table ref="xTable" border stripe show-overflow class="app-module-table"
                      :show-selection="false" :show-index="false" 
                      :loading="tableLoading" :expand-config="{expandRowKeys: ['1']}" 
-                     :data="pageDataList" @toggle-expand-change="toggleExpandChangeEvent">
+                     :data="pageDataList" @toggle-expand-change="toggleExpandChangeEvent"
+                     @select-all="handleSelectAll" @select-change="handleSelectChange">
                 <vxe-table-column type="selection" width="60"/>
                 <vxe-table-column type="expand" width="60">
                     <template v-slot="{ row, rowIndex }">
@@ -43,11 +44,11 @@
                 <vxe-table-column field="packVer" title="包版本" min-width="80"></vxe-table-column>
                 <vxe-table-column field="packFile" title="包文件名" min-width="80"></vxe-table-column>
                 <vxe-table-column field="desc" title="描述信息" min-width="60"></vxe-table-column>
-                <vxe-table-column field="createTime" title="创建时间" min-width="100" :formatter="formatGroupTable"></vxe-table-column>
-                <vxe-table-column field="status" title="状态" min-width="80" :formatter="formatGroupTable"></vxe-table-column>
+                <vxe-table-column field="createTime" title="创建时间" min-width="100" :formatter="formatAppModuleTable"></vxe-table-column>
+                <vxe-table-column field="status" title="状态" min-width="80" :formatter="formatAppModuleTable"></vxe-table-column>
                 <vxe-table-column title="操作" min-width="100">
                     <template v-slot="{ row }">
-                        <el-button size="mini" type="text" icon="el-icon-delete" @click="delGroupOne(row)">删除</el-button>
+                        <el-button size="mini" type="text" icon="el-icon-delete" @click="delOne(row)">删除</el-button>
                     </template>
                 </vxe-table-column>
                 <template v-slot:empty>
@@ -70,7 +71,7 @@
     import AppModuleController from "../controller/AppModuleController";
 
     @Component({})
-    export default class group extends AppModuleController {}
+    export default class appModule extends AppModuleController {}
 </script>
 
 <style lang="scss" scoped>

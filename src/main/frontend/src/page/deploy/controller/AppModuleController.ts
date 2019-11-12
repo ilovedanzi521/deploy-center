@@ -5,15 +5,12 @@ import { WinResponseData } from "../../common/vo/BaseVO";
 import BaseController from "../../common/controller/BaseController";
 import DeployService from "../service/DeployService";
 import PageVO from "../../common/vo/PageVO";
-import {OperationTypeEnum} from "../../common/enum/OperationTypeEnum";
-import {GroupTreeVO, DeviceReqVO} from "../vo/GroupVO";
-import {GroupConst, DeviceStatusConst, BaseTypeConst, DialogTitleConst} from "../const/DeployConst";
-import {BaseConst} from "../../common/const/BaseConst";
+import { DeviceReqVO} from "../vo/GroupVO";
+import {DialogTitleConst} from "../const/DeployConst";
 import dateUtils from "../../common/util/DateUtils";
-import { DeviceStatus, DeployTypeEnum } from "../const/DeployEnum";
+import { DeployTypeEnum } from "../const/DeployEnum";
 import { QueryReqVO, AppModuleTreeVO, UploadVO, DeviceModuleRefVO } from "../vo/AppModuleVO";
 import UploadDialog from "../view/uploadDialog.vue";
-import { async } from "q";
 
 
 @Component({ components: {UploadDialog} })
@@ -64,7 +61,7 @@ export default class AppModuleController extends BaseController {
                     console.log(this.pageDataList);
                     this.pageVO = winResponseData.data;
                 } else {
-                    this.win_message_error(winResponseData.msg);
+                    this.win_message_box_error(winResponseData.msg);
                 }
             })
             .finally(() =>{
@@ -92,31 +89,29 @@ export default class AppModuleController extends BaseController {
         }
         this.isUploadDialog = true;
     }
-    public delGroupBatch(){
-        console.log("***********delGroupBatch************");
+    public delAppModuleBatch(){
+        console.log("***********delAppModuleBatch************");
         console.log(this.selected);
-        let delGroupIds=[];
-        let groupNames = "";
+        let delIds=[];
+        let names = "";
         this.selected.forEach((row: any) => {
             console.log(row);
-            if(!row.ipAddress){
-                delGroupIds.push(row.id);
-                groupNames+=row.name+";";
-            }
+                delIds.push(row.id);
+                names+=row.name+";";
         });
        
-        if(delGroupIds.length>0){
+        if(delIds.length>0){
             const h = this.$createElement;
-            let msg =  h('p', null, [h('span', null, '确认删除设置组：'),h('i', { style: 'color: red' }, groupNames)]);
+            let msg =  h('p', null, [h('span', null, '确认批量删除应用模块：'),h('i', { style: 'color: red' }, names)]);
             this.win_message_box_success(msg,"提示")
                 .then(() => {
-                    this.deployService.removeGroupBatch(delGroupIds)
+                    this.deployService.removeAppModuleBatch(delIds)
                         .then((winResponseData: WinResponseData) =>{
                             if (WinRspType.SUCC === winResponseData.winRspType) {
                                 this.queryPageList(this.queryReqVO);
                                 this.win_message_success(winResponseData.msg);
                             } else {
-                                this.win_message_error(winResponseData.msg);
+                                this.win_message_box_error(winResponseData.msg);
                             }
                         });
                         
@@ -132,37 +127,25 @@ export default class AppModuleController extends BaseController {
         }
     }
 
-    private delGroupOne(row: GroupTreeVO) {
-        this.win_message_box_warning("确认删除选中组-"+row.name,"提示")
+    delOne(row: AppModuleTreeVO) {
+        if(row.devices && row.devices.length>0){
+            this.win_message_box_error("应用已经被部署，请先卸载再删除！");
+            return;
+        }
+        this.win_message_box_warning("确认删除选中应用-"+row.name,"提示")
             .then(() => {
-                this.deployService.removeGroupById(row.id)
+                this.deployService.removeAppModuleById(row.id)
                     .then((winResponseData: WinResponseData) =>{
                         if (WinRspType.SUCC === winResponseData.winRspType) {
                             this.queryPageList(this.queryReqVO);
                             this.win_message_success(winResponseData.msg);
                         } else {
-                            this.win_message_error(winResponseData.msg);
+                            this.win_message_box_error(winResponseData.msg);
                         }
                     });
             });
 
     }
-
-    private delDeviceOne(id: number) {
-        this.win_message_box_warning("确认删除选中设备","提示")
-            .then(() => {
-                this.deployService.removeDeviceById(id)
-                    .then((winResponseData: WinResponseData) =>{
-                        if (WinRspType.SUCC === winResponseData.winRspType) {
-                            this.queryPageList(this.queryReqVO);
-                            this.win_message_success(winResponseData.msg);
-                        } else {
-                            this.win_message_error(winResponseData.msg);
-                        }
-                    });
-            });
-    }
-
 
     // 选中行事件
     private handleSelectChange({ selection }) {
@@ -190,13 +173,13 @@ export default class AppModuleController extends BaseController {
         }
     }
       // 表格字段格式化
-      private formatGroupTable({row, column, cellValue, index}) {
-        // console.log("formatGroupTable************8");
+      private formatAppModuleTable({row, column, cellValue, index}) {
         if (column.property === "createTime"  && cellValue) {
             return dateUtils.dateFtt("yyyy-MM-dd hh:mm:ss", new Date(cellValue));
         }
         if(column.property === "status"){
-            return "未部署";
+            // 应用无状态
+            return "";
         }
     }
     // 行展开、收起事件
@@ -215,15 +198,10 @@ export default class AppModuleController extends BaseController {
                 if (WinRspType.SUCC === winResponseData.winRspType) {
                     console.log(winResponseData.data);
                     this.pageDataList[rowIndex].devices=winResponseData.data;
-                    //  if(row.id==1){
-                    //     this.pageDataList[rowIndex].devices=[{"id":1,"createTime":"2019-10-30T13:20:15.934+0000","updateTime":"2019-10-30T13:20:15.934+0000","name":"dev73","alias":"dev73","ipAddress":"192.168.0.73","userName":"root","port":22,"osType":"Centos7","status":1,"desc":null}];
-                    // }else{
-                    //     this.pageDataList[rowIndex].devices=[{"id":"1","createTime":"2019-10-30T13:20:15.934+0000","updateTime":"2019-10-30T13:20:15.934+0000","name":"test1111","alias":"test1111","ipAddress":"0.0.0.0","userName":"root","port":22,"osType":"Centos7","status":0,"desc":null}];
-                    // }
                     // 必须刷新表格数据，否则展开表格devices数据无法更新。
                     this.$refs["xTable"].refreshData();
                 } else {
-                    this.win_message_error(row.name+"机器服务查询异常："+winResponseData.msg);
+                    this.win_message_box_error(row.name+"机器服务查询异常："+winResponseData.msg);
                 }
             })
             .finally(()=>{
@@ -253,7 +231,7 @@ export default class AppModuleController extends BaseController {
                             this.queryDevices(this.pageDataList[rowIndex],rowIndex);
                         }
                     } else {
-                        this.win_message_error(row.ipAddress+"机器服务查询异常："+winResponseData.msg);
+                        this.win_message_box_error(row.ipAddress+"机器服务查询异常："+winResponseData.msg);
                     }
                 })
                 .finally(() =>{
@@ -273,8 +251,8 @@ export default class AppModuleController extends BaseController {
         if(row.ipAddress&&row.moduleName){ 
             this.stopBtnLoading = true;
             let params={
-                "ipAddress":row.ipAddress,
-                "moduleName":row.moduleName
+                "ipAddress": row.ipAddress,
+                "moduleName": row.moduleName
             }
             this.deployService.stopAppModule(params)
                 .then((winResponseData: WinResponseData) =>{
@@ -284,7 +262,7 @@ export default class AppModuleController extends BaseController {
                             this.queryDevices(this.pageDataList[rowIndex],rowIndex);
                         }
                     } else {
-                        this.win_message_error(row.ipAddress+"机器服务查询异常："+winResponseData.msg);
+                        this.win_message_box_error(row.ipAddress+"机器服务查询异常："+winResponseData.msg);
                     }
                 })
                 .finally(() =>{

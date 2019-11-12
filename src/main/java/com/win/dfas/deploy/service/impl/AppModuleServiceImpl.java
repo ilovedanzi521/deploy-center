@@ -16,8 +16,10 @@ import com.win.dfas.deploy.dto.DeviceModuleRefDTO;
 import com.win.dfas.deploy.dto.StatisticsDTO;
 import com.win.dfas.deploy.dto.SubInstanceDTO;
 import com.win.dfas.deploy.po.AppModulePO;
+import com.win.dfas.deploy.schedule.Scheduler;
 import com.win.dfas.deploy.schedule.bean.DeployEnvBean;
 import com.win.dfas.deploy.service.AppModuleService;
+import com.win.dfas.deploy.service.DeviceModuleService;
 import com.win.dfas.deploy.service.ScheduleCenterService;
 import com.win.dfas.deploy.util.DeployUtils;
 import com.win.dfas.deploy.util.SpringContextUtils;
@@ -50,6 +52,8 @@ public class AppModuleServiceImpl extends ServiceImpl<AppModuleDao, AppModulePO>
 
     @Autowired
     private ScheduleCenterService mScheduleService;
+    @Autowired
+    private DeviceModuleService deviceModuleService;
 
     @Autowired
     private Environment env;
@@ -174,8 +178,45 @@ public class AppModuleServiceImpl extends ServiceImpl<AppModuleDao, AppModulePO>
         return dto;
     }
 
+    @Override
+    public Boolean safeRemove(Long id) {
+        beforeRemoveSafeValid(id);
+        return this.removeById(id);
+    }
+
+    @Override
+    public Boolean safeRemoveBatch(List<Long> ids) {
+        for (Long id : ids) {
+            beforeRemoveSafeValid(id);
+        }
+        return this.removeByIds(ids);
+    }
+
+    /**
+     * 删除之前必须进行安全验证
+     * 1.是否存在。
+     * 2.是否已经部署。已经部署的应用需要先卸载再删除。
+     * 3.删除应用前先删除调度中心记录
+     * @param moduleId
+     */
+    private void beforeRemoveSafeValid(Long moduleId) {
+        AppModulePO appModulePO = this.getById(moduleId);
+        if (appModulePO==null){
+            throw new BaseException("应用模块["+moduleId+"]已经不存在！");
+        }
+        QueryWrapper queryWrapper=new QueryWrapper();
+        queryWrapper.eq("module_id",moduleId);
+        int count = this.deviceModuleService.count(queryWrapper);
+        if (count>0){
+            throw new BaseException("应用模块["+appModulePO.getName()+"]已经部署，无法安全删除！");
+        }
+        //删除调度中心应用模块内存记录
+        Scheduler.get().getAppManager().removeModuleByPath(appModulePO.getPath());
+    }
+
     /**
      * 上传文件到ftp仓库
+     * TODO: 暂时将ftp仓库和部署中心放在一台机器，无需进行ftp远程上传存储
      * @param file
      * @return
      */

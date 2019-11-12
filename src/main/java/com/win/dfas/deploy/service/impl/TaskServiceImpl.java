@@ -166,7 +166,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskPO> implements Tas
             detailVO.setCreateTime(taskDTO.getCreateTime());
 
             // 2. 查策略绑定应用模块列表
-            detailVO.setAppModules(strategyService.getAppModules(taskDTO.getStrategy()));
+            detailVO.setAppModules(strategyService.getAppModulesByStrategyPath(taskDTO.getStrategy().getPath()));
             //3.查组设备列表
             detailVO.setDevices(groupService.getDevicesByGroupId(taskDTO.getGroupId()));
             //4.查日志详情
