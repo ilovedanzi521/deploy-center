@@ -1,8 +1,10 @@
 package com.win.dfas.deploy.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.win.dfas.common.vo.BaseReqVO;
 import com.win.dfas.deploy.po.DevicePO;
 import com.win.dfas.deploy.vo.request.DeviceReqVO;
+import com.win.dfas.deploy.vo.response.PageVO;
 
 import java.util.List;
 
@@ -41,4 +43,11 @@ public interface DeviceService extends IService<DevicePO> {
      * @return
      */
     Boolean safeRemoveBatch(List<Long> ids);
+
+    /**
+     * 查分页列表
+     * @param reqVO
+     * @return
+     */
+    PageVO<DevicePO> getPageInfo(BaseReqVO reqVO);
 }

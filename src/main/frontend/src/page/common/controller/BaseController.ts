@@ -29,7 +29,6 @@ import {
     WinButtonGroup,
     WinFold
 } from "win-plus";
-import { WinDicSelect } from "@win-frond-frameworks/trade-biz";
 
 //新增抽出来的业务组件
 //新增抽出来的业务组件
@@ -60,7 +59,6 @@ import PageVO from "../vo/PageVO";
         WinCheckbox,
         WinTree,
         WinAutocomplete,
-        WinDicSelect,
         WinDivider,
         WinSelectTable,
         WinButtonGroup,

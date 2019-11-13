@@ -6,6 +6,7 @@ export const DialogTitleConst={
     GROUP_ADD: "新增设备组",
     GROUP_EDIT: "编辑设备组",
     DEVICE_ADD:"新增设备",
+    DEVICE_EDIT: "编辑设备",
     APP_UPLOAD: "上传应用模块",
     TASK_ADD: "添加任务",
     TASK_DETAIL: "查看任务详情日志"

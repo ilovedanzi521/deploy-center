@@ -7,6 +7,7 @@ import DeployGroup from "@/page/deploy/view/group.vue";
 import DeployAppModule from "@/page/deploy/view/appModule.vue";
 import DeployTask from "@/page/deploy/view/task.vue";
 import StrategyManagement from "@/page/deploy/view/strategyManagement.vue";
+import DeviceManagement from "@/page/deploy/view/device.vue";
 
 const routers = [
     {
@@ -43,6 +44,11 @@ const routers = [
                 path: "/deploy/strategy",
                 name: "strategyManagement",
                 component: StrategyManagement,
+            },
+            {
+                path: "/deploy/device",
+                name: "deviceManagement",
+                component: DeviceManagement,
             },
         ]
     },

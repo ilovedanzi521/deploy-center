@@ -124,7 +124,7 @@ export default class GroupController extends BaseController {
        
         if(delGroupIds.length>0){
             const h = this.$createElement;
-            let msg =  h('p', null, [h('span', null, '确认删除设置组：'),h('i', { style: 'color: red' }, groupNames)]);
+            let msg =  h('p', null, [h('span', null, '确认删除选中设备：'),h('i', { style: 'color: red' }, groupNames)]);
             this.win_message_box_warning(msg,"提示")
                 .then(() => {
                     this.deployService.removeGroupBatch(delGroupIds)

@@ -1,27 +1,17 @@
 package com.win.dfas.deploy.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.win.dfas.common.vo.BaseRepVO;
+import com.win.dfas.common.vo.BaseReqVO;
 import com.win.dfas.common.vo.WinResponseData;
 import com.win.dfas.deploy.common.annotation.SysLog;
-import com.win.dfas.deploy.common.validator.ValidatorUtils;
-import com.win.dfas.deploy.common.validator.group.AddGroup;
-import com.win.dfas.deploy.po.DeviceModuleRefPO;
 import com.win.dfas.deploy.po.DevicePO;
-import com.win.dfas.deploy.schedule.Scheduler;
-import com.win.dfas.deploy.schedule.context.ScheduleContext;
-import com.win.dfas.deploy.service.DeviceModuleService;
 import com.win.dfas.deploy.service.DeviceService;
 import com.win.dfas.deploy.service.ScheduleCenterService;
-import com.win.dfas.deploy.vo.request.DeviceReqVO;
+import com.win.dfas.deploy.vo.response.PageVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.Null;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * @包名 com.win.dfas.deploy.controller
@@ -89,5 +79,11 @@ public class DeviceController extends BaseController<DevicePO> {
             return WinResponseData.handleError("请先添加设备!");
         }
         return connectTest(dev);
+    }
+
+    @PostMapping("/pageList")
+    public WinResponseData pageList(@RequestBody BaseReqVO baseReqVO) {
+        PageVO<DevicePO> pageVO = this.deviceService.getPageInfo(baseReqVO);
+        return WinResponseData.handleSuccess(pageVO);
     }
 }

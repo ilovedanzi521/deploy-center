@@ -114,4 +114,10 @@ export default class DeployService {
     removeDeviceBatch(ids: number[]): Promise<WinResponseData> {
         return AxiosFun.post(DeployBaseUrl +"/device/safeRemoveBatch",ids);
     }
+    devicePageList(vo:QueryReqVO): Promise<WinResponseData> {
+        return AxiosFun.post(DeployBaseUrl +"/device/pageList", vo);
+    }
+    updateDevice(vo:DeviceRepVO): Promise<WinResponseData> {
+        return AxiosFun.post(DeployBaseUrl +"/device/saveOrUpdate", vo);
+    }
 }

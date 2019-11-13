@@ -1,7 +1,9 @@
 package com.win.dfas.deploy.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.win.dfas.common.vo.BaseReqVO;
 import com.win.dfas.deploy.common.enumerate.DeviceEnum;
 import com.win.dfas.deploy.common.exception.BaseException;
 import com.win.dfas.deploy.common.validator.ValidatorUtils;
@@ -14,10 +16,9 @@ import com.win.dfas.deploy.service.DeviceModuleService;
 import com.win.dfas.deploy.service.DeviceService;
 import com.win.dfas.deploy.service.GroupDeviceRefService;
 import com.win.dfas.deploy.service.ScheduleCenterService;
-import com.win.dfas.deploy.util.SpringContextUtils;
+import com.win.dfas.deploy.vo.response.PageVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -139,5 +140,15 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DevicePO> implemen
             beforeSafeRemove(id);
         }
         return this.removeByIds(ids);
+    }
+
+
+    @Override
+    public PageVO<DevicePO> getPageInfo(BaseReqVO reqVO) {
+        Page<DevicePO> page = new Page<>(reqVO.getReqPageNum(), reqVO.getReqPageSize());
+        QueryWrapper<DevicePO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.orderByDesc("create_time");
+        this.baseMapper.selectPage(page, queryWrapper);
+        return new PageVO<>(page);
     }
 }
