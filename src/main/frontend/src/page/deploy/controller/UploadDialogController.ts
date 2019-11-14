@@ -46,8 +46,9 @@ export default class UploadDialogController extends BaseController{
     // 上传前处理
     private beforeUpload(file){
         const isXZIP = file.type === MimeTypeConst.XZIP;
+        const isZIP = file.type === MimeTypeConst.ZIP;
         const isLt1G = file.size / 1024 / 1024 / 1024 < 1;
-        if (!isXZIP) {
+        if (!isXZIP && !isZIP) {
             this.win_message_box_error('上传文件只能是 zip 格式!');
           }
           if (!isLt1G) {
