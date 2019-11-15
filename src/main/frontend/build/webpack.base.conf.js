@@ -11,7 +11,7 @@ function resolve(dir) {
 module.exports = {
     context: path.resolve(__dirname, "../"),
     entry: {
-        app: "./src/main.ts"
+        index: "./src/main.ts"
     },
     output: {
         path: config.build.assetsRoot,
@@ -38,8 +38,7 @@ module.exports = {
                 loader: "babel-loader",
                 include: [
                     resolve("src"),
-                    resolve("test"),
-                    resolve("node_modules/webpack-dev-server/client")
+                    resolve("test")
                 ]
             },
             {
@@ -75,7 +74,13 @@ module.exports = {
             {
                 test: /\.tsx?$/,
                 loader: "ts-loader",
-                // exclude: /node_modules/,
+                include: [
+                    resolve("src"),
+                    resolve("test"),
+                    resolve("node_modules/win-biz"),
+                    resolve("node_modules/win-plus"),
+                    resolve("node_modules/element-ui")
+                ],
                 options: {
                     appendTsSuffixTo: [/\.vue$/],
                     transpileOnly: true

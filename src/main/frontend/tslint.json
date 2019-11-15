@@ -3,7 +3,7 @@
     "globals": {
         "require": true
     },
-    "defaultSeverity": "warning",
+    "defaultSeverity": "none",
     "rules": {
         "trailing-comma": [
             false,

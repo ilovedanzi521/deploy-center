@@ -13,3 +13,5 @@ deploy-center:
   ftpPswd: ftp
   ftpRepoDir: /pub/repo
   ftpTempDir: /temp
+server:
+  port: 9000

@@ -1,12 +1,13 @@
 import {WinResponseData} from "../../common/vo/BaseVO";
 import AxiosFun from "win-biz";
 import {DeviceRepVO, DeviceReqVO, GroupQueryVO, GroupReqVO} from "../vo/GroupVO";
-import { DeployBaseUrl } from "../const/DeployConst";
 import { TaskReqVO } from "../vo/TaskVO";
 import { QueryReqVO } from "../vo/DeployVO";
 import { LogQueryReqVO } from "../vo/LogVO";
+import { DeployBaseUrl } from "../const/DeployConst";
 
 export default class DeployService {
+
     indexAppInstanceStatistics(): Promise<WinResponseData> {
         return AxiosFun.get(DeployBaseUrl +"/index/statistics/appInstance", null);
     }

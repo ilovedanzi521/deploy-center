@@ -1,69 +1,56 @@
 import {Layout} from "win-biz";
-import Login from "@/page/login/view/index.vue";
-import Home from "@/page/home/view/index.vue";
 import Directional from "@/page/fram/view/Directional.vue";
-import DeployIndex from "@/page/deploy/view/index.vue";
-import DeployGroup from "@/page/deploy/view/group.vue";
-import DeployAppModule from "@/page/deploy/view/appModule.vue";
-import DeployTask from "@/page/deploy/view/task.vue";
-import StrategyManagement from "@/page/deploy/view/strategyManagement.vue";
+import asyncChunks from "../async-chunks";
+
 import DeviceManagement from "@/page/deploy/view/device.vue";
 
 const routers = [
-    {
+	{
         path: "/",
         name: "layout",
-        component: Layout,
+        component: () => asyncChunks.winBiz("Layout"),
         children: [
             {
                 path: "/directional",
                 name: "directional",
-                component: Directional
-            },
-            {
-                path: "/deploy/index",
-                name: "deployIndex",
-                component: DeployIndex,
-            },
-            {
-                path: "/deploy/group",
-                name: "deployGroup",
-                component: DeployGroup,
-            },
-            {
-                path: "/deploy/appmodule",
-                name: "deployAppModule",
-                component: DeployAppModule,
-            },
-            {
-                path: "/deploy/task",
-                name: "deployTask",
-                component: DeployTask,
-            },
-            {
-                path: "/deploy/strategy",
-                name: "strategyManagement",
-                component: StrategyManagement,
-            },
-            {
-                path: "/deploy/device",
-                name: "deviceManagement",
-                component: DeviceManagement,
-            },
+                component: () => asyncChunks.winBiz("Directional")
+            }
         ]
-    },
-    {
-        path: "/login",
-        name: "login",
-        component: Login
-    },
+    }
 ];
+
+
 
 const routerChildren = [
     {
-        path: "/home",
-        name: "home",
-        component: Home
+        path: "/deploy/index",
+        name: "deployIndex",
+        component: asyncChunks.DeployIndex
+    },
+    {
+        path: "/deploy/group",
+        name: "deployGroup",
+        component: asyncChunks.DeployGroup
+    },
+    {
+        path: "/deploy/device",
+        name: "deployDevice",
+        component: asyncChunks.DeployDevice
+    },
+    {
+        path: "/deploy/appmodule",
+        name: "deployAppModule",
+        component: asyncChunks.DeployAppModule
+    },
+    {
+        path: "/deploy/strategy",
+        name: "strategyManagement",
+        component: asyncChunks.StrategyManagement
+    },
+    {
+        path: "/deploy/task",
+        name: "deployTask",
+        component: asyncChunks.DeployTask
     },
 ];
 

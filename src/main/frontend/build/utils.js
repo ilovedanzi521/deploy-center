@@ -1,10 +1,10 @@
 "use strict";
 const path = require("path");
 const config = require("../config");
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const packageConfig = require("../package.json");
 
-exports.assetsPath = function(_path) {
+exports.assetsPath = function (_path) {
     const assetsSubDirectory =
         process.env.NODE_ENV === "production"
             ? config.build.assetsSubDirectory
@@ -13,7 +13,7 @@ exports.assetsPath = function(_path) {
     return path.posix.join(assetsSubDirectory, _path);
 };
 
-exports.cssLoaders = function(options) {
+exports.cssLoaders = function (options) {
     options = options || {};
 
     const cssLoader = {
@@ -48,11 +48,12 @@ exports.cssLoaders = function(options) {
         // Extract CSS when that option is specified
         // (which is the case during production build)
         if (options.extract) {
-            return ExtractTextPlugin.extract({
-                use: loaders,
-                fallback: "vue-style-loader",
-                publicPath: "../../"
-            });
+            return [{
+                loader: MiniCssExtractPlugin.loader,
+                options: {
+                    publicPath: '../../'
+                }
+            }].concat(loaders)
         } else {
             return ["vue-style-loader"].concat(loaders);
         }
@@ -76,11 +77,12 @@ exports.cssLoaders = function(options) {
             }
         ];
         if (options.extract) {
-            return ExtractTextPlugin.extract({
-                use: loaders,
-                fallback: "vue-style-loader",
-                publicPath: "../../"
-            });
+            return [{
+                loader: MiniCssExtractPlugin.loader,
+                options: {
+                    publicPath: '../../'
+                }
+            }].concat(loaders)
         } else {
             return ["vue-style-loader"].concat(loaders);
         }
@@ -99,7 +101,7 @@ exports.cssLoaders = function(options) {
 };
 
 // Generate loaders for standalone style files (outside of .vue)
-exports.styleLoaders = function(options) {
+exports.styleLoaders = function (options) {
     const output = [];
     const loaders = exports.cssLoaders(options);
 

@@ -1,7 +1,7 @@
 server:
   port: 8888 #本地开发环境时用，生产部署时，应该设置为0，系统随机创建端口
-  servlet:
-    context-path: /dfas-deploy-center
+#  servlet:
+#    context-path: /dfas-deploy-center
 spring:
   profiles:
     active: dev
@@ -11,6 +11,14 @@ spring:
     multipart:
       max-request-size: 1GB
       max-file-size: 1GB
+  cloud:
+    config:
+      name: common,${spring.application.name}
+      label: ${spring.profiles.active:dev} #对应前配置文件的git分支 #/{label}/{application}-{profile}.yml
+      profile: ${spring.profiles.active:dev} #对应前配置文件中的{profile}部分
+      discovery:
+        enabled: true #开启配置中心服务发现
+        serviceId: dfas-config-center #配置中心的servieId，即服务名
   ## h2数据库配置
   datasource:
     driverClassName: org.h2.Driver
@@ -20,7 +28,7 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     #进行该配置后，每次启动程序，程序都会运行resources/db/schema-h2文件，对数据库的结构进行操作，相当于新建一个表。
     schema: classpath:db/schema-h2.sql
-    #进行该配置后，每次启动程序，程序都会运行resources/data.sql文件，对数据库的数据操作，相当于往表中插入数据。
+    #进行该配置后，每次启动程序(重启)，程序都会运行resources/data.sql文件，对数据库的数据操作，相当于往表中插入数据。
 #    data: classpath:db/data.sql
     druid:
       initial-size: 10
@@ -58,12 +66,18 @@ spring:
       path: /db
       #网页访问开关，默认false
       enabled: true
-  #出现错误时, 直接抛出异常
-#  mvc:
-#    throw-exception-if-no-handler-found: true
-  #不要为我们工程中的资源文件建立映射
-#  resources:
-#    add-mappings: false
+eureka:
+  instance:
+    lease-renewal-interval-in-seconds: 10 # 续约更新时间间隔（默认是30秒）
+    lease-expiration-duration-in-seconds: 30 #服务失效时间。默认是90秒，也就是如果Eureka Server在90秒内没有接收到来自ServiceProvider的Renew操作，就会把Service Provider剔除
+    instance-id: ${spring.cloud.client.hostname}:${spring.cloud.client.ipAddress}:${random.int} #设置实例名
+    prefer-ip-address: true #使用IP地址来做注册中心地址
+  client:
+    InitialInstanceInfoReplicationIntervalSeconds: 1 #最初复制实例信息到eureka服务器所需的时间（s），默认为40秒
+    InstanceInfoReplicationIntervalSeconds: 10 #复制实例变化信息到eureka服务器所需要的时间间隔（s），默认为30秒
+    RegistryFetchIntervalSeconds: 10 #从eureka服务器注册表中获取注册信息的时间间隔（s），默认为30秒
+    service-url:
+      defaultZone: http://192.168.0.60:10010/eureka/ #配置服务注册中心 多个用逗号分隔
 mybatis-plus:
   # 扫描 mapper.xml
   mapper-locations: classpath:/mapper/**/*Mapper.xml

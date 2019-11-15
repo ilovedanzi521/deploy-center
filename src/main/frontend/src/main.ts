@@ -7,18 +7,22 @@ import "xe-utils";
 import App from "./App.vue";
 import router from "./router/index";
 import store from "./store/index";
-import { PluginsPage } from "win-biz";
-import "win-plus/dist/static/index.css";
+import { winBiz } from "./async-chunks";
+
+winBiz("PluginsPage").then(PluginsPage => {
+    Vue.use(PluginsPage, { store });
+});
+
+import XEUtils from "xe-utils";
+import VXEUtils from "vxe-utils";
 
 Vue.use(VueDND);
 Vue.use(ElementUI);
-Vue.use(PluginsPage);
+Vue.use(VXEUtils, XEUtils);
 
-Vue.config.productionTip = false;
 Vue.config.productionTip = false;
 let $env = process.env.NODE_ENV;
 Vue.prototype.$env = $env;
-
 
 //全局锁屏判断
 router.beforeEach((to, from, next) => {
